@@ -1,0 +1,88 @@
+using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+
+namespace Noname.GameAbilitySystem
+{
+    /// <summary>
+    /// ê²Œì„?Œë ˆ???œê·¸ ë¬¸ì??? í‹¸ë¦¬í‹°?…ë‹ˆ??(?œìˆ˜ C#).
+    /// Unity???˜ì¡´?˜ì? ?Šìœ¼ë©?Host ?˜ê²½?ì„œ ?¬ìš© ê°€?¥í•©?ˆë‹¤.
+    /// </summary>
+    public static class GameplayTagUtility
+    {
+        public static bool IsValidTagString(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return false;
+            if (value[0] == '.' || value[value.Length - 1] == '.')
+                return false;
+
+            var previousDot = false;
+            for (var i = 0; i < value.Length; i++)
+            {
+                var c = value[i];
+                if (c == '.')
+                {
+                    if (previousDot) return false;
+                    previousDot = true;
+                    continue;
+                }
+                if (!IsAllowedTagChar(c)) return false;
+                previousDot = false;
+            }
+            return !previousDot;
+        }
+
+        public static IEnumerable<string> EnumerateParents(string value)
+        {
+            if (string.IsNullOrEmpty(value)) yield break;
+            var index = value.Length;
+            while ((index = value.LastIndexOf('.', index - 1)) >= 0)
+                yield return value.Substring(0, index);
+        }
+
+        public static IEnumerable<string> EnumerateTagAndParents(string value)
+        {
+            if (string.IsNullOrEmpty(value)) yield break;
+            yield return value;
+            foreach (var parent in EnumerateParents(value))
+                yield return parent;
+        }
+
+        public static bool IsDescendant(string child, string parent)
+        {
+            if (string.IsNullOrEmpty(child) || string.IsNullOrEmpty(parent))
+                return false;
+            if (parent.Length >= child.Length)
+                return false;
+            return child.StartsWith(parent, StringComparison.Ordinal) && child[parent.Length] == '.';
+        }
+
+        //TagUtilityê°€ ?„ë‹ˆ?´ë„ ? ë“¯. ?´ë°?œë„ ?¸ì¼ ?ê¸°ë©???¸°??
+        public static int Fnv1a32(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                return 0;
+            
+            const uint offset = 2166136261;
+            const uint prime = 16777619;
+            uint hash = offset;
+
+            for (int i = 0; i < value.Length; i++)
+            {
+                hash ^= value[i];
+                hash *= prime;
+            }
+
+            return unchecked((int)hash);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool IsAllowedTagChar(char c)
+        {
+            return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_';
+        }
+
+    }
+}
+

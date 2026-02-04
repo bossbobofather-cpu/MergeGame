@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(dir /B /S \"c:\\\\Users\\\\user\\\\OneDrive\\\\바탕 화면\\\\Noname\\\\UpmPackages\\\\com.noname.gameabilitysystem.plugin\\\\Runtime\\\\Presentation\\\\Task\")",
+      "Bash(dir /B /S \"c:\\\\Users\\\\user\\\\OneDrive\\\\바탕 화면\\\\Noname\\\\UpmPackages\\\\com.noname.gameabilitysystem.plugin\\\\Runtime\\\\Presentation\\\\Target\")",
+      "Bash(dir:*)",
+      "Bash(del:*)",
+      "Bash(xargs rm -f)",
+      "Bash(tree:*)",
+      "Bash(findstr:*)",
+      "Bash(\"build-domain.bat\")",
+      "Bash(cmd.exe /c \"cd /d \"\"C:\\\\Users\\\\user\\\\OneDrive\\\\바탕 화면\\\\GameCore\"\" && build-domain.bat\")",
+      "Bash(dotnet build:*)"
+    ],
+    "additionalDirectories": [
+      "c:\\Users\\user\\OneDrive\\바탕 화면\\Noname\\UpmPackages\\com.noname.gameabilitysystem.plugin\\Runtime\\Domain\\Snapshots"
+    ]
+  }
+}

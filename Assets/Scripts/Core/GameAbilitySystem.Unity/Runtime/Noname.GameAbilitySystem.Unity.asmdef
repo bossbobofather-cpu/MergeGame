@@ -1,0 +1,16 @@
+{
+  "name": "Noname.GameAbilitySystem.Unity",
+  "rootNamespace": "Noname.GameAbilitySystem.Unity",
+  "references": [
+    "Noname.GameAbilitySystem"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

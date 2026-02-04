@@ -1,0 +1,20 @@
+{
+  "name": "Noname.MergeGame.Unity",
+  "rootNamespace": "Noname.MergeGame.Unity",
+  "references": [
+    "Noname.MergeGame",
+    "Noname.GameAbilitySystem",
+    "Noname.GameAbilitySystem.Unity",
+    "Noname.GameHost",
+    "Noname.Shared.Unity"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

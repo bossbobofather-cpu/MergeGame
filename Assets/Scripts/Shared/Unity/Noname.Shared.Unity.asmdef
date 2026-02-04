@@ -1,0 +1,16 @@
+{
+  "name": "Noname.Shared.Unity",
+  "rootNamespace": "Noname.Shared.Unity",
+  "references": [
+    "Noname.GameHost"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
