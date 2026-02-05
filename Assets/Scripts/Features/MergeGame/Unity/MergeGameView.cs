@@ -1,16 +1,15 @@
-using System;
 using MyProject.Common.GameMode;
 using MyProject.Common.UI;
 using MyProject.MergeGame.Commands;
 using UnityEngine;
 
-namespace MyProject.MergeGame.Presentation
+namespace MyProject.MergeGame.Unity
 {
     /// <summary>
-    /// MergeGame의 프레젠테이션 모드입니다.
-    /// 호스트 이벤트를 수신해 시스템 메시지로 출력합니다.
+    /// MergeGame의 뷰입니다.
+    /// 호스트 이벤트를 수신해 모듈에 라우팅하고 시스템 메시지로 출력합니다.
     /// </summary>
-    public class MergeGameMode : GameMode<MergeCommand, MergeCommandResult, MergeHostEvent, MergeHostSnapshot>
+    public class MergeGameView : GameMode<MergeCommand, MergeCommandResult, MergeHostEvent, MergeHostSnapshot>
     {
         [SerializeField] private long _localUserId = 1;
 
@@ -24,6 +23,11 @@ namespace MyProject.MergeGame.Presentation
 
         private MergeHostSnapshot _latestSnapshot = null;
         private long _latestSnapshotTick = -1;
+
+        /// <summary>
+        /// 최신 스냅샷입니다.
+        /// </summary>
+        public MergeHostSnapshot LatestSnapshot => _latestSnapshot;
 
         protected override void OnInitialize()
         {
@@ -55,30 +59,14 @@ namespace MyProject.MergeGame.Presentation
 
             _latestSnapshot = snapshot;
             _latestSnapshotTick = snapshot.Tick;
+
+            // 모듈에 스냅샷 전파
+            RouteSnapshotToModules(snapshot);
         }
 
         private void CheckInput()
         {
-            // if (_latestSnapshot == null || _latestSnapshot.SessionPhase != MergeSessionPhase.Playing)
-            // {
-            //     return;
-            // }
-
-            // var keyboard = Keyboard.current;
-            // if (keyboard == null)
-            // {
-            //     return;
-            // }
-
-            // // Space: 유닛 스폰
-            // if (keyboard.spaceKey.wasPressedThisFrame)
-            // {
-            //     Host?.SendCommand(new SpawnUnitCommand(_localUserId));
-            // }
-
-            // // 1-9: 슬롯 선택 (머지용)
-            // // 간단한 예시: 1번 키로 첫 번째 슬롯, 2번 키로 두 번째 슬롯 선택 후 머지
-            // // 실제 구현에서는 드래그앤드롭 UI가 필요합니다.
+            // 인풋 모듈에서 처리 예정
         }
 
         protected override void OnHostResult(MergeCommandResult result)
@@ -99,8 +87,16 @@ namespace MyProject.MergeGame.Presentation
         /// </summary>
         protected override void OnHostEvent(MergeHostEvent evt)
         {
+            // 모듈에 이벤트 전파
+            RouteEventToModules(evt);
+
+            // 로그 출력
             switch (evt)
             {
+                case MapInitializedEvent e:
+                    PublishMessage($"[맵 초기화] MapId: {e.MapId}, 슬롯: {e.SlotPositions.Count}, 경로: {e.Paths.Count}", _startColor);
+                    break;
+
                 case MergeGameStartedEvent e:
                     PublishMessage($"[게임 시작] 슬롯 수: {e.SlotCount}", _startColor);
                     break;
@@ -129,13 +125,39 @@ namespace MyProject.MergeGame.Presentation
             }
         }
 
+        #region Module Routing
+
+        private void RouteEventToModules(MergeHostEvent evt)
+        {
+            for (var i = 0; i < Modules.Count; i++)
+            {
+                if (Modules[i] is IMergeViewModule viewModule)
+                {
+                    viewModule.OnHostEvent(evt);
+                }
+            }
+        }
+
+        private void RouteSnapshotToModules(MergeHostSnapshot snapshot)
+        {
+            for (var i = 0; i < Modules.Count; i++)
+            {
+                if (Modules[i] is IMergeViewModule viewModule)
+                {
+                    viewModule.OnSnapshotUpdated(snapshot);
+                }
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// 시스템 메시지로 로그를 출력합니다.
         /// </summary>
         private void PublishMessage(string message, Color color)
         {
             SystemMessageBus.Publish(message, color);
-            Debug.Log($"[MergeGame] {message}");
+            Debug.Log($"[MergeGameView] {message}");
         }
 
         /// <summary>
@@ -145,11 +167,5 @@ namespace MyProject.MergeGame.Presentation
         {
             PublishMessage(message, _logColor);
         }
-
-        internal void Initialize(MergeGameHost mergeGameHost)
-        {
-            throw new NotImplementedException();
-        }
-
     }
 }

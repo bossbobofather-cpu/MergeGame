@@ -1,17 +1,17 @@
 using MyProject.Common.Bootstrap;
 using UnityEngine;
 
-namespace MyProject.MergeGame.Presentation
+namespace MyProject.MergeGame.Unity
 {
     /// <summary>
-    /// MergeGame 모드를 생성하고 시작하기를 담당하는 부트스트래퍼입니다.
+    /// MergeGame 뷰를 생성하고 시작하기를 담당하는 부트스트래퍼입니다.
     /// </summary>
     public class MergeGameBootstrapper : BootstrapperBase
     {
         [SerializeField] private MergeHostConfig _config;
-        [SerializeField] private MergeGameMode _gameModePrefab;
+        [SerializeField] private MergeGameView _gameViewPrefab;
 
-        private MergeGameMode _gameModeInstance;
+        private MergeGameView _gameViewInstance;
 
         protected override void OnInit()
         {
@@ -22,22 +22,22 @@ namespace MyProject.MergeGame.Presentation
 
         private void CreateGameMode()
         {
-            if (_gameModePrefab == null)
+            if (_gameViewPrefab == null)
             {
-                Debug.LogError("GameMode Prefab이 설정되지 않았습니다.");
+                Debug.LogError("GameView Prefab이 설정되지 않았습니다.");
                 return;
             }
 
-            // 게임 모드 프리팹을 생성합니다.
-            var instance = Instantiate(_gameModePrefab);
+            // 게임 뷰 프리팹을 생성합니다.
+            var instance = Instantiate(_gameViewPrefab);
             if (instance == null)
             {
-                Debug.LogError("GameMode 인스턴스 생성에 실패했습니다.");
+                Debug.LogError("GameView 인스턴스 생성에 실패했습니다.");
                 return;
             }
 
-            _gameModeInstance = instance;
-            _gameModeInstance.Initialize(new MergeGameHost(_config));
+            _gameViewInstance = instance;
+            _gameViewInstance.Initialize(new MergeGameHost(_config));
         }
     }
 }

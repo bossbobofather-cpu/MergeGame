@@ -4,8 +4,8 @@ using System.Collections.Generic;
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// AbilitySystemComponent ?�태 모델?�니??(?�수 C# 모델).
-    /// Unity???�존?��? ?�으�?Host ?�경?�서 ?�레???�전?�게 ?�작?�니??
+    /// AbilitySystemComponent 상태 모델입니다 (순수 C# 모델).
+    /// Unity에 의존하지 않으며 Host 환경에서 스레드 안전하게 동작합니다.
     /// </summary>
     public sealed class AbilitySystemComponent : IDisposable
     {
@@ -16,7 +16,7 @@ namespace Noname.GameAbilitySystem
             public float EndTime;
         }
 
-        private IAbilitySystemOwner _onwer;
+        private IAbilitySystemOwner _owner;
 
         private readonly object _modelLock = new();
         private readonly AttributeSet _attributes;
@@ -30,18 +30,17 @@ namespace Noname.GameAbilitySystem
         private int _nextAbilityHandleId = 1;
 
         /// <summary>
-        /// ?�성 컨테?�너?�니?? (?�레???�전?��? ?�음 - 직접 ?�정 금�?)
+        /// 속성 컨테이너입니다. (스레드 안전하지 않음 - 직접 수정 금지)
         /// </summary>
         public AttributeSet Attributes => _attributes;
 
         /// <summary>
-        /// ?�유 ?�그 컨테?�너?�니?? (?�레???�전?��? ?�음 - 직접 ?�정 금�?)
+        /// 소유 태그 컨테이너입니다. (스레드 안전하지 않음 - 직접 수정 금지)
         /// </summary>
         public GameplayTagContainer OwnedTags => _ownedTags;
 
         /// <summary>
-        /// ?�유???�력?�입?�다. (?�레???�전?��? ?�음 - 직접 ?�정 금�?)
-        /// </summary>
+        /// 소유한 능력입니다. (스레드 안전하지 않음 - 직접 수정 금지)
         /// </summary>
         public IReadOnlyList<GameplayAbility> Abilities => _abilities;
 
@@ -49,7 +48,7 @@ namespace Noname.GameAbilitySystem
         public event Action OnAddedAbility;
         public event Action<GameplayAbility, TargetData> OnActivateAbility;
 
-        public IAbilitySystemOwner Owner => _onwer;
+        public IAbilitySystemOwner Owner => _owner;
 
         public AbilitySystemComponent()
         {
@@ -68,11 +67,11 @@ namespace Noname.GameAbilitySystem
 
         public void SetOwner(IAbilitySystemOwner owner)
         {
-            _onwer = owner;
+            _owner = owner;
         }
 
         /// <summary>
-        /// ?�성 ?�과 개수?�니??
+        /// 활성 효과 개수입니다.
         /// </summary>
         public int ActiveEffectCount
         {
@@ -86,7 +85,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// 처음부??보유 ???�력???�용?�니??
+        /// 처음부터 보유한 능력을 적용합니다.
         /// </summary>
         private void ApplyStartupAbilities()
         {
@@ -111,7 +110,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�성 값을 조회?�니??
+        /// 속성 값을 조회합니다.
         /// </summary>
         public float Get(AttributeId id)
         {
@@ -122,7 +121,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�성 값을 ?�정?�니??
+        /// 속성 값을 설정합니다.
         /// </summary>
         public void Set(AttributeId id, float value)
         {
@@ -133,7 +132,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�성 값을 증감?�니??
+        /// 속성 값을 증감합니다.
         /// </summary>
         public void Add(AttributeId id, float delta)
         {
@@ -145,8 +144,8 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�성 값을 ?�센?�로 증감?�니??
-        /// ?�수 ?�센?�는 증�?, ?�수 ?�센?�는 감소�??��??�니??
+        /// 속성 값을 퍼센트로 증감합니다.
+        /// 양수 퍼센트는 증가, 음수 퍼센트는 감소를 의미합니다.
         /// </summary>
         public void AddPercent(AttributeId id, float percent)
         {
@@ -160,7 +159,7 @@ namespace Noname.GameAbilitySystem
                 var current = _attributes.Get(id);
                 var bonus = (float)System.Math.Round(current * percent);
 
-                // 최소 변?�량 보장 (버프/?�버?��? ?�무 ?��? ?�도�?
+                // 최소 변화량 보장 (버프/디버프가 너무 작지 않도록)
                 if (bonus > 0f && bonus < 1f)
                 {
                     bonus = 1f;
@@ -175,7 +174,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�력??추�??�니??
+        /// 능력을 추가합니다.
         /// </summary>
         public FGameplayAbilitySpecHandle GiveAbility(GameplayAbility ability)
         {
@@ -191,10 +190,10 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�들???�해 ?�력???�거?�니??
+        /// 핸들을 통해 능력을 제거합니다.
         /// </summary>
-        /// <param name="handle"></param>
-        /// <returns></returns>
+        /// <param name="handle">제거할 능력의 핸들</param>
+        /// <returns>제거 성공 여부</returns>
         public bool RemoveAbility(FGameplayAbilitySpecHandle handle)
         {
             lock (_modelLock)
@@ -220,10 +219,10 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�력???�거?�니??
+        /// 능력을 제거합니다.
         /// </summary>
-        /// <param name="handle"></param>
-        /// <returns></returns>
+        /// <param name="ability">제거할 능력</param>
+        /// <returns>제거 성공 여부</returns>
         public bool RemoveAbility(GameplayAbility ability)
         {
             lock (_modelLock)
@@ -231,7 +230,7 @@ namespace Noname.GameAbilitySystem
                 for (var i = _abilitySpecs.Count - 1; i >= 0; i--)
                 {
                     var spec = _abilitySpecs[i];
-                    if (spec.AbilityTag.Equals(ability.AbilityTag)) continue;
+                    if (!spec.AbilityTag.Equals(ability.AbilityTag)) continue;
 
                     var lastIndex = _abilitySpecs.Count - 1;
                     if (i < lastIndex)
@@ -248,19 +247,17 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�정 ?�그�?가�??�력???�성???�도?�니?? ?�러 개일 ???�습?�다.
+        /// 특정 태그를 가진 능력의 활성화를 시도합니다. 여러 개일 수 있습니다.
         /// </summary>
-        /// <param name="abilityTag">?�력 ?�그</param>
-        /// <returns>?�성???�공 ?��?</returns>
+        /// <param name="abilityTag">능력 태그</param>
+        /// <returns>활성화 성공 여부</returns>
         public bool TryActivateAbilityByTag(FGameplayTag abilityTag)
         {
-            // ?�그가 ?�함???�펙??모두 ?�도?�다.
+            // 태그가 일치하는 스펙을 모두 시도한다.
             var bSuccess = false;
             foreach (var spec in _abilitySpecs)
             {
                 if (spec == null) continue;
-                if (!spec.AbilityTag.Equals(abilityTag)) continue;
-
                 if (!spec.AbilityTag.Equals(abilityTag)) continue;
 
                 bSuccess |= TryActivateAbility(spec);
@@ -270,34 +267,34 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�력 ?�양?�로 ?�력???�성???�도?�니??
-        /// TargetContext ?�이 ?�출?�면 ?�겟팅 ?�이 진행?�니??
+        /// 능력 스펙으로 능력 활성화를 시도합니다.
+        /// TargetContext 없이 호출하면 타겟팅 없이 진행합니다.
         /// </summary>
-        /// <param name="spec">?�력 ?�양</param>
-        /// <returns>?�성???�공 ?��?</returns>
+        /// <param name="spec">능력 스펙</param>
+        /// <returns>활성화 성공 여부</returns>
         public bool TryActivateAbility(GameplayAbilitySpec spec)
         {
             return TryActivateAbility(spec, null, out _);
         }
 
         /// <summary>
-        /// ?�력 ?�양?�로 ?�력???�성???�도?�니??
+        /// 능력 스펙으로 능력 활성화를 시도합니다.
         /// </summary>
-        /// <param name="spec">?�력 ?�양</param>
-        /// <param name="targetContext">?�겟팅 컨텍?�트</param>
-        /// <returns>?�성???�공 ?��?</returns>
+        /// <param name="spec">능력 스펙</param>
+        /// <param name="targetContext">타겟팅 컨텍스트</param>
+        /// <returns>활성화 성공 여부</returns>
         public bool TryActivateAbility(GameplayAbilitySpec spec, TargetContext targetContext)
         {
             return TryActivateAbility(spec, targetContext, out _);
         }
 
         /// <summary>
-        /// ?�력 ?�양?�로 ?�력???�성???�도?�니??
+        /// 능력 스펙으로 능력 활성화를 시도합니다.
         /// </summary>
-        /// <param name="spec">?�력 ?�양</param>
-        /// <param name="targetContext">?�겟팅 컨텍?�트</param>
-        /// <param name="targetData">?�겟팅 결과 (out)</param>
-        /// <returns>?�성???�공 ?��?</returns>
+        /// <param name="spec">능력 스펙</param>
+        /// <param name="targetContext">타겟팅 컨텍스트</param>
+        /// <param name="targetData">타겟팅 결과 (out)</param>
+        /// <returns>활성화 성공 여부</returns>
         public bool TryActivateAbility(GameplayAbilitySpec spec, TargetContext targetContext, out TargetData targetData)
         {
             targetData = null;
@@ -307,7 +304,7 @@ namespace Noname.GameAbilitySystem
                 return false;
             }
 
-            //ASC ?�서 ?�단?�는 ?�력 ?�성??가???��?
+            // ASC에서 판단하는 능력 활성화 가능 여부
             if (!CanActivateAbility(spec))
             {
                 return false;
@@ -319,22 +316,25 @@ namespace Noname.GameAbilitySystem
                 return false;
             }
 
-            //?�력 개별?�으로도 ?�력 ?�성??가???��?�??�단?�야 ?�다�??�기??            //ability.CanActivateAbility()
+            // 능력 개별적으로도 능력 활성화 가능 여부를 판단해야 한다면 여기서
+            // ability.CanActivateAbility()
 
-            // ?�겟팅
+            // 타겟팅
             if (ability.TargetingStrategy != null && targetContext != null)
             {
-                //?�력???�겟전?�에 ?�당?�는 ?��?찾기
-                //ex) SelfTargetingStrategy : ?�기 ?�신???�겟의 ??                //ex ) NearestNEnemiesTargetingStrategy : 가??가까운 N명의 ??                targetData = ability.TargetingStrategy.FindTargets(this, targetContext);
+                // 능력의 타겟전략에 해당하는 대상 찾기
+                // ex) SelfTargetingStrategy : 자기 자신을 타겟으로
+                // ex) NearestNEnemiesTargetingStrategy : 가장 가까운 N명의 적
+                targetData = ability.TargetingStrategy.FindTargets(this, targetContext);
 
-                // ?�겟이 ?�요???�력?�데 ?�겟이 ?�으�??�패
+                // 타겟이 필요한 능력인데 타겟이 없으면 실패
                 if (targetData == null || targetData.Targets.Count == 0)
                 {
                     return false;
                 }
             }
 
-            // ?�과 ?�용
+            // 효과 적용
             if (ability.AppliedEffects != null && targetData != null)
             {
                 foreach (var effect in ability.AppliedEffects)
@@ -344,7 +344,7 @@ namespace Noname.GameAbilitySystem
                 }
             }
 
-            // 쿨다???�과 ?�용 (?�신?�게)
+            // 쿨다운 효과 적용 (자신에게)
             if (ability.CooldownEffect != null)
             {
                 ApplyEffectToSelf(ability.CooldownEffect);
@@ -357,7 +357,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�신?�게 ?�과�??�용?�니??
+        /// 자신에게 효과를 적용합니다.
         /// </summary>
         private void ApplyEffectToSelf(GameplayEffect effect)
         {
@@ -366,7 +366,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�겟들?�게 ?�과�??�용?�니??
+        /// 타겟들에게 효과를 적용합니다.
         /// </summary>
         private void ApplyEffectToTargets(GameplayEffect effect, TargetData targetData)
         {
@@ -380,33 +380,34 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�일 ?�겟에�??�과�??�용?�니??
+        /// 단일 타겟에게 효과를 적용합니다.
         /// </summary>
         private void ApplyEffectToTarget(GameplayEffect effect, AbilitySystemComponent target)
         {
             if (effect == null || target == null) return;
 
-            //?�과???�그 체크�??�니??
+            // 효과의 태그 체크를 합니다.
 
-            // ?�수 ?�그 체크
+            // 필수 태그 체크
             if (effect.RequiredTags != null && !target.OwnedTags.HasAll(effect.RequiredTags))
             {
                 return;
             }
 
-            // 차단 ?�그 체크
+            // 차단 태그 체크
             if (effect.BlockedTags != null && target.OwnedTags.HasAny(effect.BlockedTags))
             {
                 return;
             }
 
-            // ?�성 ?�정 ?�용 (this = source, target = ?�??
+            // 속성 수정 적용 (this = source, target = 대상)
             foreach (var modifier in effect.Modifiers)
             {
                 ApplyModifier(this, target, modifier);
             }
 
-            // ?�그 부??            if (effect.GrantedTags != null)
+            // 태그 부여
+            if (effect.GrantedTags != null)
             {
                 foreach (var tag in effect.GrantedTags.Tags)
                 {
@@ -414,21 +415,22 @@ namespace Noname.GameAbilitySystem
                 }
             }
 
-            // Duration ?�과??경우 ?�성 ?�과�??�록
-            // Tick?�서 만료 처리 ???�그 ?�거??            if (effect.DurationType == EffectDurationType.HasDuration && effect.Duration > 0)
+            // Duration 효과인 경우 활성 효과로 등록
+            // Tick에서 만료 처리 및 태그 제거
+            if (effect.DurationType == EffectDurationType.HasDuration && effect.Duration > 0)
             {
-                // Duration?� Effect??Duration Polciy가 ?�는 경우
-                //계산???�해 ?�정 ?�다
+                // Duration의 Effect에 Duration Policy가 있는 경우
+                // 계산을 통해 수정한다
                 target.AddActiveEffect(effect, effect.Duration);
             }
         }
 
         /// <summary>
-        /// 모디?�이?��? ?�용?�니??
+        /// 모디파이어를 적용합니다.
         /// </summary>
-        /// <param name="source">?�전??(?�과�?발동??주체)</param>
-        /// <param name="target">?�??(?�과�?받는 주체)</param>
-        /// <param name="modifier">?�용???�정??/param>
+        /// <param name="source">소스 (효과를 발동한 주체)</param>
+        /// <param name="target">타겟 (효과를 받는 주체)</param>
+        /// <param name="modifier">적용할 수정자</param>
         private void ApplyModifier(AbilitySystemComponent source, AbilitySystemComponent target, AttributeModifier modifier)
         {
             if (target == null) return;
@@ -446,7 +448,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// Static 모드 ?�정?��? ?�용?�니??
+        /// Static 모드 수정자를 적용합니다.
         /// </summary>
         private void ApplyStaticModifier(AbilitySystemComponent target, AttributeModifier modifier)
         {
@@ -468,8 +470,8 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// Calculated 모드 ?�정?��? ?�용?�니??
-        /// 계산기�? source/target ASC ?�보�?기반?�로 ?�성???�정?�니??
+        /// Calculated 모드 수정자를 적용합니다.
+        /// 계산기가 source/target ASC 정보를 기반으로 속성을 수정합니다.
         /// </summary>
         private void ApplyCalculatedModifier(AbilitySystemComponent source, AbilitySystemComponent target, AttributeModifier modifier)
         {
@@ -480,21 +482,21 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�력 ?�성??조건??검?�합?�다. (?�수 ?�그, 차단 ?�그)
+        /// 능력 활성화 조건을 검사합니다. (필수 태그, 차단 태그)
         /// </summary>
-        /// <param name="spec">검?�할 ?�력 ?�양</param>
-        /// <returns>?�성??가?�하�?true</returns>
+        /// <param name="spec">검사할 능력 스펙</param>
+        /// <returns>활성화 가능하면 true</returns>
         public bool CanActivateAbility(GameplayAbilitySpec spec)
         {
             if (spec == null) return false;
 
-            // ?�수 ?�그 체크
+            // 필수 태그 체크
             if (spec.ActivationRequiredTags != null && !OwnedTags.HasAll(spec.ActivationRequiredTags))
             {
                 return false;
             }
 
-            // 차단 ?�그 체크 (쿨다???�그???�기??체크??
+            // 차단 태그 체크 (쿨다운 태그도 여기서 체크됨)
             if (spec.ActivationBlockedTags != null && OwnedTags.HasAny(spec.ActivationBlockedTags))
             {
                 return false;
@@ -504,8 +506,8 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�성??가?�한 ?�력 ?�양 목록??반환?�니??
-        /// 쿨다?��? ActivationBlockedTags???�그 체크�?처리?�니??
+        /// 활성화 가능한 능력 스펙 목록을 반환합니다.
+        /// 쿨다운은 ActivationBlockedTags의 태그 체크로 처리합니다.
         /// </summary>
         public void GetActivatableAbilities(List<GameplayAbilitySpec> results)
         {
@@ -529,7 +531,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�력 ?�양 목록??반환?�니??
+        /// 능력 스펙 목록을 반환합니다.
         /// </summary>
         public IReadOnlyList<GameplayAbilitySpec> GetAbilitySpecs()
         {
@@ -540,7 +542,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// 루즈 ?�그�?추�??�니??
+        /// 루즈 태그를 추가합니다.
         /// </summary>
         public bool AddLooseTag(FGameplayTag tag, out int totalCount)
         {
@@ -551,7 +553,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// 루즈 ?�그�??�거?�니??
+        /// 루즈 태그를 제거합니다.
         /// </summary>
         public bool RemoveLooseTag(FGameplayTag tag, out int totalCount)
         {
@@ -562,7 +564,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�과 ?�그�?추�??�니??
+        /// 효과 태그를 추가합니다.
         /// </summary>
         public bool AddEffectTag(FGameplayTag tag, out int totalCount)
         {
@@ -573,7 +575,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�과 ?�그�??�거?�니??
+        /// 효과 태그를 제거합니다.
         /// </summary>
         public bool RemoveEffectTag(FGameplayTag tag, out int totalCount)
         {
@@ -584,7 +586,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�그??�?개수�?조회?�니??
+        /// 태그의 총 개수를 조회합니다.
         /// </summary>
         public int GetTotalTagCount(FGameplayTag tag)
         {
@@ -600,10 +602,10 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�성 ?�과�?추�??�고 ?�성??UID�?반환?�니??
+        /// 활성 효과를 추가하고 생성된 UID를 반환합니다.
         /// </summary>
-        /// <param name="effect">?�과</param>
-        /// <param name="remainingDuration">?��? 지???�간 (�?</param>
+        /// <param name="effect">효과</param>
+        /// <param name="remainingDuration">남은 지속 시간 (초)</param>
         public long AddActiveEffect(GameplayEffect effect, float remainingDuration)
         {
             lock (_modelLock)
@@ -612,7 +614,7 @@ namespace Noname.GameAbilitySystem
 
                 var CalculateDuration = remainingDuration;
 
-                //지???�간 계산 ?�책???�다�?계산?�다.
+                // 지속 시간 계산 정책이 있다면 계산한다.
                 if (effect.DurationPolicy != null)
                 {
                     effect.DurationPolicy.CalculateDuration(this, ref CalculateDuration);
@@ -622,15 +624,15 @@ namespace Noname.GameAbilitySystem
                 {
                     EffectUid = uid,
                     Effect = effect,
-                    EndTime = CalculateDuration  // 카운?�다??방식?�로 ?�용
+                    EndTime = CalculateDuration  // 카운트다운 방식으로 사용
                 });
                 return uid;
             }
         }
 
         /// <summary>
-        /// ?�성 ?�과???��? ?�간??갱신?�고 만료???�과�?처리?�니??
-        /// �??�레???�출?�어???�니??
+        /// 활성 효과의 남은 시간을 갱신하고 만료된 효과를 처리합니다.
+        /// 매 프레임 호출되어야 합니다.
         /// </summary>
         private void TickActiveEffectsInternal(float deltaTime, List<GameplayEffect> expired = null)
         {
@@ -645,14 +647,14 @@ namespace Noname.GameAbilitySystem
                         continue;
                     }
 
-                    // ?��? ?�간 감소
+                    // 남은 시간 감소
                     active.EndTime -= deltaTime;
                     _activeEffects[i] = active;
 
                     // 만료 체크
                     if (active.EndTime <= 0)
                     {
-                        // ?�과가 부?�한 ?�그 ?�거
+                        // 효과가 부여한 태그 제거
                         if (active.Effect.GrantedTags != null)
                         {
                             foreach (var tag in active.Effect.GrantedTags.Tags)
@@ -669,7 +671,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�덱?�로 ?�성 ?�과�??�거?�니?? (lock ?��??�서�??�출)
+        /// 인덱스로 활성 효과를 제거합니다. (lock 내부에서만 호출)
         /// </summary>
         private void RemoveActiveEffectAt(int index)
         {
@@ -682,7 +684,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// UID�??�성 ?�과�??�거?�니??
+        /// UID로 활성 효과를 제거합니다.
         /// </summary>
         public bool RemoveActiveEffectByUid(long effectUid)
         {
@@ -709,7 +711,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// EffectId�??�성 ?�과�??�거?�니?? (같�? EffectId??�?번째 ?�과�??�거)
+        /// EffectId로 활성 효과를 제거합니다. (같은 EffectId의 첫 번째 효과를 제거)
         /// </summary>
         public bool RemoveActiveEffect(string effectId)
         {
@@ -741,8 +743,8 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// 만료???�과�??�집?�고 ?�거?�니??
-        /// ?�과가 부?�한 ?�그???�께 ?�거?�니??
+        /// 만료된 효과를 수집하고 제거합니다.
+        /// 효과가 부여한 태그도 함께 제거합니다.
         /// </summary>
         public void CollectExpiredEffects(float now, List<GameplayEffect> expired)
         {
@@ -761,7 +763,7 @@ namespace Noname.GameAbilitySystem
                         continue;
                     }
 
-                    // ?�과가 부?�한 ?�그 ?�거
+                    // 효과가 부여한 태그 제거
                     if (active.Effect.GrantedTags != null)
                     {
                         foreach (var tag in active.Effect.GrantedTags.Tags)
@@ -783,7 +785,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�성 ?�과 목록??복사?�여 반환?�니?? (?�레???�전)
+        /// 활성 효과 목록을 복사하여 반환합니다. (스레드 안전)
         /// </summary>
         public List<GameplayEffect> GetActiveEffects()
         {
@@ -803,7 +805,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�성 ?�과 목록???�공??리스?�에 추�??�니?? (?�레???�전)
+        /// 활성 효과 목록을 제공된 리스트에 추가합니다. (스레드 안전)
         /// </summary>
         public void GetActiveEffects(List<GameplayEffect> results)
         {
@@ -826,7 +828,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?��? ?�성 ?�과 목록???�전?��? ?��? ?�근???�공?�니?? (lock ?��??�서�??�출)
+        /// 내부 활성 효과 목록에 안전하지 않은 직접 접근을 제공합니다. (lock 내부에서만 호출)
         /// </summary>
         internal IReadOnlyList<ActiveGameplayEffect> GetActiveEffectsUnsafe()
         {
@@ -834,7 +836,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�그�?추�??�는 ?��? 메서?�입?�다. (lock ?��??�서�??�출)
+        /// 태그를 추가하는 내부 메서드입니다. (lock 내부에서만 호출)
         /// </summary>
         private bool AddTagInternal(Dictionary<int, int> counts, FGameplayTag tag, out int totalCount)
         {
@@ -864,7 +866,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�그�??�거?�는 ?��? 메서?�입?�다. (lock ?��??�서�??�출)
+        /// 태그를 제거하는 내부 메서드입니다. (lock 내부에서만 호출)
         /// </summary>
         private bool RemoveTagInternal(Dictionary<int, int> counts, FGameplayTag tag, out int totalCount)
         {
@@ -903,7 +905,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�그??�?개수�?조회?�는 ?��? 메서?�입?�다. (lock ?��??�서�??�출)
+        /// 태그의 총 개수를 조회하는 내부 메서드입니다. (lock 내부에서만 호출)
         /// </summary>
         private int GetTotalTagCount(int hash)
         {
@@ -913,68 +915,25 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// 게임?�레???�벤?��? 처리?�니?? ?�벤???�그�??�리거되???�력???�성?�합?�다.
+        /// 게임플레이 이벤트를 처리합니다. 이벤트 태그로 트리거되는 능력을 활성화합니다.
         /// </summary>
-        /// <param name="eventData">?�벤???�이??/param>
-        /// <returns>?�성???�공 ?��?</returns>
+        /// <param name="eventData">이벤트 데이터</param>
+        /// <returns>활성화 성공 여부</returns>
         public bool HandleGameplayTagEvent(GameplayTagEventData eventData)
         {
+            // TODO: 이벤트 기반 능력 활성화 구현 필요
             return false;
-            // if (!eventData.EventTag.IsValid)
-            // {
-            //     return false;
-            // }
-
-            // // ?�벤?��? 브로?�캐?�트?�고 조건??맞는 ?�력??찾는??
-            // var eventTag = eventData.EventTag;
-            // _onGameplayEvent?.Invoke(this, eventData);
-            // var bSuccess = false;
-            // foreach (var spec in _abilities)
-            // {
-            //     if (spec == null) continue;
-            //     if (spec.AbilityType == null) continue;
-
-            //     if (!spec.TryGetConfigs<GameplayEventTriggerConfig>(out var triggerConfigs))
-            //     {
-            //         continue;
-            //     }
-
-            //     var matched = false;
-            //     for (var i = 0; i < triggerConfigs.Count; i++)
-            //     {
-            //         var triggerConfig = triggerConfigs[i];
-            //         if (triggerConfig == null || !triggerConfig.ActivateOnEvent)
-            //         {
-            //             continue;
-            //         }
-
-            //         if (!IsEventTagMatch(eventTag, triggerConfig.TriggerTag))
-            //         {
-            //             continue;
-            //         }
-
-            //         matched = true;
-            //         break;
-            //     }
-
-            //     if (matched)
-            //     {
-            //         bSuccess |= TryActivateAbility(spec, eventData);
-            //     }
-            // }
-
-            // return bSuccess;
         }
 
         /// <summary>
-        /// ?�재 ?�태??불�? ?�냅?�을 ?�성?�니?? (?�레???�전)
-        /// Host ?�경?�서 ?�라?�언?�로 ?�태�??�송?????�용?�니??
+        /// 현재 상태의 불변 스냅샷을 생성합니다. (스레드 안전)
+        /// Host 환경에서 클라이언트로 상태를 전송할 때 사용합니다.
         /// </summary>
         public AbilitySystemSnapshot BuildSnapshot()
         {
             lock (_modelLock)
             {
-                // ?�성 �?복사
+                // 속성 값 복사
                 var attributeDict = new Dictionary<AttributeId, float>();
                 foreach (var attr in _attributes.Values)
                 {
@@ -984,13 +943,13 @@ namespace Noname.GameAbilitySystem
                     }
                 }
 
-                // ?�그 복사
+                // 태그 복사
                 var tagList = new List<FGameplayTag>(_ownedTags.Tags);
 
-                // ?�력 복사
+                // 능력 복사
                 var abilities = new List<GameplayAbility>(_abilities);
 
-                // ?�성 ?�과 복사
+                // 활성 효과 복사
                 var effectList = new List<ActiveGameplayEffectSnapshot>(_activeEffects.Count);
                 for (var i = 0; i < _activeEffects.Count; i++)
                 {
@@ -1011,9 +970,7 @@ namespace Noname.GameAbilitySystem
             OnAddedAbility = null;
             OnChangedTags = null;
             OnActivateAbility = null;
-            _onwer = null;
+            _owner = null;
         }
-
     }
 }
-

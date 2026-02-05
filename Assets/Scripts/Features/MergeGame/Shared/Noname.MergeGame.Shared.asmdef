@@ -1,11 +1,7 @@
 {
-  "name": "Noname.MergeGame",
+  "name": "Noname.MergeGame.Shared",
   "rootNamespace": "MyProject.MergeGame",
-  "references": [
-    "Noname.GameAbilitySystem",
-    "Noname.GameHost",
-    "Noname.MergeGame.Shared"
-  ],
+  "references": [],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

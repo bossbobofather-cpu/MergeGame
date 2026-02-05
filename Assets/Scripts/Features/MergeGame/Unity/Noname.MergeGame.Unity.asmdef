@@ -1,8 +1,9 @@
 {
   "name": "Noname.MergeGame.Unity",
-  "rootNamespace": "Noname.MergeGame.Unity",
+  "rootNamespace": "MyProject.MergeGame.Unity",
   "references": [
     "Noname.MergeGame",
+    "Noname.MergeGame.Shared",
     "Noname.GameAbilitySystem",
     "Noname.GameAbilitySystem.Unity",
     "Noname.GameHost",

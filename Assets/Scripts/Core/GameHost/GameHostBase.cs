@@ -259,9 +259,9 @@ namespace Noname.GameHost
                     var outcome = HandleCommand(command);
                     if (outcome.PreEvents != null)
                     {
-                        for (var i = 0; i < outcome.PreEvents.Count; i++)
+                        foreach (var preEvent in outcome.PreEvents)
                         {
-                            PublishEvent(outcome.PreEvents[i]);
+                            PublishEvent(preEvent);
                         }
                     }
 
@@ -274,9 +274,9 @@ namespace Noname.GameHost
                     // 커맨드에 대한 후행 이벤트가 있다면 발행합니다.
                     if (outcome.PostEvents != null)
                     {
-                        for (var i = 0; i < outcome.PostEvents.Count; i++)
+                        foreach (var postEvent in outcome.PostEvents)
                         {
-                            PublishEvent(outcome.PostEvents[i]);
+                            PublishEvent(postEvent);
                         }
                     }
                 }
@@ -311,6 +311,8 @@ namespace Noname.GameHost
 
         /// <summary>
         /// 커맨드 처리 실패 시 기본 에러 이벤트를 생성합니다.
+        /// 기본 구현은 default(TEvent)를 반환하므로, 에러 이벤트를 실제로 발행하려면
+        /// 파생 클래스에서 이 메서드를 재정의해야 합니다.
         /// </summary>
         protected virtual TEvent CreateErrorEvent(TCommand command, Exception exception)
         {
@@ -508,6 +510,9 @@ namespace Noname.GameHost
             }
 
             _disposed = true;
+
+            // 스레드가 큐에 접근할 수 있으므로 먼저 중지합니다.
+            StopSimulation();
 
             while (_pendingCommands.TryDequeue(out _)) { }
             while (_dispatchQueue.TryDequeue(out _)) { }
