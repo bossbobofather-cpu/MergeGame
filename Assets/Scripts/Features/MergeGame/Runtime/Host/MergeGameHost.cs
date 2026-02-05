@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using MyProject.MergeGame.Commands;
@@ -31,6 +31,11 @@ namespace MyProject.MergeGame
         private readonly MergeHostConfig _config;
 
         /// <summary>
+        /// 캐릭터 정의/랜덤 선택을 제공하는 데이터베이스입니다.
+        /// </summary>
+        private readonly ICharacterDatabase _characterDatabase;
+
+        /// <summary>
         /// 전투 시스템입니다.
         /// </summary>
         private readonly MergeCombatSystem _combatSystem;
@@ -53,26 +58,15 @@ namespace MyProject.MergeGame
         private readonly List<MonsterSnapshot> _tempMonsterSnapshots = new();
 
         /// <summary>
-        /// 웨이브 스폰용 타이머입니다.
-        /// </summary>
-        private float _waveSpawnTimer;
-        private int _waveSpawnedCount;
-        private int _waveTotalCount;
-
-        /// <summary>
         /// 이벤트 버퍼입니다.
         /// </summary>
         private readonly List<MergeHostEvent> _tickEventBuffer = new();
 
         /// <summary>
-        /// 캐릭터 정의 조회 콜백입니다.
+        /// WaveModule 상태 동기화/이벤트 발행을 위한 이전 상태 캐시입니다.
         /// </summary>
-        public Func<string, CharacterDefinition> GetCharacterDefinition { get; set; }
-
-        /// <summary>
-        /// 랜덤 캐릭터 ID 획득 콜백입니다 (머지 결과용).
-        /// </summary>
-        public Func<int, string> GetRandomCharacterIdForGrade { get; set; }
+        private int _lastWaveNumber;
+        private WavePhase _lastWavePhase = WavePhase.Idle;
 
         #region Module System
 
@@ -125,9 +119,10 @@ namespace MyProject.MergeGame
 
         #endregion
 
-        public MergeGameHost(MergeHostConfig config)
+        public MergeGameHost(MergeHostConfig config, ICharacterDatabase characterDatabase)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
+            _characterDatabase = characterDatabase ?? throw new ArgumentNullException(nameof(characterDatabase));
             _state = new MergeHostState();
 
             _combatSystem = new MergeCombatSystem(_state, _config.DefaultAttackRange);
@@ -187,6 +182,9 @@ namespace MyProject.MergeGame
             // 0. 모듈 틱
             TickModules(deltaTime);
 
+            // WaveModule 상태 동기화 및 웨이브 이벤트/보상 처리
+            SyncWaveStateAndEmitWaveEvents();
+
             // 1. 전투 시스템 업데이트
             var combatEvents = _combatSystem.Tick(Tick, deltaTime);
             foreach (var evt in combatEvents)
@@ -206,12 +204,6 @@ namespace MyProject.MergeGame
 
             // 4. 사망한 몬스터 처리
             ProcessDeadMonsters();
-
-            // 5. 웨이브 스폰 처리
-            ProcessWaveSpawning(deltaTime);
-
-            // 6. 웨이브 완료 체크
-            CheckWaveCompletion();
 
             // 7. 게임 오버 체크
             if (_state.PlayerHp <= 0)
@@ -513,7 +505,7 @@ namespace MyProject.MergeGame
             }
 
             // 캐릭터 정의 조회
-            var definition = GetCharacterDefinition?.Invoke(command.CharacterId);
+            var definition = _characterDatabase.GetDefinition(command.CharacterId);
             if (definition == null)
             {
                 return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
@@ -608,8 +600,13 @@ namespace MyProject.MergeGame
             var newGrade = sourceChar.Grade + 1;
 
             // 새 캐릭터 ID 결정 (덱에서 랜덤)
-            var newCharacterId = GetRandomCharacterIdForGrade?.Invoke(newGrade) ?? sourceChar.CharacterId;
-            var newDefinition = GetCharacterDefinition?.Invoke(newCharacterId);
+            var newCharacterId = _characterDatabase.GetRandomIdForGrade(newGrade);
+            if (string.IsNullOrEmpty(newCharacterId))
+            {
+                newCharacterId = sourceChar.CharacterId;
+            }
+
+            var newDefinition = _characterDatabase.GetDefinition(newCharacterId);
 
             // 결과 캐릭터 생성
             var resultChar = _state.CreateCharacter(
@@ -784,31 +781,37 @@ namespace MyProject.MergeGame
                     StartWaveResult.Fail(Tick, command.SenderUid, "게임이 진행 중이 아닙니다."));
             }
 
-            if (_state.CurrentWavePhase == WavePhase.Spawning || _state.CurrentWavePhase == WavePhase.InProgress)
+            var waveModule = GetModule<WaveModule>();
+            if (waveModule == null)
             {
                 return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
-                    StartWaveResult.Fail(Tick, command.SenderUid, "웨이브가 이미 진행 중입니다."));
+                    StartWaveResult.Fail(Tick, command.SenderUid, "WaveModule이 등록되지 않았습니다."));
             }
 
-            // 웨이브 번호 결정
-            var waveNumber = command.WaveNumber > 0 ? command.WaveNumber : _state.CurrentWaveNumber + 1;
-            _state.SetCurrentWaveNumber(waveNumber);
-            _state.SetWavePhase(WavePhase.Spawning);
-
-            // 웨이브 몬스터 수 (웨이브 번호에 따라 증가)
-            _waveTotalCount = 5 + waveNumber * 2;
-            _waveSpawnedCount = 0;
-            _waveSpawnTimer = 0;
-
-            var events = new List<MergeHostEvent>
+            // 현재 구현은 "다음 웨이브 시작"만 지원합니다.
+            if (command.WaveNumber > 0 && command.WaveNumber != waveModule.CurrentWaveNumber + 1)
             {
-                new WaveStartedEvent(Tick, waveNumber, _waveTotalCount)
-            };
+                return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
+                    StartWaveResult.Fail(Tick, command.SenderUid, "특정 웨이브 번호 시작은 아직 지원하지 않습니다."));
+            }
+
+            var started = waveModule.StartWave(Tick);
+            if (!started)
+            {
+                return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
+                    StartWaveResult.Fail(Tick, command.SenderUid, "웨이브 시작에 실패했습니다."));
+            }
+
+            // WaveModule이 응답하는 상태를 조회해서 Result에 포함합니다.
+            var status = new GetWaveStatusRequest(Tick);
+            _innerEventBus.Publish(status);
+
+            // View/스냅샷용 상태 동기화
+            _state.SetCurrentWaveNumber(status.CurrentWaveNumber);
+            _state.SetWavePhase(status.Phase);
 
             return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
-                StartWaveResult.Ok(Tick, command.SenderUid, waveNumber, _waveTotalCount),
-                events
-            );
+                StartWaveResult.Ok(Tick, command.SenderUid, status.CurrentWaveNumber, status.TotalMonsters));
         }
 
         #endregion
@@ -896,92 +899,73 @@ namespace MyProject.MergeGame
             }
         }
 
-        private void ProcessWaveSpawning(float deltaTime)
+        private void SyncWaveStateAndEmitWaveEvents()
         {
-            if (_state.CurrentWavePhase != WavePhase.Spawning)
+            var waveModule = GetModule<WaveModule>();
+            if (waveModule == null)
             {
                 return;
             }
 
-            _waveSpawnTimer += deltaTime;
+            var currentWaveNumber = waveModule.CurrentWaveNumber;
+            var currentPhase = waveModule.CurrentPhase;
 
-            while (_waveSpawnTimer >= _config.WaveSpawnInterval && _waveSpawnedCount < _waveTotalCount)
+            // 스냅샷에서 조회할 수 있도록 HostState에 반영합니다.
+            if (_state.CurrentWaveNumber != currentWaveNumber)
             {
-                _waveSpawnTimer -= _config.WaveSpawnInterval;
-                SpawnWaveMonster();
-                _waveSpawnedCount++;
+                _state.SetCurrentWaveNumber(currentWaveNumber);
             }
 
-            // 모든 몬스터 스폰 완료
-            if (_waveSpawnedCount >= _waveTotalCount)
+            if (_state.CurrentWavePhase != currentPhase)
             {
-                _state.SetWavePhase(WavePhase.InProgress);
+                _state.SetWavePhase(currentPhase);
             }
-        }
 
-        private void SpawnWaveMonster()
-        {
-            // 기본 몬스터 스폰 (실제로는 웨이브 데이터에서 가져와야 함)
-            var pathIndex = 0;
-            var path = _state.GetMonsterPath(pathIndex);
-            if (path == null)
+            // 변화가 없으면 종료
+            if (_lastWaveNumber == currentWaveNumber && _lastWavePhase == currentPhase)
             {
                 return;
             }
 
-            var monster = _state.CreateMonster(
-                "monster_basic",
-                pathIndex,
-                path.GetStartPosition(),
-                damageToPlayer: 10,
-                goldReward: 10 + _state.CurrentWaveNumber
-            );
-
-            // ASC 초기화 (웨이브에 따라 스케일링)
-            var waveMultiplier = 1f + (_state.CurrentWaveNumber - 1) * 0.1f;
-            monster.ASC.Set(AttributeId.MaxHealth, 100f * waveMultiplier);
-            monster.ASC.Set(AttributeId.Health, 100f * waveMultiplier);
-            monster.ASC.Set(AttributeId.MoveSpeed, 2f);
-
-            _tickEventBuffer.Add(new MonsterSpawnedEvent(
-                Tick,
-                monster.Uid,
-                monster.MonsterId,
-                monster.PathIndex,
-                monster.Position.X,
-                monster.Position.Y,
-                monster.ASC.Get(AttributeId.MaxHealth)
-            ));
-        }
-
-        private void CheckWaveCompletion()
-        {
-            if (_state.CurrentWavePhase != WavePhase.InProgress)
+            // 웨이브 시작
+            if (currentPhase == WavePhase.Spawning && (_lastWaveNumber != currentWaveNumber || _lastWavePhase != WavePhase.Spawning))
             {
-                return;
+                var status = new GetWaveStatusRequest(Tick);
+                _innerEventBus.Publish(status);
+
+                _tickEventBuffer.Add(new WaveStartedEvent(
+                    Tick,
+                    status.CurrentWaveNumber,
+                    status.TotalMonsters
+                ));
             }
 
-            // 모든 몬스터가 처리되었는지 확인
-            if (_state.Monsters.Count == 0)
+            // 웨이브 완료
+            if (currentPhase == WavePhase.Completed && _lastWavePhase != WavePhase.Completed)
             {
-                _state.SetWavePhase(WavePhase.Completed);
+                var bonusGold = _config.WaveCompletionBonusGold;
 
-                // 웨이브 보너스 골드
-                _state.AddPlayerGold(_config.WaveCompletionBonusGold);
+                if (bonusGold != 0)
+                {
+                    _state.AddPlayerGold(bonusGold);
+
+                    _tickEventBuffer.Add(new PlayerGoldChangedEvent(
+                        Tick,
+                        _state.PlayerGold,
+                        bonusGold,
+                        "WaveCompletion"
+                    ));
+                }
 
                 _tickEventBuffer.Add(new WaveCompletedEvent(
                     Tick,
-                    _state.CurrentWaveNumber,
-                    _config.WaveCompletionBonusGold
-                ));
-
-                _tickEventBuffer.Add(new PlayerGoldChangedEvent(
-                    Tick,
-                    _state.PlayerGold,
-                    _config.WaveCompletionBonusGold,
-                    "WaveCompletion"
+                    currentWaveNumber,
+                    bonusGold
                 ));
             }
+
+            _lastWaveNumber = currentWaveNumber;
+            _lastWavePhase = currentPhase;
         }
 
         private void HandleGameOver(bool isVictory)
@@ -1037,20 +1021,24 @@ namespace MyProject.MergeGame
         /// <param name="module">모듈 인스턴스</param>
         public void AddModule<TModule>(TModule module) where TModule : IHostModule
         {
-            if (module == null || _moduleMap.ContainsKey(module.ModuleId))
+            if (module == null)
+            {
+                return;
+            }
+
+            if (_modulesInitialized)
+            {
+                GameHostLog.LogError($"[{GetType().Name}] 모듈이 이미 초기화된 상태에서는 AddModule을 호출할 수 없습니다. ({module.ModuleId})");
+                return;
+            }
+
+            if (_moduleMap.ContainsKey(module.ModuleId))
             {
                 return;
             }
 
             _modules.Add(module);
             _moduleMap[module.ModuleId] = module;
-
-            // 이미 초기화된 상태라면 즉시 초기화
-            if (_modulesInitialized)
-            {
-                module.Initialize(this);
-                module.Startup();
-            }
         }
 
         /// <summary>
@@ -1060,7 +1048,18 @@ namespace MyProject.MergeGame
             where TModule : IHostModule<TConfig>
             where TConfig : class
         {
-            if (module == null || _moduleMap.ContainsKey(module.ModuleId))
+            if (module == null)
+            {
+                return;
+            }
+
+            if (_modulesInitialized)
+            {
+                GameHostLog.LogError($"[{GetType().Name}] 모듈이 이미 초기화된 상태에서는 AddModule을 호출할 수 없습니다. ({module.ModuleId})");
+                return;
+            }
+
+            if (_moduleMap.ContainsKey(module.ModuleId))
             {
                 return;
             }
@@ -1069,12 +1068,6 @@ namespace MyProject.MergeGame
 
             _modules.Add(module);
             _moduleMap[module.ModuleId] = module;
-
-            if (_modulesInitialized)
-            {
-                module.Initialize(this);
-                module.Startup();
-            }
         }
 
         /// <summary>
@@ -1205,22 +1198,6 @@ namespace MyProject.MergeGame
         }
     }
 
-    #region Definition Classes
-
-    /// <summary>
-    /// 캐릭터 정의 데이터입니다.
-    /// </summary>
-    public class CharacterDefinition
-    {
-        public string CharacterId { get; set; }
-        public string CharacterType { get; set; }
-        public int InitialGrade { get; set; } = 1;
-        public float BaseAttackDamage { get; set; } = 10f;
-        public float BaseAttackSpeed { get; set; } = 1f;
-        public float BaseAttackRange { get; set; } = 5f;
-        public string OnMergeSourceEffectId { get; set; }
-        public string OnMergeTargetEffectId { get; set; }
-    }
-
-    #endregion
 }
+
+

@@ -1,10 +1,15 @@
+﻿using System;
+using System.Collections.Generic;
 using MyProject.Common.Bootstrap;
+using MyProject.MergeGame.Modules;
+using Noname.GameAbilitySystem;
 using UnityEngine;
 
 namespace MyProject.MergeGame.Unity
 {
     /// <summary>
-    /// MergeGame 뷰를 생성하고 시작하기를 담당하는 부트스트래퍼입니다.
+    /// MergeGame 실행 진입점입니다.
+    /// Host를 조립/초기화한 뒤 MergeGameView를 생성해 Host를 주입합니다.
     /// </summary>
     public class MergeGameBootstrapper : BootstrapperBase
     {
@@ -24,20 +29,124 @@ namespace MyProject.MergeGame.Unity
         {
             if (_gameViewPrefab == null)
             {
-                Debug.LogError("GameView Prefab이 설정되지 않았습니다.");
+                Debug.LogError("[MergeGameBootstrapper] GameView Prefab이 설정되지 않았습니다.");
                 return;
             }
 
-            // 게임 뷰 프리팹을 생성합니다.
+            // Host 조립: StartSimulation 이전에 모듈 구성/초기화를 끝내야 합니다.
+            var hostConfig = _config ?? new MergeHostConfig();
+            var host = new MergeGameHost(hostConfig, new DevCharacterDatabase());
+
+            host.AddModule(new MapModule(), BuildMapConfig());
+            host.AddModule(new RuleModule(), BuildRuleConfig(hostConfig));
+            host.AddModule(new WaveModule(), BuildWaveConfig(hostConfig));
+
+            host.InitializeModules();
+            host.StartSimulation();
+
             var instance = Instantiate(_gameViewPrefab);
             if (instance == null)
             {
-                Debug.LogError("GameView 인스턴스 생성에 실패했습니다.");
+                Debug.LogError("[MergeGameBootstrapper] GameView 인스턴스 생성에 실패했습니다.");
+
+                host.StopSimulation();
+                (host as IDisposable)?.Dispose();
                 return;
             }
 
             _gameViewInstance = instance;
-            _gameViewInstance.Initialize(new MergeGameHost(_config));
+            _gameViewInstance.Initialize(host);
+        }
+
+        private static MapModuleConfig BuildMapConfig()
+        {
+            // 프로토타입용: 단순 그리드 + 1개 경로
+            return new MapModuleConfig
+            {
+                MapId = 1,
+                SlotDefinitions = MapModuleConfig.CreateGridSlotDefinitions(rows: 4, columns: 4, slotWidth: 1.5f, slotHeight: 1.5f),
+                PathDefinitions = new List<PathDefinition>
+                {
+                    new PathDefinition(
+                        pathIndex: 0,
+                        waypoints: new List<Point2D>
+                        {
+                            new Point2D(-6f, 3f),
+                            new Point2D(-2f, 3f),
+                            new Point2D( 2f, 3f),
+                            new Point2D( 6f, 3f)
+                        }
+                    )
+                }
+            };
+        }
+
+        private static RuleModuleConfig BuildRuleConfig(MergeHostConfig hostConfig)
+        {
+            // Host의 기본 설정을 RuleModuleConfig에 반영합니다.
+            return new RuleModuleConfig
+            {
+                PlayerMaxHp = hostConfig.PlayerMaxHp,
+                PlayerStartGold = hostConfig.PlayerStartGold,
+                ScorePerGrade = hostConfig.ScorePerGrade,
+                InitialUnitGrade = hostConfig.InitialUnitGrade,
+                MaxUnitGrade = hostConfig.MaxUnitGrade,
+                WaveCompletionBonusGold = hostConfig.WaveCompletionBonusGold,
+            };
+        }
+
+        private static WaveModuleConfig BuildWaveConfig(MergeHostConfig hostConfig)
+        {
+            // 프로토타입: 자동 웨이브 + 기본 몬스터 스폰
+            return new WaveModuleConfig
+            {
+                AutoStartWaves = true,
+                WaveStartDelay = 2f,
+                WaveIntervalDelay = 3f,
+                DefaultSpawnInterval = hostConfig.WaveSpawnInterval,
+                MaxWaveCount = 5,
+                BaseMonsterCount = 3,
+                MonstersPerWaveIncrease = 1,
+            };
+        }
+
+        /// <summary>
+        /// 개발용 하드코딩 캐릭터 DB입니다.
+        /// 이후 SO/JSON/서버로 교체할 수 있도록 인터페이스로 한 겹 감쌌습니다.
+        /// </summary>
+        private sealed class DevCharacterDatabase : ICharacterDatabase
+        {
+            private readonly Dictionary<string, CharacterDefinition> _definitions = new()
+            {
+                {
+                    "unit_basic",
+                    new CharacterDefinition
+                    {
+                        CharacterId = "unit_basic",
+                        CharacterType = "basic",
+                        InitialGrade = 1,
+                        BaseAttackDamage = 10f,
+                        BaseAttackSpeed = 1f,
+                        BaseAttackRange = 10f,
+                    }
+                },
+            };
+
+            public CharacterDefinition GetDefinition(string characterId)
+            {
+                if (string.IsNullOrEmpty(characterId))
+                {
+                    return null;
+                }
+
+                return _definitions.TryGetValue(characterId, out var definition) ? definition : null;
+            }
+
+            public string GetRandomIdForGrade(int grade)
+            {
+                // 프로토타입: 등급에 따라 별도 캐릭터를 쓰지 않고 동일 ID를 반환합니다.
+                return "unit_basic";
+            }
         }
     }
 }
