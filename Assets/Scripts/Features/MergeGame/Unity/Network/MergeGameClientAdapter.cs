@@ -36,7 +36,9 @@ namespace MyProject.MergeGame.Unity.Network
             _initialized = true;
 
             // 인증 흐름을 아직 구성하지 않았으므로 requireAuthentication=false
+            NetworkClient.UnregisterHandler<EventMsg>();
             NetworkClient.RegisterHandler<EventMsg>(OnEventMsg, requireAuthentication: false);
+            NetworkClient.UnregisterHandler<SnapshotMsg>();
             NetworkClient.RegisterHandler<SnapshotMsg>(OnSnapshotMsg, requireAuthentication: false);
 
             NetworkClient.OnConnectedEvent += HandleConnected;
@@ -52,6 +54,9 @@ namespace MyProject.MergeGame.Unity.Network
 
             NetworkClient.OnConnectedEvent -= HandleConnected;
             NetworkClient.OnDisconnectedEvent -= HandleDisconnected;
+            NetworkClient.UnregisterHandler<EventMsg>();
+            NetworkClient.UnregisterHandler<SnapshotMsg>();
+            _initialized = false;
         }
 
         /// <summary>
@@ -127,3 +132,4 @@ namespace MyProject.MergeGame.Unity.Network
         }
     }
 }
+

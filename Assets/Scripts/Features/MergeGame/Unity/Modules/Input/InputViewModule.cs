@@ -1,4 +1,4 @@
-﻿using MyProject.Common.UI;
+using MyProject.Common.UI;
 using MyProject.MergeGame.Commands;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -10,8 +10,9 @@ using UnityEngine.InputSystem;
 namespace MyProject.MergeGame.Unity
 {
     /// <summary>
-    /// 입력을 받아 Move/Merge 커맨드를 발행하는 모듈입니다.
-    /// Spawn은 HUD 버튼에서 처리하고, 여기서는 드래그/키보드 입력만 처리합니다.
+    /// MergeGame 입력 처리 모듈입니다.
+    /// 키보드/드래그 입력을 해석해 Host 커맨드로 변환합니다.
+    /// 타워 생성은 HUD 버튼에서 처리하고, 여기서는 이동/머지 입력만 처리합니다.
     /// </summary>
     public sealed class InputViewModule : MergeViewModuleBase
     {
@@ -36,7 +37,7 @@ namespace MyProject.MergeGame.Unity
         private bool _isDragging;
 
         /// <summary>
-        /// MergeGameView.Update에서 호출되는 입력 처리 루프입니다.
+        /// 매 프레임 입력을 수집해 커맨드 전송 여부를 판단합니다.
         /// </summary>
         public void TickInput()
         {
@@ -64,14 +65,14 @@ namespace MyProject.MergeGame.Unity
 
         private void HandleKeyboardInput(MergeHostSnapshot snapshot)
         {
-            // Esc: 선택 취소
+            // Esc 입력: 현재 슬롯 선택을 해제합니다.
             if (WasPressedCancel())
             {
                 _selectedSlotIndex = -1;
                 Post("[선택 취소]", _infoColor);
             }
 
-            // 1~9: 슬롯 선택(2번 입력 시 Move/Merge 커맨드 발행)
+            // 1~9 입력: 슬롯을 선택하고, 두 번째 선택 시 이동/머지를 시도합니다.
             var digit = GetPressedDigit1To9();
             if (digit > 0)
             {
@@ -170,7 +171,7 @@ namespace MyProject.MergeGame.Unity
 
         private void HandleSlotDigit(int digit, MergeHostSnapshot snapshot)
         {
-            // 키보드 입력은 1-based이므로 슬롯 인덱스는 0-based로 변환합니다.
+            // 키 입력(1~9)은 1 기반이므로 슬롯 인덱스로 사용할 때 0 기반으로 변환합니다.
             var slotIndex = digit - 1;
             if (slotIndex < 0 || slotIndex >= snapshot.Slots.Count)
             {
@@ -204,7 +205,7 @@ namespace MyProject.MergeGame.Unity
                 return;
             }
 
-            // 빈 슬롯이면 이동, 아니면 머지 시도
+            // 대상 슬롯이 비어 있으면 이동, 점유 중이면 머지를 시도합니다.
             if (toSlot.IsEmpty)
             {
                 if (_useTowerCommands)

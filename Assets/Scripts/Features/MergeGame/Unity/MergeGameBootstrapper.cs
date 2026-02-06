@@ -1,190 +1,300 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Reflection;
 using MyProject.Common.Bootstrap;
-using MyProject.MergeGame.Modules;
-using Noname.GameAbilitySystem;
 using UnityEngine;
 
 namespace MyProject.MergeGame.Unity
 {
     /// <summary>
-    /// MergeGame 부트스트래퍼입니다.
-    /// Host를 생성/초기화한 뒤 MergeGameView를 생성하고 Host를 주입합니다.
+    /// MergeGame 네트워크 부트스트래퍼입니다.
+    /// 싱글/멀티를 구분하지 않고 동일한 네트워크 경로(Mirror)로 시작합니다.
     /// </summary>
-    public class MergeGameBootstrapper : BootstrapperBase
+    public sealed class MergeGameBootstrapper : BootstrapperBase
     {
-        [SerializeField] private MergeHostConfig _config;
-        [SerializeField] private MergeGameView _gameViewPrefab;
+        private const string TransportTypeName = "Mirror.Transport, Mirror";
+        private const string TelepathyTransportTypeName = "Mirror.TelepathyTransport, Mirror.Transports";
+        private const string PortTransportTypeName = "Mirror.PortTransport, Mirror.Transports";
 
-        private MergeGameView _gameViewInstance;
+        private const string NetworkServerTypeName = "Mirror.NetworkServer, Mirror";
+        private const string NetworkClientTypeName = "Mirror.NetworkClient, Mirror";
+        private const string HostModeTypeName = "Mirror.HostMode, Mirror";
+
+        private const string ServerAdapterTypeName = "MyProject.MergeGame.Unity.Network.MergeGameServerAdapter, Noname.MergeGame.Unity.Network";
+        private const string ClientAdapterTypeName = "MyProject.MergeGame.Unity.Network.MergeGameClientAdapter, Noname.MergeGame.Unity.Network";
+        private const string LogViewTypeName = "MyProject.MergeGame.Unity.Network.MergeGameNetworkLogView, Noname.MergeGame.Unity.Network";
+
+        public enum RunMode
+        {
+            Host,
+            ServerOnly,
+            Client,
+        }
+
+        [Header("Network")]
+        [SerializeField] private RunMode _runMode = RunMode.Host;
+        [SerializeField] private bool _autoSelectRunModeByParrelSync = true;
+        [SerializeField] private RunMode _cloneRunMode = RunMode.Client;
+        [SerializeField] private string _address = "localhost";
+        [SerializeField] private ushort _port = 7777;
+        [Tooltip("Host 모드: local(호스트) 1명 + remote(maxConnections). 기본 0이면 싱글과 동일한 1인 실행입니다.")]
+        [SerializeField] private int _maxConnections = 0;
+        [SerializeField] private bool _autoStart = true;
+
+        [Header("Components")]
+        [SerializeField] private MonoBehaviour _transport;
+        [SerializeField] private MonoBehaviour _serverAdapter;
+        [SerializeField] private MonoBehaviour _clientAdapter;
+        [SerializeField] private MonoBehaviour _logView;
+
+        private bool _started;
 
         protected override void OnInit()
         {
             base.OnInit();
 
-            CreateGameMode();
+            Application.runInBackground = true;
+            EnsureTransport();
+
+            if (_autoStart)
+            {
+                StartNetwork();
+            }
         }
 
-        private void CreateGameMode()
+        public void StartNetwork()
         {
-            if (_gameViewPrefab == null)
-            {
-                Debug.LogError("[MergeGameBootstrapper] GameView Prefab이 할당되지 않았습니다.");
-                return;
-            }
-
-            // Host 생성: StartSimulation 전에 모듈을 등록/초기화합니다.
-            var hostConfig = _config ?? new MergeHostConfig();
-            var host = new MergeGameHost(hostConfig, new DevTowerDatabase());
-
-            host.AddModule(new MapModule(), BuildMapConfig());
-            host.AddModule(new RuleModule(), BuildRuleConfig(hostConfig));
-            host.AddModule(new WaveModule(), BuildWaveConfig(hostConfig));
-
-            host.InitializeModules();
-            host.StartSimulation();
-
-            var instance = Instantiate(_gameViewPrefab);
-            if (instance == null)
-            {
-                Debug.LogError("[MergeGameBootstrapper] GameView 인스턴스 생성에 실패했습니다.");
-
-                host.StopSimulation();
-                (host as IDisposable)?.Dispose();
-                return;
-            }
-
-            _gameViewInstance = instance;
-
-            // 기본 뷰 모듈을 자동으로 구성합니다.
-            EnsureViewModules(_gameViewInstance);
-
-            _gameViewInstance.Initialize(host);
-        }
-
-        private static void EnsureViewModules(MergeGameView view)
-        {
-            if (view == null)
+            if (_started)
             {
                 return;
             }
 
-            EnsureModule<MapViewModule>(view, "MapViewModule");
-            EnsureModule<TowerViewModule>(view, "TowerViewModule");
-            EnsureModule<MonsterViewModule>(view, "MonsterViewModule");
-            EnsureModule<ProjectileViewModule>(view, "ProjectileViewModule");
-            EnsureModule<HudViewModule>(view, "HudViewModule");
-            EnsureModule<InputViewModule>(view, "InputViewModule");
+            if (_autoSelectRunModeByParrelSync && TryDetectParrelSyncClone(out var isClone) && isClone)
+            {
+                _runMode = _cloneRunMode;
+            }
+
+            _started = true;
+
+            if (_runMode == RunMode.Host)
+            {
+                StartAsHost();
+                EnsureLogView();
+            }
+            else if (_runMode == RunMode.ServerOnly)
+            {
+                StartAsServerOnly();
+            }
+            else
+            {
+                StartAsClient();
+                EnsureLogView();
+            }
         }
 
-        private static T EnsureModule<T>(MergeGameView view, string name) where T : Component
+        private void EnsureTransport()
         {
-            var existing = view.GetComponentInChildren<T>(true);
+            var transportType = Type.GetType(TransportTypeName);
+            var telepathyTransportType = Type.GetType(TelepathyTransportTypeName);
+            var portTransportType = Type.GetType(PortTransportTypeName);
+
+            if (transportType == null || telepathyTransportType == null)
+            {
+                Debug.LogError("[MergeGameBootstrapper] Mirror Transport 타입을 찾지 못했습니다.");
+                return;
+            }
+
+            if (_transport == null)
+            {
+                var existing = GetComponent(transportType);
+                if (existing != null)
+                {
+                    _transport = existing as MonoBehaviour;
+                }
+            }
+
+            if (_transport == null)
+            {
+                _transport = gameObject.AddComponent(telepathyTransportType) as MonoBehaviour;
+            }
+
+            if (_transport != null && portTransportType != null && portTransportType.IsInstanceOfType(_transport))
+            {
+                var portProperty = portTransportType.GetProperty("Port", BindingFlags.Public | BindingFlags.Instance);
+                portProperty?.SetValue(_transport, (ushort)_port);
+            }
+
+            var activeProperty = transportType.GetProperty("active", BindingFlags.Public | BindingFlags.Static);
+            activeProperty?.SetValue(null, _transport);
+        }
+
+        private void EnsureServerAdapter()
+        {
+            _serverAdapter = EnsureComponent(_serverAdapter, ServerAdapterTypeName);
+        }
+
+        private void EnsureClientAdapter()
+        {
+            _clientAdapter = EnsureComponent(_clientAdapter, ClientAdapterTypeName);
+        }
+
+        private void EnsureLogView()
+        {
+            _logView = EnsureComponent(_logView, LogViewTypeName);
+        }
+
+        private MonoBehaviour EnsureComponent(MonoBehaviour current, string typeName)
+        {
+            if (current != null)
+            {
+                return current;
+            }
+
+            var type = Type.GetType(typeName);
+            if (type == null)
+            {
+                Debug.LogError($"[MergeGameBootstrapper] 타입을 찾지 못했습니다: {typeName}");
+                return null;
+            }
+
+            var existing = GetComponent(type);
             if (existing != null)
             {
-                return existing;
+                return existing as MonoBehaviour;
             }
 
-            var obj = new GameObject(name);
-            obj.transform.SetParent(view.transform, false);
-            return obj.AddComponent<T>();
+            return gameObject.AddComponent(type) as MonoBehaviour;
         }
 
-        private static MapModuleConfig BuildMapConfig()
+        private void StartAsHost()
         {
-            // 프로토타입용: 단순 그리드 + 1개 경로
-            return new MapModuleConfig
+            var remoteCapacity = Mathf.Max(0, _maxConnections);
+            var maxPlayers = Mathf.Clamp(remoteCapacity + 1, 1, 2);
+
+            var networkServerType = Type.GetType(NetworkServerTypeName);
+            var networkClientType = Type.GetType(NetworkClientTypeName);
+            var hostModeType = Type.GetType(HostModeTypeName);
+
+            networkServerType?.GetMethod("Listen", BindingFlags.Public | BindingFlags.Static)?.Invoke(null, new object[] { Mathf.Max(1, remoteCapacity + 1) });
+
+            EnsureServerAdapter();
+            InvokeInstanceMethod(_serverAdapter, "Configure", true);
+            InvokeInstanceMethod(_serverAdapter, "SetMaxPlayers", maxPlayers);
+            InvokeInstanceMethod(_serverAdapter, "Initialize");
+
+            EnsureClientAdapter();
+            InvokeInstanceMethod(_clientAdapter, "Initialize");
+
+            networkClientType?.GetMethod("ConnectHost", BindingFlags.Public | BindingFlags.Static)?.Invoke(null, null);
+            hostModeType?.GetMethod("InvokeOnConnected", BindingFlags.Public | BindingFlags.Static)?.Invoke(null, null);
+
+            Debug.Log($"[MergeGameBootstrapper] Started as HOST (players={maxPlayers}, remoteCapacity={remoteCapacity})");
+        }
+
+        private void StartAsServerOnly()
+        {
+            var connectionCapacity = Mathf.Max(1, _maxConnections);
+            var maxPlayers = Mathf.Clamp(connectionCapacity, 1, 2);
+
+            var networkServerType = Type.GetType(NetworkServerTypeName);
+            networkServerType?.GetMethod("Listen", BindingFlags.Public | BindingFlags.Static)?.Invoke(null, new object[] { connectionCapacity });
+
+            EnsureServerAdapter();
+            InvokeInstanceMethod(_serverAdapter, "Configure", false);
+            InvokeInstanceMethod(_serverAdapter, "SetMaxPlayers", maxPlayers);
+            InvokeInstanceMethod(_serverAdapter, "Initialize");
+
+            Debug.Log($"[MergeGameBootstrapper] Started as SERVER (players={maxPlayers}, connectionCapacity={connectionCapacity})");
+        }
+
+        private void StartAsClient()
+        {
+            var networkClientType = Type.GetType(NetworkClientTypeName);
+
+            EnsureClientAdapter();
+            InvokeInstanceMethod(_clientAdapter, "Initialize");
+
+            networkClientType?.GetMethod("Connect", BindingFlags.Public | BindingFlags.Static, null, new[] { typeof(string) }, null)?.Invoke(null, new object[] { _address });
+
+            Debug.Log($"[MergeGameBootstrapper] Started as CLIENT (addr={_address}, port={_port})");
+        }
+
+        private static void InvokeInstanceMethod(object instance, string methodName, params object[] args)
+        {
+            if (instance == null)
             {
-                MapId = 1,
-                SlotDefinitions = MapModuleConfig.CreateGridSlotDefinitions(rows: 4, columns: 4, slotWidth: 1.5f, slotHeight: 1.5f),
-                PathDefinitions = new List<PathDefinition>
+                return;
+            }
+
+            var type = instance.GetType();
+            var method = type.GetMethod(methodName, BindingFlags.Public | BindingFlags.Instance);
+            method?.Invoke(instance, args);
+        }
+
+        private static bool TryDetectParrelSyncClone(out bool isClone)
+        {
+            isClone = false;
+
+            try
+            {
+                var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+                Type clonesManagerType = null;
+
+                for (var i = 0; i < assemblies.Length; i++)
                 {
-                    new PathDefinition(
-                        pathIndex: 0,
-                        waypoints: new List<Point3D>
-                        {
-                            new Point3D(-6f, 3f, 0f),
-                            new Point3D(-2f, 3f, 0f),
-                            new Point3D( 2f, 3f, 0f),
-                            new Point3D( 6f, 3f, 0f)
-                        }
-                    )
-                }
-            };
-        }
-
-        private static RuleModuleConfig BuildRuleConfig(MergeHostConfig hostConfig)
-        {
-            // Host 기본 설정을 RuleModuleConfig에 반영합니다.
-            return new RuleModuleConfig
-            {
-                PlayerMaxHp = hostConfig.PlayerMaxHp,
-                PlayerStartGold = hostConfig.PlayerStartGold,
-                ScorePerGrade = hostConfig.ScorePerGrade,
-                InitialUnitGrade = hostConfig.InitialUnitGrade,
-                MaxUnitGrade = hostConfig.MaxUnitGrade,
-                WaveCompletionBonusGold = hostConfig.WaveCompletionBonusGold,
-            };
-        }
-
-        private static WaveModuleConfig BuildWaveConfig(MergeHostConfig hostConfig)
-        {
-            // 프로토타입용: 기본 웨이브 테이블 + 기본 증가값
-            return new WaveModuleConfig
-            {
-                AutoStartWaves = true,
-                WaveStartDelay = 2f,
-                WaveIntervalDelay = 3f,
-                DefaultSpawnInterval = hostConfig.WaveSpawnInterval,
-                MaxWaveCount = 5,
-                BaseMonsterCount = 3,
-                MonstersPerWaveIncrease = 1,
-            };
-        }
-
-        /// <summary>
-        /// 프로토타입용 하드코딩 타워 DB입니다.
-        /// 나중에 SO/JSON/서버 데이터로 교체할 수 있도록 인터페이스로 분리합니다.
-        /// </summary>
-        private sealed class DevTowerDatabase : ITowerDatabase
-        {
-            private readonly Dictionary<string, TowerDefinition> _definitions = new()
-            {
-                {
-                    "unit_basic",
-                    new TowerDefinition
+                    clonesManagerType = assemblies[i].GetType("ParrelSync.ClonesManager", throwOnError: false);
+                    if (clonesManagerType != null)
                     {
-                        TowerId = "unit_basic",
-                        TowerType = "basic",
-                        InitialGrade = 1,
-                        BaseAttackDamage = 10f,
-                        BaseAttackSpeed = 1f,
-                        BaseAttackRange = 10f,
-                        AttackType = TowerAttackType.HitScan,
-                        ProjectileType = ProjectileType.Direct,
-                        ProjectileSpeed = 8f,
-                        ThrowRadius = 1.5f,
+                        break;
                     }
-                },
-            };
-
-            public TowerDefinition GetDefinition(string towerId)
-            {
-                if (string.IsNullOrEmpty(towerId))
-                {
-                    return null;
                 }
 
-                return _definitions.TryGetValue(towerId, out var definition) ? definition : null;
+                if (clonesManagerType == null)
+                {
+                    return false;
+                }
+
+                var method = clonesManagerType.GetMethod("IsClone", BindingFlags.Public | BindingFlags.Static);
+                if (method == null)
+                {
+                    return false;
+                }
+
+                var value = method.Invoke(null, null);
+                if (value is bool b)
+                {
+                    isClone = b;
+                    return true;
+                }
+
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            var networkClientType = Type.GetType(NetworkClientTypeName);
+            var networkServerType = Type.GetType(NetworkServerTypeName);
+
+            var clientActiveProperty = networkClientType?.GetProperty("active", BindingFlags.Public | BindingFlags.Static);
+            var serverActiveProperty = networkServerType?.GetProperty("active", BindingFlags.Public | BindingFlags.Static);
+
+            var isClientActive = clientActiveProperty?.GetValue(null) is bool b1 && b1;
+            var isServerActive = serverActiveProperty?.GetValue(null) is bool b2 && b2;
+
+            if (isClientActive)
+            {
+                networkClientType?.GetMethod("Disconnect", BindingFlags.Public | BindingFlags.Static)?.Invoke(null, null);
+                networkClientType?.GetMethod("Shutdown", BindingFlags.Public | BindingFlags.Static)?.Invoke(null, null);
             }
 
-            public string GetRandomIdForGrade(int grade)
+            if (isServerActive)
             {
-                // 프로토타입에서는 기본 ID를 반환합니다.
-                return "unit_basic";
+                networkServerType?.GetMethod("Shutdown", BindingFlags.Public | BindingFlags.Static)?.Invoke(null, null);
             }
         }
     }
 }
-
-

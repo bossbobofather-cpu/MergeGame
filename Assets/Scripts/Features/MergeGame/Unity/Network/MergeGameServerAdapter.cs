@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Mirror;
+using MyProject.MergeGame;
 using MyProject.MergeGame.Commands;
 using MyProject.MergeGame.Modules;
 using Noname.GameAbilitySystem;
@@ -8,47 +8,52 @@ using UnityEngine;
 
 namespace MyProject.MergeGame.Unity.Network
 {
+    /// <summary>
+    /// 서버 측 네트워크 어댑터입니다.
+    /// - 플레이어별 MergeGameHost를 생성/관리합니다.
+    /// - 클라이언트 CommandMsg를 Host 커맨드로 변환합니다.
+    /// - Host Event/Snapshot을 EventMsg/SnapshotMsg로 전송합니다.
+    /// </summary>
     public sealed class MergeGameServerAdapter : MonoBehaviour
     {
+        private const int MaxSupportedPlayers = 2;
+
         [Header("Connection Mapping")]
         [SerializeField] private bool _reserveSlot0ForLocalHost = true;
-        [SerializeField] private int _maxPlayers = 2;
-
-        [Header("Match Rules")]
-        [SerializeField] private int _killsPerGarbage = 10;
+        [SerializeField] private int _maxPlayers = 1;
         [SerializeField] private float _snapshotSendInterval = 0.1f;
         [SerializeField] private float _dummySpawnInterval = 1f;
         [SerializeField] private string _dummyTowerId = "unit_basic";
 
         /// <summary>
-        /// Host(Server+LocalClient) 모드인지 Dedicated Server인지에 따라
-        /// 플레이어 인덱스 매핑이 달라집니다.
-        /// - Host 모드: localConnection(connectionId=0)을 playerIndex=0으로 예약합니다.
-        /// - ServerOnly: 최초 접속한 클라이언트를 playerIndex=0으로 배정합니다.
-        /// </summary>        
+        /// Host(Server+LocalClient) 모드와 Dedicated Server 모드에 맞춰
+        /// 연결 ID를 플레이어 인덱스로 매핑하는 방식을 설정합니다.
+        /// </summary>
         public void Configure(bool reserveSlot0ForLocalHost)
         {
             _reserveSlot0ForLocalHost = reserveSlot0ForLocalHost;
         }
 
+        /// <summary>
+        /// 매치에 허용할 최대 플레이어 수를 설정합니다.
+        /// 예: 싱글 테스트(1), 1:1 멀티(2)
+        /// </summary>
+        public void SetMaxPlayers(int maxPlayers)
+        {
+            _maxPlayers = Mathf.Clamp(maxPlayers, 1, MaxSupportedPlayers);
+        }
 
         private readonly Dictionary<int, int> _playerIndexByConnectionId = new();
-        private readonly NetworkConnectionToClient[] _connections = new NetworkConnectionToClient[2];
-
-        private readonly long[] _playerUids = { 1, 2 };
-
-        private MergeGameHost _hostA;
-        private MergeGameHost _hostB;
-        private MergeGameMatchHost _matchHost;
-
-        private readonly bool[] _playerReady = new bool[2];
-
-        private readonly bool[] _playerStarted = new bool[2];
-        private readonly bool[] _playerGameOver = new bool[2];
+        private NetworkConnectionToClient[] _connections;
+        private long[] _playerUids;
+        private MergeGameHost[] _playerHosts;
+        private bool[] _playerReady;
+        private bool[] _playerStarted;
+        private bool[] _playerGameOver;
 
         private bool _matchStarted;
 
-        private readonly float[] _dummySpawnTimers = new float[2];
+        private float[] _dummySpawnTimers;
         private float _snapshotTimer;
 
         private bool _initialized;
@@ -66,26 +71,37 @@ namespace MyProject.MergeGame.Unity.Network
                 return;
             }
 
+            var playerCount = Mathf.Clamp(_maxPlayers, 1, MaxSupportedPlayers);
+            _connections = new NetworkConnectionToClient[playerCount];
+            _playerUids = new long[playerCount];
+            _playerHosts = new MergeGameHost[playerCount];
+            _playerReady = new bool[playerCount];
+            _playerStarted = new bool[playerCount];
+            _playerGameOver = new bool[playerCount];
+            _dummySpawnTimers = new float[playerCount];
+
+            for (var i = 0; i < playerCount; i++)
+            {
+                _playerUids[i] = i + 1;
+            }
+
             _initialized = true;
 
             NetworkServer.OnConnectedEvent += HandleConnected;
             NetworkServer.OnDisconnectedEvent += HandleDisconnected;
+            NetworkServer.UnregisterHandler<CommandMsg>();
             NetworkServer.RegisterHandler<CommandMsg>(HandleCommandMsg, requireAuthentication: false);
 
-            // Host 생성/초기화
-            _hostA = BuildHost();
-            _hostB = BuildHost();
-
-            _hostA.ResultProduced += result => OnHostResult(0, result);
-            _hostB.ResultProduced += result => OnHostResult(1, result);
-
-            _hostA.EventRaised += evt => OnHostEvent(0, evt);
-            _hostB.EventRaised += evt => OnHostEvent(1, evt);
-
-            _matchHost = new MergeGameMatchHost(_hostA, _hostB, killsPerGarbage: _killsPerGarbage);
-
-            _hostA.StartSimulation();
-            _hostB.StartSimulation();
+            // 플레이어 보드별 Host를 생성하고 초기화합니다.
+            for (var i = 0; i < _playerHosts.Length; i++)
+            {
+                var playerIndex = i;
+                var host = BuildHost();
+                host.ResultProduced += result => OnHostResult(playerIndex, result);
+                host.EventRaised += evt => OnHostEvent(playerIndex, evt);
+                host.StartSimulation();
+                _playerHosts[playerIndex] = host;
+            }
 
             Debug.Log("[MergeGameServerAdapter] ServerAdapter initialized.");
         }
@@ -99,48 +115,56 @@ namespace MyProject.MergeGame.Unity.Network
 
             NetworkServer.OnConnectedEvent -= HandleConnected;
             NetworkServer.OnDisconnectedEvent -= HandleDisconnected;
+            NetworkServer.UnregisterHandler<CommandMsg>();
 
-            _matchHost?.Dispose();
-
-            if (_hostA != null)
+            if (_playerHosts != null)
             {
-                _hostA.StopSimulation();
-                _hostA.Dispose();
+                for (var i = 0; i < _playerHosts.Length; i++)
+                {
+                    var host = _playerHosts[i];
+                    if (host == null)
+                    {
+                        continue;
+                    }
+
+                    host.StopSimulation();
+                    host.Dispose();
+                    _playerHosts[i] = null;
+                }
             }
 
-            if (_hostB != null)
-            {
-                _hostB.StopSimulation();
-                _hostB.Dispose();
-            }
-
-            _hostA = null;
-            _hostB = null;
+            _initialized = false;
         }
 
         private void Update()
         {
-            if (!_initialized || !NetworkServer.active)
+            if (!_initialized || !NetworkServer.active || _playerHosts == null)
             {
                 return;
             }
 
-            // Host -> ServerAdapter/MatchHost 이벤트 플러시
-            _hostA?.FlushEvents();
-            _hostB?.FlushEvents();
+            // 서버 프레임에서 각 Host의 Result/Event를 메인 스레드로 디스패치합니다.
+            for (var i = 0; i < _playerHosts.Length; i++)
+            {
+                _playerHosts[i]?.FlushEvents();
+            }
 
-            // 더미 테스트: 1초마다 기본 타워 자동 스폰
-            TickDummySpawn(0, Time.deltaTime);
-            TickDummySpawn(1, Time.deltaTime);
+            // 더미 테스트: 일정 주기로 기본 타워를 자동 생성합니다.
+            for (var i = 0; i < _playerHosts.Length; i++)
+            {
+                TickDummySpawn(i, Time.deltaTime);
+            }
 
-            // 스냅샷 전송
+            // 스냅샷 주기 전송
             _snapshotTimer += Time.deltaTime;
             if (_snapshotTimer >= _snapshotSendInterval)
             {
                 _snapshotTimer -= _snapshotSendInterval;
 
-                SendSnapshotToPlayer(0);
-                SendSnapshotToPlayer(1);
+                for (var i = 0; i < _playerHosts.Length; i++)
+                {
+                    SendSnapshotToPlayer(i);
+                }
             }
         }
 
@@ -227,7 +251,7 @@ namespace MyProject.MergeGame.Unity.Network
             var playerIndex = ResolvePlayerIndexForConnection(conn);
             if (playerIndex < 0)
             {
-                Debug.LogWarning($"[MergeGameServerAdapter] 플레이어 슬롯이 꽉 찼습니다. connId={conn.connectionId}");
+                Debug.LogWarning($"[MergeGameServerAdapter] 플레이어 슬롯이 가득 찼습니다. connId={conn.connectionId}");
                 conn.Disconnect();
                 return;
             }
@@ -235,14 +259,13 @@ namespace MyProject.MergeGame.Unity.Network
             _playerIndexByConnectionId[conn.connectionId] = playerIndex;
             _connections[playerIndex] = conn;
 
-            Debug.Log($"[MergeGameServerAdapter] 클라이언트 연결됨. connId={conn.connectionId}, playerIndex={playerIndex}");
-
+            Debug.Log($"[MergeGameServerAdapter] 클라이언트 연결 성공. connId={conn.connectionId}, playerIndex={playerIndex}");
 
             _playerReady[playerIndex] = false;
             _playerStarted[playerIndex] = false;
             _playerGameOver[playerIndex] = false;
 
-            SendLog(playerIndex, 0, "[대기] 준비(Ready) 커맨드를 기다립니다.");
+            SendLog(playerIndex, 0, "[서버] 준비(Ready) 커맨드를 보내주세요.");
         }
 
         private void HandleDisconnected(NetworkConnectionToClient conn)
@@ -261,10 +284,10 @@ namespace MyProject.MergeGame.Unity.Network
                 _playerGameOver[playerIndex] = false;
                 _dummySpawnTimers[playerIndex] = 0f;
 
-                // 더미 테스트: 플레이어가 나가면 준비 상태로 초기화합니다.
+                // 연결이 끊기면 Ready 게이트를 다시 열어둡니다.
                 _matchStarted = false;
 
-                Debug.Log($"[MergeGameServerAdapter] 클라이언트 연결 해제됨. connId={conn.connectionId}, playerIndex={playerIndex}");
+                Debug.Log($"[MergeGameServerAdapter] 클라이언트 연결 해제. connId={conn.connectionId}, playerIndex={playerIndex}");
             }
         }
 
@@ -276,8 +299,8 @@ namespace MyProject.MergeGame.Unity.Network
                 return 0;
             }
 
-            // 그 외 접속한 클라이언트는 0..N 중 첫 빈 슬롯에 배정합니다.
-            for (var i = 0; i < _maxPlayers && i < _connections.Length; i++)
+            // 비어 있는 첫 슬롯을 배정합니다.
+            for (var i = 0; i < _connections.Length; i++)
             {
                 if (_connections[i] == null)
                 {
@@ -301,7 +324,7 @@ namespace MyProject.MergeGame.Unity.Network
                 return;
             }
 
-            // MVP: 필요한 커맨드만 처리
+            // MVP에서는 준비/타워 생성/머지 커맨드만 처리합니다.
             switch (msg.CommandType)
             {
                 case MergeNetCommandType.StartGame:
@@ -346,7 +369,7 @@ namespace MyProject.MergeGame.Unity.Network
             }
 
             _playerReady[playerIndex] = true;
-            SendLog(playerIndex, 0, "[준비] Ready 완료.");
+            SendLog(playerIndex, 0, "[준비] Ready 수신.");
 
             TryStartMatchIfReady();
         }
@@ -358,29 +381,25 @@ namespace MyProject.MergeGame.Unity.Network
                 return;
             }
 
-            // 2명 연결 + 2명 준비가 완료되면 게임을 시작합니다.
-            if (_connections[0] == null || _connections[1] == null)
+            for (var i = 0; i < _connections.Length; i++)
             {
-                return;
-            }
-
-            if (!_playerReady[0] || !_playerReady[1])
-            {
-                return;
+                if (_connections[i] == null || !_playerReady[i])
+                {
+                    return;
+                }
             }
 
             _matchStarted = true;
 
-            // 게임 시작과 동시에 더미 스폰 타이머를 초기화합니다.
-            _dummySpawnTimers[0] = 0f;
-            _dummySpawnTimers[1] = 0f;
-
-            SendLog(0, 0, "[매치] 모두 준비 완료. 게임을 시작합니다.");
-            SendLog(1, 0, "[매치] 모두 준비 완료. 게임을 시작합니다.");
-
-            GetHost(0)?.SendCommand(new StartMergeGameCommand(_playerUids[0]));
-            GetHost(1)?.SendCommand(new StartMergeGameCommand(_playerUids[1]));
+            // 매치 시작 직후 타이머를 초기화하고 게임 시작 커맨드를 보냅니다.
+            for (var i = 0; i < _dummySpawnTimers.Length; i++)
+            {
+                _dummySpawnTimers[i] = 0f;
+                SendLog(i, 0, "[매치] 준비 완료. 게임을 시작합니다.");
+                GetHost(i)?.SendCommand(new StartMergeGameCommand(_playerUids[i]));
+            }
         }
+
         private void OnHostResult(int playerIndex, MergeCommandResult result)
         {
             if (result == null)
@@ -403,7 +422,7 @@ namespace MyProject.MergeGame.Unity.Network
                 return;
             }
 
-            // 서버 내부에서 발생한 이벤트 로깅
+            // 시작/종료 상태를 서버 내부 플래그에 반영합니다.
             if (evt is MergeGameStartedEvent)
             {
                 _playerStarted[playerIndex] = true;
@@ -413,7 +432,7 @@ namespace MyProject.MergeGame.Unity.Network
                 _playerGameOver[playerIndex] = true;
             }
 
-            // 너무 자주 발생하는 이벤트는 로그 전송에서 제외
+            // 이동 이벤트는 빈도가 높아 로그에서 제외합니다.
             if (evt is MonsterMovedEvent)
             {
                 return;
@@ -429,6 +448,11 @@ namespace MyProject.MergeGame.Unity.Network
 
         private void SendLog(int playerIndex, long tick, string text)
         {
+            if (playerIndex < 0 || playerIndex >= _connections.Length)
+            {
+                return;
+            }
+
             var conn = _connections[playerIndex];
             if (conn == null)
             {
@@ -463,11 +487,11 @@ namespace MyProject.MergeGame.Unity.Network
                     return true;
 
                 case MonsterSpawnedEvent e:
-                    line = $"[몬스터 스폰] uid={e.MonsterUid} id={e.MonsterId} path={e.PathIndex} hp={e.MaxHealth:0}";
+                    line = $"[몬스터 생성] uid={e.MonsterUid} id={e.MonsterId} path={e.PathIndex} hp={e.MaxHealth:0}";
                     return true;
 
                 case TowerSpawnedEvent e:
-                    line = $"[타워 스폰] uid={e.TowerUid} id={e.TowerId} grade={e.Grade} slot={e.SlotIndex}";
+                    line = $"[타워 생성] uid={e.TowerUid} id={e.TowerId} grade={e.Grade} slot={e.SlotIndex}";
                     return true;
 
                 case TowerAttackedEvent e:
@@ -483,7 +507,7 @@ namespace MyProject.MergeGame.Unity.Network
                     return true;
 
                 case PlayerGoldChangedEvent e:
-                    line = $"[골드] {e.Reason} delta={e.GoldDelta} current={e.CurrentGold}";
+                    line = $"[골드] reason={e.Reason} delta={e.GoldDelta} current={e.CurrentGold}";
                     return true;
 
                 case MergeGameOverEvent e:
@@ -496,7 +520,12 @@ namespace MyProject.MergeGame.Unity.Network
 
         private MergeGameHost GetHost(int playerIndex)
         {
-            return playerIndex == 0 ? _hostA : _hostB;
+            if (_playerHosts == null || playerIndex < 0 || playerIndex >= _playerHosts.Length)
+            {
+                return null;
+            }
+
+            return _playerHosts[playerIndex];
         }
 
         private static MergeGameHost BuildHost()
@@ -553,7 +582,7 @@ namespace MyProject.MergeGame.Unity.Network
 
         private static WaveModuleConfig BuildWaveConfig(MergeHostConfig hostConfig)
         {
-            // 더미 테스트: 1초마다 기본 타워 자동 스폰
+            // 자동 진행용 단순 웨이브 설정입니다.
             return new WaveModuleConfig
             {
                 AutoStartWaves = true,
@@ -567,15 +596,8 @@ namespace MyProject.MergeGame.Unity.Network
         }
 
         /// <summary>
-        /// Mirror 서버 어댑터입니다.
-        ///
-        /// 책임:
-        /// - 클라이언트 CommandMsg 수신 -> Host 커맨드 변환/전달
-        /// - Host의 Event/Snapshot -> 클라이언트 전송
-        /// - 개발용 더미 시뮬레이션(주기적 타워 스폰)
-        ///
-        /// 주의:
-        /// Host.FlushEvents()는 메인 스레드에서 주기적으로 호출해야 합니다.
+        /// 개발/테스트용 타워 데이터베이스입니다.
+        /// 실서비스에서는 외부 데이터 소스(JSON/DB 등)로 교체할 수 있습니다.
         /// </summary>
         private sealed class DevTowerDatabase : ITowerDatabase
         {
@@ -616,6 +638,3 @@ namespace MyProject.MergeGame.Unity.Network
         }
     }
 }
-
-
-
