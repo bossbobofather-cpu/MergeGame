@@ -15,8 +15,8 @@ namespace MyProject.MergeGame.Unity
     public sealed class InputViewModule : MergeViewModuleBase
     {
         [Header("Spawn")]
-        [SerializeField] private bool _useCharacterCommands = true;
-        [SerializeField] private string _spawnCharacterId = "unit_basic";
+        [SerializeField] private bool _useTowerCommands = true;
+        [SerializeField] private string _spawnTowerId = "unit_basic";
 
         [Header("Message")]
         [SerializeField] private Color _infoColor = new Color(0f, 0f, 0f, 0.6f);
@@ -105,15 +105,15 @@ namespace MyProject.MergeGame.Unity
         }
         private void SpawnAuto()
         {
-            if (_useCharacterCommands)
+            if (_useTowerCommands)
             {
-                if (string.IsNullOrEmpty(_spawnCharacterId))
+                if (string.IsNullOrEmpty(_spawnTowerId))
                 {
-                    Post("[스폰 실패] SpawnCharacterId가 비어있습니다.", _warnColor);
+                    Post("[스폰 실패] SpawnTowerId가 비어있습니다.", _warnColor);
                     return;
                 }
 
-                GameView.SendCommand(new SpawnCharacterCommand(GameView.LocalUserId, _spawnCharacterId));
+                GameView.SendCommand(new SpawnTowerCommand(GameView.LocalUserId, _spawnTowerId));
             }
             else
             {
@@ -160,9 +160,9 @@ namespace MyProject.MergeGame.Unity
             // 빈 슬롯이면 이동, 아니면 머지 시도
             if (toSlot.IsEmpty)
             {
-                if (_useCharacterCommands)
+                if (_useTowerCommands)
                 {
-                    GameView.SendCommand(new MoveCharacterCommand(GameView.LocalUserId, from, to));
+                    GameView.SendCommand(new MoveTowerCommand(GameView.LocalUserId, from, to));
                 }
                 else
                 {
@@ -172,9 +172,9 @@ namespace MyProject.MergeGame.Unity
                 return;
             }
 
-            if (_useCharacterCommands)
+            if (_useTowerCommands)
             {
-                GameView.SendCommand(new MergeCharacterCommand(GameView.LocalUserId, from, to));
+                GameView.SendCommand(new MergeTowerCommand(GameView.LocalUserId, from, to));
             }
             else
             {
@@ -252,4 +252,5 @@ namespace MyProject.MergeGame.Unity
         }
     }
 }
+
 

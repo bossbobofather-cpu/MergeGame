@@ -118,20 +118,60 @@ namespace MyProject.MergeGame.Unity
                     PublishMessage($"[게임 시작] 슬롯 수: {e.SlotCount}", _startColor);
                     break;
 
-                case MergeUnitSpawnedEvent e:
-                    PublishMessage($"[유닛 생성] 등급: {e.Grade}, 슬롯: {e.SlotIndex}, UID: {e.UnitUid}", _spawnColor);
+                case WaveStartedEvent e:
+                    PublishMessage($"[웨이브 시작] Wave: {e.WaveNumber}, 몬스터: {e.TotalMonsterCount}", _startColor);
                     break;
 
-                case MergeUnitMergedEvent e:
-                    PublishMessage($"[머지 성공] 새 등급: {e.ResultGrade}, 슬롯: {e.SlotIndex}, UID: {e.ResultUnitUid}", _mergeColor);
+                case WaveCompletedEvent e:
+                    PublishMessage($"[웨이브 완료] Wave: {e.WaveNumber}, 보너스 골드: +{e.BonusGold}", _scoreColor);
                     break;
 
-                case MergeUnitRemovedEvent e:
-                    PublishMessage($"[유닛 제거] 슬롯: {e.SlotIndex}, UID: {e.UnitUid}", _logColor);
+                case TowerSpawnedEvent e:
+                    PublishMessage($"[타워 생성] {e.TowerId}({e.TowerType}) G{e.Grade}, 슬롯: {e.SlotIndex}, UID: {e.TowerUid}", _spawnColor);
+                    break;
+
+                case TowerMovedEvent e:
+                    PublishMessage($"[타워 이동] UID: {e.TowerUid}, {e.FromSlotIndex} -> {e.ToSlotIndex}", _logColor);
+                    break;
+
+                case TowerMergedEvent e:
+                    PublishMessage($"[타워 머지] {e.SourceTowerUid} + {e.TargetTowerUid} -> {e.ResultTowerUid} (G{e.ResultGrade}) 슬롯: {e.SlotIndex}", _mergeColor);
+                    break;
+
+                case TowerRemovedEvent e:
+                    PublishMessage($"[타워 제거] UID: {e.TowerUid}, 슬롯: {e.SlotIndex}, 사유: {e.Reason}", _logColor);
+                    break;
+
+                case TowerAttackedEvent e:
+                    PublishMessage($"[타워 공격] {e.AttackerUid} -> {e.TargetUid}, 데미지: {e.Damage}", _logColor);
+                    break;
+
+                case MonsterSpawnedEvent e:
+                    PublishMessage($"[몬스터 생성] {e.MonsterId}, UID: {e.MonsterUid}, Path: {e.PathIndex}", _spawnColor);
+                    break;
+
+                case MonsterDamagedEvent e:
+                    PublishMessage($"[몬스터 피격] UID: {e.MonsterUid}, -{e.Damage} (HP: {e.CurrentHealth})", _logColor);
+                    break;
+
+                case MonsterDiedEvent e:
+                    PublishMessage($"[몬스터 처치] UID: {e.MonsterUid}, 보상 골드: +{e.GoldReward}", _scoreColor);
+                    break;
+
+                case PlayerHpChangedEvent e:
+                    PublishMessage($"[HP] {e.CurrentHp}/{e.MaxHp} ({e.HpDelta:+#;-#;0}) 이유: {e.Reason}", _logColor);
+                    break;
+
+                case PlayerGoldChangedEvent e:
+                    PublishMessage($"[골드] {e.CurrentGold} ({e.GoldDelta:+#;-#;0}) 이유: {e.Reason}", _scoreColor);
                     break;
 
                 case MergeScoreChangedEvent e:
                     PublishMessage($"[점수] +{e.ScoreDelta} (총: {e.CurrentScore})", _scoreColor);
+                    break;
+
+                case MergeEffectTriggeredEvent e:
+                    PublishMessage($"[이펙트] {e.EffectId} at ({e.PositionX:F1},{e.PositionY:F1})", _mergeColor);
                     break;
 
                 case MergeGameOverEvent e:
@@ -139,7 +179,20 @@ namespace MyProject.MergeGame.Unity
                         $"[게임 종료] 승리: {e.IsVictory}, 최종 점수: {e.FinalScore}, 최고 등급: {e.MaxGradeReached}",
                         _gameOverColor);
                     break;
+
+                case MonsterMovedEvent:
+                case MonsterReachedGoalEvent:
+                    // 이동 관련 이벤트는 너무 자주 발생할 수 있어 기본 로그에서는 생략합니다.
+                    break;
+
+                case MergeUnitSpawnedEvent:
+                case MergeUnitMergedEvent:
+                case MergeUnitRemovedEvent:
+                    // 레거시(Unit) 이벤트는 타워 이벤트로 대체되었습니다.
+                    break;
             }
+
+
         }
 
         #region Module Routing
@@ -186,4 +239,7 @@ namespace MyProject.MergeGame.Unity
         }
     }
 }
+
+
+
 

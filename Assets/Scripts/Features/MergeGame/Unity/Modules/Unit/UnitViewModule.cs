@@ -10,15 +10,15 @@ namespace MyProject.MergeGame.Unity
     public sealed class UnitViewModule : MergeViewModuleBase
     {
         [Header("Prefabs (Optional)")]
-        [SerializeField] private GameObject _characterPrefab;
+        [SerializeField] private GameObject _towerPrefab;
         [SerializeField] private GameObject _monsterPrefab;
 
         [Header("Fallback Visual")]
         [SerializeField] private bool _usePrimitiveFallback = true;
-        [SerializeField] private Vector3 _characterScale = new Vector3(0.8f, 0.8f, 0.8f);
+        [SerializeField] private Vector3 _towerScale = new Vector3(0.8f, 0.8f, 0.8f);
         [SerializeField] private Vector3 _monsterScale = new Vector3(0.8f, 0.8f, 0.8f);
 
-        private readonly Dictionary<long, GameObject> _characterObjects = new();
+        private readonly Dictionary<long, GameObject> _towerObjects = new();
         private readonly Dictionary<long, GameObject> _monsterObjects = new();
 
         private readonly HashSet<long> _seen = new();
@@ -31,35 +31,35 @@ namespace MyProject.MergeGame.Unity
                 return;
             }
 
-            SyncCharacters(snapshot);
+            SyncTowers(snapshot);
             SyncMonsters(snapshot);
         }
 
-        private void SyncCharacters(MergeHostSnapshot snapshot)
+        private void SyncTowers(MergeHostSnapshot snapshot)
         {
             _seen.Clear();
 
-            var characters = snapshot.Characters;
-            for (var i = 0; i < characters.Count; i++)
+            var towers = snapshot.Towers;
+            for (var i = 0; i < towers.Count; i++)
             {
-                var ch = characters[i];
+                var ch = towers[i];
                 _seen.Add(ch.Uid);
 
-                if (!_characterObjects.TryGetValue(ch.Uid, out var obj) || obj == null)
+                if (!_towerObjects.TryGetValue(ch.Uid, out var obj) || obj == null)
                 {
-                    obj = CreateCharacterObject(ch);
-                    _characterObjects[ch.Uid] = obj;
+                    obj = CreateTowerObject(ch);
+                    _towerObjects[ch.Uid] = obj;
                 }
 
                 // 좌표계는 Host/Map과 동일한 로컬 좌표계를 가정합니다.
                 obj.transform.localPosition = new Vector3(ch.PositionX, ch.PositionY, 0f);
-                obj.transform.localScale = _characterScale;
-                obj.name = $"Character_{ch.Uid}_G{ch.Grade}";
+                obj.transform.localScale = _towerScale;
+                obj.name = $"Tower_{ch.Uid}_G{ch.Grade}";
 
                 ApplyGradeColor(obj, ch.Grade);
             }
 
-            RemoveNotSeen(_characterObjects);
+            RemoveNotSeen(_towerObjects);
         }
 
         private void SyncMonsters(MergeHostSnapshot snapshot)
@@ -112,11 +112,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
 
-        private GameObject CreateCharacterObject(CharacterSnapshot snapshot)
+        private GameObject CreateTowerObject(TowerSnapshot snapshot)
         {
-            if (_characterPrefab != null)
+            if (_towerPrefab != null)
             {
-                return Instantiate(_characterPrefab, transform);
+                return Instantiate(_towerPrefab, transform);
             }
 
             if (_usePrimitiveFallback)
@@ -126,7 +126,7 @@ namespace MyProject.MergeGame.Unity
                 return primitive;
             }
 
-            var obj = new GameObject("Character");
+            var obj = new GameObject("Tower");
             obj.transform.SetParent(transform, false);
             return obj;
         }
@@ -196,14 +196,14 @@ namespace MyProject.MergeGame.Unity
         {
             base.OnShutdown();
 
-            foreach (var kv in _characterObjects)
+            foreach (var kv in _towerObjects)
             {
                 if (kv.Value != null)
                 {
                     Destroy(kv.Value);
                 }
             }
-            _characterObjects.Clear();
+            _towerObjects.Clear();
 
             foreach (var kv in _monsterObjects)
             {
@@ -216,3 +216,4 @@ namespace MyProject.MergeGame.Unity
         }
     }
 }
+

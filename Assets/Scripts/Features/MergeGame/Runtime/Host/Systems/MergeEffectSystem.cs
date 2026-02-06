@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Noname.GameAbilitySystem;
 using MyProject.MergeGame.Models;
@@ -54,9 +54,9 @@ namespace MyProject.MergeGame.Systems
         void Apply(
             long tick,
             MergeHostState state,
-            MergeCharacter source,
-            MergeCharacter target,
-            MergeCharacter result,
+            MergeTower source,
+            MergeTower target,
+            MergeTower result,
             bool isSourceEffect,
             MergeEffectResult effectResult);
     }
@@ -93,9 +93,9 @@ namespace MyProject.MergeGame.Systems
         /// </summary>
         public MergeEffectResult ApplyMergeEffects(
             long tick,
-            MergeCharacter source,
-            MergeCharacter target,
-            MergeCharacter result)
+            MergeTower source,
+            MergeTower target,
+            MergeTower result)
         {
             var effectResult = new MergeEffectResult();
 
@@ -168,9 +168,9 @@ namespace MyProject.MergeGame.Systems
         public void Apply(
             long tick,
             MergeHostState state,
-            MergeCharacter source,
-            MergeCharacter target,
-            MergeCharacter result,
+            MergeTower source,
+            MergeTower target,
+            MergeTower result,
             bool isSourceEffect,
             MergeEffectResult effectResult)
         {
@@ -222,9 +222,9 @@ namespace MyProject.MergeGame.Systems
         public void Apply(
             long tick,
             MergeHostState state,
-            MergeCharacter source,
-            MergeCharacter target,
-            MergeCharacter result,
+            MergeTower source,
+            MergeTower target,
+            MergeTower result,
             bool isSourceEffect,
             MergeEffectResult effectResult)
         {
@@ -252,9 +252,9 @@ namespace MyProject.MergeGame.Systems
         public void Apply(
             long tick,
             MergeHostState state,
-            MergeCharacter source,
-            MergeCharacter target,
-            MergeCharacter result,
+            MergeTower source,
+            MergeTower target,
+            MergeTower result,
             bool isSourceEffect,
             MergeEffectResult effectResult)
         {
@@ -280,21 +280,21 @@ namespace MyProject.MergeGame.Systems
         public void Apply(
             long tick,
             MergeHostState state,
-            MergeCharacter source,
-            MergeCharacter target,
-            MergeCharacter result,
+            MergeTower source,
+            MergeTower target,
+            MergeTower result,
             bool isSourceEffect,
             MergeEffectResult effectResult)
         {
             // 캐릭터는 일반적으로 HP가 없지만 확장성을 위해 구현
-            foreach (var character in state.Characters.Values)
+            foreach (var tower in state.Towers.Values)
             {
-                var maxHealth = character.ASC.Get(AttributeId.MaxHealth);
+                var maxHealth = tower.ASC.Get(AttributeId.MaxHealth);
                 if (maxHealth > 0)
                 {
-                    var currentHealth = character.ASC.Get(AttributeId.Health);
+                    var currentHealth = tower.ASC.Get(AttributeId.Health);
                     var newHealth = Math.Min(currentHealth + _healAmount, maxHealth);
-                    character.ASC.Set(AttributeId.Health, newHealth);
+                    tower.ASC.Set(AttributeId.Health, newHealth);
                 }
             }
         }
@@ -302,3 +302,4 @@ namespace MyProject.MergeGame.Systems
 
     #endregion
 }
+

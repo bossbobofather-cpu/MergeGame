@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MyProject.Common.Bootstrap;
 using MyProject.MergeGame.Modules;
@@ -35,7 +35,7 @@ namespace MyProject.MergeGame.Unity
 
             // Host 조립: StartSimulation 이전에 모듈 구성/초기화를 끝내야 합니다.
             var hostConfig = _config ?? new MergeHostConfig();
-            var host = new MergeGameHost(hostConfig, new DevCharacterDatabase());
+            var host = new MergeGameHost(hostConfig, new DevTowerDatabase());
 
             host.AddModule(new MapModule(), BuildMapConfig());
             host.AddModule(new RuleModule(), BuildRuleConfig(hostConfig));
@@ -70,7 +70,8 @@ namespace MyProject.MergeGame.Unity
             }
 
             EnsureModule<MapViewModule>(view, "MapViewModule");
-            EnsureModule<UnitViewModule>(view, "UnitViewModule");
+            EnsureModule<TowerViewModule>(view, "TowerViewModule");
+            EnsureModule<MonsterViewModule>(view, "MonsterViewModule");
             EnsureModule<HudViewModule>(view, "HudViewModule");
             EnsureModule<InputViewModule>(view, "InputViewModule");
         }
@@ -144,16 +145,16 @@ namespace MyProject.MergeGame.Unity
         /// 개발용 하드코딩 캐릭터 DB입니다.
         /// 이후 SO/JSON/서버로 교체할 수 있도록 인터페이스로 한 겹 감쌌습니다.
         /// </summary>
-        private sealed class DevCharacterDatabase : ICharacterDatabase
+        private sealed class DevTowerDatabase : ITowerDatabase
         {
-            private readonly Dictionary<string, CharacterDefinition> _definitions = new()
+            private readonly Dictionary<string, TowerDefinition> _definitions = new()
             {
                 {
                     "unit_basic",
-                    new CharacterDefinition
+                    new TowerDefinition
                     {
-                        CharacterId = "unit_basic",
-                        CharacterType = "basic",
+                        TowerId = "unit_basic",
+                        TowerType = "basic",
                         InitialGrade = 1,
                         BaseAttackDamage = 10f,
                         BaseAttackSpeed = 1f,
@@ -162,14 +163,14 @@ namespace MyProject.MergeGame.Unity
                 },
             };
 
-            public CharacterDefinition GetDefinition(string characterId)
+            public TowerDefinition GetDefinition(string towerId)
             {
-                if (string.IsNullOrEmpty(characterId))
+                if (string.IsNullOrEmpty(towerId))
                 {
                     return null;
                 }
 
-                return _definitions.TryGetValue(characterId, out var definition) ? definition : null;
+                return _definitions.TryGetValue(towerId, out var definition) ? definition : null;
             }
 
             public string GetRandomIdForGrade(int grade)
@@ -180,3 +181,4 @@ namespace MyProject.MergeGame.Unity
         }
     }
 }
+

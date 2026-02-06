@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using MyProject.MergeGame.Models;
 using MyProject.MergeGame.Modules;
@@ -27,58 +27,55 @@ namespace MyProject.MergeGame
             public Point2D Position { get; }
 
             /// <summary>
-            /// 유닛/캐릭터 UID입니다. 비어있으면 0입니다.
+            /// 타워 UID입니다. 비어있으면 0입니다.
             /// </summary>
-            public long UnitUid { get; private set; }
+            public long TowerUid { get; private set; }
 
             /// <summary>
-            /// 유닛/캐릭터 등급입니다.
+            /// 타워 등급입니다.
             /// </summary>
-            public int UnitGrade { get; private set; }
-
-            /// <summary>
-            /// 캐릭터 UID입니다 (UnitUid와 동일).
-            /// </summary>
-            public long CharacterUid => UnitUid;
+            public int TowerGrade { get; private set; }
 
             /// <summary>
             /// 슬롯이 비어있는지 여부입니다.
             /// </summary>
-            public bool IsEmpty => UnitUid == 0;
+            public bool IsEmpty => TowerUid == 0;
 
             public SlotInfo(int index, Point2D position)
             {
                 Index = index;
                 Position = position;
-                UnitUid = 0;
-                UnitGrade = 0;
+                TowerUid = 0;
+                TowerGrade = 0;
             }
 
             public void Clear()
             {
-                UnitUid = 0;
-                UnitGrade = 0;
+                TowerUid = 0;
+                TowerGrade = 0;
             }
 
+            public void SetTower(long towerUid, int grade)
+            {
+                TowerUid = towerUid;
+                TowerGrade = grade;
+            }
+
+            /// <summary>
+            /// 레거시 API 호환용입니다.
+            /// </summary>
             public void SetUnit(long unitUid, int grade)
             {
-                UnitUid = unitUid;
-                UnitGrade = grade;
-            }
-
-            public void SetCharacter(long characterUid)
-            {
-                UnitUid = characterUid;
+                SetTower(unitUid, grade);
             }
         }
-
-        // 세션 상태
+// 세션 상태
         private MergeSessionPhase _sessionPhase = MergeSessionPhase.None;
         private float _elapsedTime;
 
         // 보드 및 캐릭터
         private readonly List<SlotInfo> _slots = new();
-        private readonly Dictionary<long, MergeCharacter> _characters = new();
+        private readonly Dictionary<long, MergeTower> _towers = new();
 
         // 몬스터
         private readonly Dictionary<long, MergeMonster> _monsters = new();
@@ -101,7 +98,7 @@ namespace MyProject.MergeGame
         private int _maxGrade;
 
         // UID 생성기
-        private long _nextCharacterUid = 1;
+        private long _nextTowerUid = 1;
         private long _nextMonsterUid = 1;
 
         #region Properties
@@ -124,7 +121,7 @@ namespace MyProject.MergeGame
         /// <summary>
         /// 캐릭터 목록입니다.
         /// </summary>
-        public IReadOnlyDictionary<long, MergeCharacter> Characters => _characters;
+        public IReadOnlyDictionary<long, MergeTower> Towers => _towers;
 
         /// <summary>
         /// 몬스터 목록입니다.
@@ -293,87 +290,87 @@ namespace MyProject.MergeGame
 
         #endregion
 
-        #region Character Management
+        #region Tower Management
 
         /// <summary>
         /// 새 캐릭터 UID를 생성합니다.
         /// </summary>
-        public long GenerateCharacterUid()
+        public long GenerateTowerUid()
         {
-            return _nextCharacterUid++;
+            return _nextTowerUid++;
         }
 
         /// <summary>
         /// 캐릭터를 추가합니다.
         /// </summary>
-        public void AddCharacter(MergeCharacter character)
+        public void AddTower(MergeTower tower)
         {
-            if (character == null) return;
+            if (tower == null) return;
 
-            _characters[character.Uid] = character;
+            _towers[tower.Uid] = tower;
 
-            var slot = GetSlot(character.SlotIndex);
+            var slot = GetSlot(tower.SlotIndex);
             if (slot != null)
             {
-                slot.SetCharacter(character.Uid);
+                slot.SetTower(tower.Uid, tower.Grade);
             }
 
-            UpdateMaxGrade(character.Grade);
+            UpdateMaxGrade(tower.Grade);
         }
 
         /// <summary>
         /// 캐릭터를 가져옵니다.
         /// </summary>
-        public MergeCharacter GetCharacter(long uid)
+        public MergeTower GetTower(long uid)
         {
-            return _characters.TryGetValue(uid, out var character) ? character : null;
+            return _towers.TryGetValue(uid, out var tower) ? tower : null;
         }
 
         /// <summary>
         /// 슬롯의 캐릭터를 가져옵니다.
         /// </summary>
-        public MergeCharacter GetCharacterAtSlot(int slotIndex)
+        public MergeTower GetTowerAtSlot(int slotIndex)
         {
             var slot = GetSlot(slotIndex);
             if (slot == null || slot.IsEmpty) return null;
 
-            return GetCharacter(slot.CharacterUid);
+            return GetTower(slot.TowerUid);
         }
 
         /// <summary>
         /// 캐릭터를 제거합니다.
         /// </summary>
-        public void RemoveCharacter(long uid)
+        public void RemoveTower(long uid)
         {
-            if (!_characters.TryGetValue(uid, out var character)) return;
+            if (!_towers.TryGetValue(uid, out var tower)) return;
 
-            var slot = GetSlot(character.SlotIndex);
+            var slot = GetSlot(tower.SlotIndex);
             if (slot != null)
             {
                 slot.Clear();
             }
 
-            character.Dispose();
-            _characters.Remove(uid);
+            tower.Dispose();
+            _towers.Remove(uid);
         }
 
         /// <summary>
         /// 캐릭터를 생성하고 등록합니다.
         /// </summary>
-        public MergeCharacter CreateCharacter(
-            string characterId,
-            string characterType,
+        public MergeTower CreateTower(
+            string towerId,
+            string towerType,
             int grade,
             int slotIndex,
             Point2D position,
             string onMergeSourceEffectId = null,
             string onMergeTargetEffectId = null)
         {
-            var uid = GenerateCharacterUid();
-            var character = new MergeCharacter(
+            var uid = GenerateTowerUid();
+            var tower = new MergeTower(
                 uid,
-                characterId,
-                characterType,
+                towerId,
+                towerType,
                 grade,
                 slotIndex,
                 position,
@@ -381,39 +378,39 @@ namespace MyProject.MergeGame
                 onMergeTargetEffectId
             );
 
-            _characters[uid] = character;
+            _towers[uid] = tower;
             UpdateMaxGrade(grade);
 
-            return character;
+            return tower;
         }
 
         /// <summary>
-        /// 슬롯의 캐릭터를 가져옵니다 (GetCharacterAtSlot 별칭).
+        /// 슬롯의 캐릭터를 가져옵니다 (GetTowerAtSlot 별칭).
         /// </summary>
-        public MergeCharacter GetCharacterBySlot(int slotIndex)
+        public MergeTower GetTowerBySlot(int slotIndex)
         {
-            return GetCharacterAtSlot(slotIndex);
+            return GetTowerAtSlot(slotIndex);
         }
 
         /// <summary>
         /// 캐릭터를 다른 슬롯으로 이동합니다.
         /// </summary>
-        public bool MoveCharacter(long uid, int newSlotIndex)
+        public bool MoveTower(long uid, int newSlotIndex)
         {
-            if (!_characters.TryGetValue(uid, out var character)) return false;
+            if (!_towers.TryGetValue(uid, out var tower)) return false;
 
             var newSlot = GetSlot(newSlotIndex);
             if (newSlot == null || !newSlot.IsEmpty) return false;
 
-            var oldSlot = GetSlot(character.SlotIndex);
+            var oldSlot = GetSlot(tower.SlotIndex);
             if (oldSlot != null)
             {
                 oldSlot.Clear();
             }
 
-            character.SlotIndex = newSlotIndex;
-            character.Position = newSlot.Position;
-            newSlot.SetCharacter(uid);
+            tower.SlotIndex = newSlotIndex;
+            tower.Position = newSlot.Position;
+            newSlot.SetTower(uid, tower.Grade);
 
             return true;
         }
@@ -423,10 +420,8 @@ namespace MyProject.MergeGame
         /// </summary>
         public long GenerateUnitUid()
         {
-            return GenerateCharacterUid();
-        }
-
-        #endregion
+            return GenerateTowerUid();
+        }#endregion
 
         #region Monster Management
 
@@ -734,11 +729,11 @@ namespace MyProject.MergeGame
             _slots.Clear();
 
             // 캐릭터 정리
-            foreach (var character in _characters.Values)
+            foreach (var tower in _towers.Values)
             {
-                character.Dispose();
+                tower.Dispose();
             }
-            _characters.Clear();
+            _towers.Clear();
 
             // 몬스터 정리
             foreach (var monster in _monsters.Values)
@@ -767,7 +762,7 @@ namespace MyProject.MergeGame
             _maxGrade = 0;
 
             // UID 초기화
-            _nextCharacterUid = 1;
+            _nextTowerUid = 1;
             _nextMonsterUid = 1;
         }
 
@@ -781,3 +776,7 @@ namespace MyProject.MergeGame
 
     // WavePhase는 Shared/Enums/MergeEnums.cs에 정의됨
 }
+
+
+
+

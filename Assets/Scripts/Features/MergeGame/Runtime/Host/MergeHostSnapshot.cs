@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Noname.GameHost;
 
 namespace MyProject.MergeGame
@@ -18,30 +18,30 @@ namespace MyProject.MergeGame
         /// <summary>
         /// 유닛 UID입니다. 비어있으면 0입니다.
         /// </summary>
-        public long UnitUid { get; }
+        public long TowerUid { get; }
 
         /// <summary>
         /// 유닛 등급입니다. 비어있으면 0입니다.
         /// </summary>
-        public int UnitGrade { get; }
+        public int TowerGrade { get; }
 
         /// <summary>
         /// 슬롯이 비어있는지 여부입니다.
         /// </summary>
-        public bool IsEmpty => UnitUid == 0;
+        public bool IsEmpty => TowerUid == 0;
 
         public SlotSnapshot(int index, long unitUid, int unitGrade)
         {
             Index = index;
-            UnitUid = unitUid;
-            UnitGrade = unitGrade;
+            TowerUid = unitUid;
+            TowerGrade = unitGrade;
         }
     }
 
     /// <summary>
     /// 캐릭터 스냅샷입니다.
     /// </summary>
-    public readonly struct CharacterSnapshot
+    public readonly struct TowerSnapshot
     {
         /// <summary>
         /// 캐릭터 고유 ID입니다.
@@ -51,12 +51,12 @@ namespace MyProject.MergeGame
         /// <summary>
         /// 캐릭터 정의 ID입니다.
         /// </summary>
-        public string CharacterId { get; }
+        public string TowerId { get; }
 
         /// <summary>
         /// 캐릭터 타입입니다.
         /// </summary>
-        public string CharacterType { get; }
+        public string TowerType { get; }
 
         /// <summary>
         /// 캐릭터 등급입니다.
@@ -93,10 +93,10 @@ namespace MyProject.MergeGame
         /// </summary>
         public float AttackRange { get; }
 
-        public CharacterSnapshot(
+        public TowerSnapshot(
             long uid,
-            string characterId,
-            string characterType,
+            string towerId,
+            string towerType,
             int grade,
             int slotIndex,
             float positionX,
@@ -106,8 +106,8 @@ namespace MyProject.MergeGame
             float attackRange)
         {
             Uid = uid;
-            CharacterId = characterId;
-            CharacterType = characterType;
+            TowerId = towerId;
+            TowerType = towerType;
             Grade = grade;
             SlotIndex = slotIndex;
             PositionX = positionX;
@@ -263,7 +263,7 @@ namespace MyProject.MergeGame
         /// <summary>
         /// 캐릭터 목록입니다.
         /// </summary>
-        public IReadOnlyList<CharacterSnapshot> Characters { get; }
+        public IReadOnlyList<TowerSnapshot> Towers { get; }
 
         /// <summary>
         /// 몬스터 목록입니다.
@@ -297,7 +297,7 @@ namespace MyProject.MergeGame
             PlayerGold = 0;
             CurrentWaveNumber = 0;
             WavePhase = WavePhase.Idle;
-            Characters = System.Array.Empty<CharacterSnapshot>();
+            Towers = System.Array.Empty<TowerSnapshot>();
             Monsters = System.Array.Empty<MonsterSnapshot>();
         }
 
@@ -318,7 +318,7 @@ namespace MyProject.MergeGame
             int playerGold,
             int currentWaveNumber,
             WavePhase wavePhase,
-            IReadOnlyList<CharacterSnapshot> characters,
+            IReadOnlyList<TowerSnapshot> towers,
             IReadOnlyList<MonsterSnapshot> monsters) : base(tick)
         {
             SessionPhase = sessionPhase;
@@ -333,8 +333,10 @@ namespace MyProject.MergeGame
             PlayerGold = playerGold;
             CurrentWaveNumber = currentWaveNumber;
             WavePhase = wavePhase;
-            Characters = characters;
+            Towers = towers;
             Monsters = monsters;
         }
     }
 }
+
+

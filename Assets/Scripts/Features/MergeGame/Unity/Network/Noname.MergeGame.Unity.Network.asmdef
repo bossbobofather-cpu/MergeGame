@@ -1,0 +1,32 @@
+﻿{
+    "name":  "Noname.MergeGame.Unity.Network",
+    "rootNamespace":  "MyProject.MergeGame.Unity.Network",
+    "references":  [
+                       "Noname.MergeGame",
+                       "Noname.MergeGame.Shared",
+                       "Noname.GameAbilitySystem",
+                       "Noname.GameHost",
+                       "Noname.Shared.Unity",
+                       "Mirror",
+                       "Mirror.Transports"
+                   ],
+    "includePlatforms":  [
+
+                         ],
+    "excludePlatforms":  [
+
+                         ],
+    "allowUnsafeCode":  false,
+    "overrideReferences":  false,
+    "precompiledReferences":  [
+
+                              ],
+    "autoReferenced":  true,
+    "defineConstraints":  [
+
+                          ],
+    "versionDefines":  [
+
+                       ],
+    "noEngineReferences":  false
+}

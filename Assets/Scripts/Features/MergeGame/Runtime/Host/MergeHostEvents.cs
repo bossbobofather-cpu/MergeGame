@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Noname.GameHost;
 
 namespace MyProject.MergeGame
@@ -180,22 +180,22 @@ namespace MyProject.MergeGame
     /// <summary>
     /// 캐릭터 스폰 이벤트입니다.
     /// </summary>
-    public sealed class CharacterSpawnedEvent : MergeHostEvent
+    public sealed class TowerSpawnedEvent : MergeHostEvent
     {
         /// <summary>
         /// 캐릭터 고유 ID입니다.
         /// </summary>
-        public long CharacterUid { get; }
+        public long TowerUid { get; }
 
         /// <summary>
         /// 캐릭터 정의 ID입니다.
         /// </summary>
-        public string CharacterId { get; }
+        public string TowerId { get; }
 
         /// <summary>
         /// 캐릭터 타입입니다.
         /// </summary>
-        public string CharacterType { get; }
+        public string TowerType { get; }
 
         /// <summary>
         /// 캐릭터 등급입니다.
@@ -213,19 +213,19 @@ namespace MyProject.MergeGame
         public float PositionX { get; }
         public float PositionY { get; }
 
-        public CharacterSpawnedEvent(
+        public TowerSpawnedEvent(
             long tick,
-            long characterUid,
-            string characterId,
-            string characterType,
+            long towerUid,
+            string towerId,
+            string towerType,
             int grade,
             int slotIndex,
             float positionX,
             float positionY) : base(tick)
         {
-            CharacterUid = characterUid;
-            CharacterId = characterId;
-            CharacterType = characterType;
+            TowerUid = towerUid;
+            TowerId = towerId;
+            TowerType = towerType;
             Grade = grade;
             SlotIndex = slotIndex;
             PositionX = positionX;
@@ -236,7 +236,7 @@ namespace MyProject.MergeGame
     /// <summary>
     /// 캐릭터 공격 이벤트입니다.
     /// </summary>
-    public sealed class CharacterAttackedEvent : MergeHostEvent
+    public sealed class TowerAttackedEvent : MergeHostEvent
     {
         /// <summary>
         /// 공격한 캐릭터 UID입니다.
@@ -265,7 +265,7 @@ namespace MyProject.MergeGame
         public float TargetX { get; }
         public float TargetY { get; }
 
-        public CharacterAttackedEvent(
+        public TowerAttackedEvent(
             long tick,
             long attackerUid,
             long targetUid,
@@ -288,12 +288,12 @@ namespace MyProject.MergeGame
     /// <summary>
     /// 캐릭터 제거 이벤트입니다.
     /// </summary>
-    public sealed class CharacterRemovedEvent : MergeHostEvent
+    public sealed class TowerRemovedEvent : MergeHostEvent
     {
         /// <summary>
         /// 제거된 캐릭터 UID입니다.
         /// </summary>
-        public long CharacterUid { get; }
+        public long TowerUid { get; }
 
         /// <summary>
         /// 제거된 슬롯 인덱스입니다.
@@ -305,9 +305,9 @@ namespace MyProject.MergeGame
         /// </summary>
         public string Reason { get; }
 
-        public CharacterRemovedEvent(long tick, long characterUid, int slotIndex, string reason) : base(tick)
+        public TowerRemovedEvent(long tick, long towerUid, int slotIndex, string reason) : base(tick)
         {
-            CharacterUid = characterUid;
+            TowerUid = towerUid;
             SlotIndex = slotIndex;
             Reason = reason;
         }
@@ -316,32 +316,32 @@ namespace MyProject.MergeGame
     /// <summary>
     /// 캐릭터 머지 이벤트입니다.
     /// </summary>
-    public sealed class CharacterMergedEvent : MergeHostEvent
+    public sealed class TowerMergedEvent : MergeHostEvent
     {
         /// <summary>
         /// 소스 캐릭터 UID (흡수된 캐릭터)입니다.
         /// </summary>
-        public long SourceCharacterUid { get; }
+        public long SourceTowerUid { get; }
 
         /// <summary>
         /// 타겟 캐릭터 UID (남는 캐릭터)입니다.
         /// </summary>
-        public long TargetCharacterUid { get; }
+        public long TargetTowerUid { get; }
 
         /// <summary>
         /// 결과 캐릭터 UID입니다.
         /// </summary>
-        public long ResultCharacterUid { get; }
+        public long ResultTowerUid { get; }
 
         /// <summary>
         /// 결과 캐릭터 정의 ID입니다.
         /// </summary>
-        public string ResultCharacterId { get; }
+        public string ResultTowerId { get; }
 
         /// <summary>
         /// 결과 캐릭터 타입입니다.
         /// </summary>
-        public string ResultCharacterType { get; }
+        public string ResultTowerType { get; }
 
         /// <summary>
         /// 결과 캐릭터 등급입니다.
@@ -353,21 +353,21 @@ namespace MyProject.MergeGame
         /// </summary>
         public int SlotIndex { get; }
 
-        public CharacterMergedEvent(
+        public TowerMergedEvent(
             long tick,
-            long sourceCharacterUid,
-            long targetCharacterUid,
-            long resultCharacterUid,
-            string resultCharacterId,
-            string resultCharacterType,
+            long sourceTowerUid,
+            long targetTowerUid,
+            long resultTowerUid,
+            string resultTowerId,
+            string resultTowerType,
             int resultGrade,
             int slotIndex) : base(tick)
         {
-            SourceCharacterUid = sourceCharacterUid;
-            TargetCharacterUid = targetCharacterUid;
-            ResultCharacterUid = resultCharacterUid;
-            ResultCharacterId = resultCharacterId;
-            ResultCharacterType = resultCharacterType;
+            SourceTowerUid = sourceTowerUid;
+            TargetTowerUid = targetTowerUid;
+            ResultTowerUid = resultTowerUid;
+            ResultTowerId = resultTowerId;
+            ResultTowerType = resultTowerType;
             ResultGrade = resultGrade;
             SlotIndex = slotIndex;
         }
@@ -376,12 +376,12 @@ namespace MyProject.MergeGame
     /// <summary>
     /// 캐릭터 이동 이벤트입니다.
     /// </summary>
-    public sealed class CharacterMovedEvent : MergeHostEvent
+    public sealed class TowerMovedEvent : MergeHostEvent
     {
         /// <summary>
         /// 이동한 캐릭터 UID입니다.
         /// </summary>
-        public long CharacterUid { get; }
+        public long TowerUid { get; }
 
         /// <summary>
         /// 이동 전 슬롯 인덱스입니다.
@@ -399,15 +399,15 @@ namespace MyProject.MergeGame
         public float PositionX { get; }
         public float PositionY { get; }
 
-        public CharacterMovedEvent(
+        public TowerMovedEvent(
             long tick,
-            long characterUid,
+            long towerUid,
             int fromSlotIndex,
             int toSlotIndex,
             float positionX,
             float positionY) : base(tick)
         {
-            CharacterUid = characterUid;
+            TowerUid = towerUid;
             FromSlotIndex = fromSlotIndex;
             ToSlotIndex = toSlotIndex;
             PositionX = positionX;
@@ -439,17 +439,17 @@ namespace MyProject.MergeGame
         /// <summary>
         /// 소스 캐릭터 UID입니다.
         /// </summary>
-        public long SourceCharacterUid { get; }
+        public long SourceTowerUid { get; }
 
         /// <summary>
         /// 타겟 캐릭터 UID입니다.
         /// </summary>
-        public long TargetCharacterUid { get; }
+        public long TargetTowerUid { get; }
 
         /// <summary>
         /// 결과 캐릭터 UID입니다.
         /// </summary>
-        public long ResultCharacterUid { get; }
+        public long ResultTowerUid { get; }
 
         public MergeEffectTriggeredEvent(
             long tick,
@@ -457,17 +457,17 @@ namespace MyProject.MergeGame
             float positionX,
             float positionY,
             bool isSourceEffect,
-            long sourceCharacterUid,
-            long targetCharacterUid,
-            long resultCharacterUid) : base(tick)
+            long sourceTowerUid,
+            long targetTowerUid,
+            long resultTowerUid) : base(tick)
         {
             EffectId = effectId;
             PositionX = positionX;
             PositionY = positionY;
             IsSourceEffect = isSourceEffect;
-            SourceCharacterUid = sourceCharacterUid;
-            TargetCharacterUid = targetCharacterUid;
-            ResultCharacterUid = resultCharacterUid;
+            SourceTowerUid = sourceTowerUid;
+            TargetTowerUid = targetTowerUid;
+            ResultTowerUid = resultTowerUid;
         }
     }
 
@@ -869,3 +869,4 @@ namespace MyProject.MergeGame
 
     #endregion
 }
+

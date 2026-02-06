@@ -1,4 +1,4 @@
-using Noname.GameHost;
+﻿using Noname.GameHost;
 
 namespace MyProject.MergeGame.Commands
 {
@@ -186,21 +186,21 @@ namespace MyProject.MergeGame.Commands
     /// <summary>
     /// 캐릭터 스폰 Command입니다.
     /// </summary>
-    public sealed class SpawnCharacterCommand : MergeCommand
+    public sealed class SpawnTowerCommand : MergeCommand
     {
         /// <summary>
         /// 스폰할 캐릭터 정의 ID입니다.
         /// </summary>
-        public string CharacterId { get; }
+        public string TowerId { get; }
 
         /// <summary>
         /// 스폰할 슬롯 인덱스입니다. -1이면 빈 슬롯에 자동 배치합니다.
         /// </summary>
         public int SlotIndex { get; }
 
-        public SpawnCharacterCommand(long senderUid, string characterId, int slotIndex = -1) : base(senderUid)
+        public SpawnTowerCommand(long senderUid, string towerId, int slotIndex = -1) : base(senderUid)
         {
-            CharacterId = characterId;
+            TowerId = towerId;
             SlotIndex = slotIndex;
         }
     }
@@ -208,22 +208,22 @@ namespace MyProject.MergeGame.Commands
     /// <summary>
     /// 캐릭터 스폰 Result입니다.
     /// </summary>
-    public sealed class SpawnCharacterResult : MergeCommandResult
+    public sealed class SpawnTowerResult : MergeCommandResult
     {
         /// <summary>
         /// 생성된 캐릭터 UID입니다.
         /// </summary>
-        public long CharacterUid { get; }
+        public long TowerUid { get; }
 
         /// <summary>
         /// 캐릭터 정의 ID입니다.
         /// </summary>
-        public string CharacterId { get; }
+        public string TowerId { get; }
 
         /// <summary>
         /// 캐릭터 타입입니다.
         /// </summary>
-        public string CharacterType { get; }
+        public string TowerType { get; }
 
         /// <summary>
         /// 캐릭터 등급입니다.
@@ -235,43 +235,43 @@ namespace MyProject.MergeGame.Commands
         /// </summary>
         public int SlotIndex { get; }
 
-        private SpawnCharacterResult(
+        private SpawnTowerResult(
             long tick,
             long senderUid,
             bool success,
             string reason,
-            long characterUid,
-            string characterId,
-            string characterType,
+            long towerUid,
+            string towerId,
+            string towerType,
             int grade,
             int slotIndex)
             : base(tick, senderUid, success, reason)
         {
-            CharacterUid = characterUid;
-            CharacterId = characterId;
-            CharacterType = characterType;
+            TowerUid = towerUid;
+            TowerId = towerId;
+            TowerType = towerType;
             Grade = grade;
             SlotIndex = slotIndex;
         }
 
-        public static SpawnCharacterResult Ok(
+        public static SpawnTowerResult Ok(
             long tick,
             long senderUid,
-            long characterUid,
-            string characterId,
-            string characterType,
+            long towerUid,
+            string towerId,
+            string towerType,
             int grade,
             int slotIndex)
-            => new SpawnCharacterResult(tick, senderUid, true, null, characterUid, characterId, characterType, grade, slotIndex);
+            => new SpawnTowerResult(tick, senderUid, true, null, towerUid, towerId, towerType, grade, slotIndex);
 
-        public static SpawnCharacterResult Fail(long tick, long senderUid, string reason)
-            => new SpawnCharacterResult(tick, senderUid, false, reason, 0, null, null, 0, -1);
+        public static SpawnTowerResult Fail(long tick, long senderUid, string reason)
+            => new SpawnTowerResult(tick, senderUid, false, reason, 0, null, null, 0, -1);
     }
 
     /// <summary>
     /// 캐릭터 머지 Command입니다.
     /// </summary>
-    public sealed class MergeCharacterCommand : MergeCommand
+    public sealed class MergeTowerCommand : MergeCommand
     {
         /// <summary>
         /// 드래그 시작 슬롯 인덱스 (소스 캐릭터)입니다.
@@ -283,7 +283,7 @@ namespace MyProject.MergeGame.Commands
         /// </summary>
         public int ToSlotIndex { get; }
 
-        public MergeCharacterCommand(long senderUid, int fromSlotIndex, int toSlotIndex) : base(senderUid)
+        public MergeTowerCommand(long senderUid, int fromSlotIndex, int toSlotIndex) : base(senderUid)
         {
             FromSlotIndex = fromSlotIndex;
             ToSlotIndex = toSlotIndex;
@@ -293,32 +293,32 @@ namespace MyProject.MergeGame.Commands
     /// <summary>
     /// 캐릭터 머지 Result입니다.
     /// </summary>
-    public sealed class MergeCharacterResult : MergeCommandResult
+    public sealed class MergeTowerResult : MergeCommandResult
     {
         /// <summary>
         /// 소스 캐릭터 UID (흡수된 캐릭터)입니다.
         /// </summary>
-        public long SourceCharacterUid { get; }
+        public long SourceTowerUid { get; }
 
         /// <summary>
         /// 타겟 캐릭터 UID (남는 캐릭터)입니다.
         /// </summary>
-        public long TargetCharacterUid { get; }
+        public long TargetTowerUid { get; }
 
         /// <summary>
         /// 머지 결과로 생성된 캐릭터 UID입니다.
         /// </summary>
-        public long ResultCharacterUid { get; }
+        public long ResultTowerUid { get; }
 
         /// <summary>
         /// 결과 캐릭터의 정의 ID입니다.
         /// </summary>
-        public string ResultCharacterId { get; }
+        public string ResultTowerId { get; }
 
         /// <summary>
         /// 결과 캐릭터의 타입입니다.
         /// </summary>
-        public string ResultCharacterType { get; }
+        public string ResultTowerType { get; }
 
         /// <summary>
         /// 결과 캐릭터의 등급입니다.
@@ -330,52 +330,52 @@ namespace MyProject.MergeGame.Commands
         /// </summary>
         public int SlotIndex { get; }
 
-        private MergeCharacterResult(
+        private MergeTowerResult(
             long tick,
             long senderUid,
             bool success,
             string reason,
-            long sourceCharacterUid,
-            long targetCharacterUid,
-            long resultCharacterUid,
-            string resultCharacterId,
-            string resultCharacterType,
+            long sourceTowerUid,
+            long targetTowerUid,
+            long resultTowerUid,
+            string resultTowerId,
+            string resultTowerType,
             int resultGrade,
             int slotIndex)
             : base(tick, senderUid, success, reason)
         {
-            SourceCharacterUid = sourceCharacterUid;
-            TargetCharacterUid = targetCharacterUid;
-            ResultCharacterUid = resultCharacterUid;
-            ResultCharacterId = resultCharacterId;
-            ResultCharacterType = resultCharacterType;
+            SourceTowerUid = sourceTowerUid;
+            TargetTowerUid = targetTowerUid;
+            ResultTowerUid = resultTowerUid;
+            ResultTowerId = resultTowerId;
+            ResultTowerType = resultTowerType;
             ResultGrade = resultGrade;
             SlotIndex = slotIndex;
         }
 
-        public static MergeCharacterResult Ok(
+        public static MergeTowerResult Ok(
             long tick,
             long senderUid,
-            long sourceCharacterUid,
-            long targetCharacterUid,
-            long resultCharacterUid,
-            string resultCharacterId,
-            string resultCharacterType,
+            long sourceTowerUid,
+            long targetTowerUid,
+            long resultTowerUid,
+            string resultTowerId,
+            string resultTowerType,
             int resultGrade,
             int slotIndex)
-            => new MergeCharacterResult(
+            => new MergeTowerResult(
                 tick, senderUid, true, null,
-                sourceCharacterUid, targetCharacterUid, resultCharacterUid,
-                resultCharacterId, resultCharacterType, resultGrade, slotIndex);
+                sourceTowerUid, targetTowerUid, resultTowerUid,
+                resultTowerId, resultTowerType, resultGrade, slotIndex);
 
-        public static MergeCharacterResult Fail(long tick, long senderUid, string reason)
-            => new MergeCharacterResult(tick, senderUid, false, reason, 0, 0, 0, null, null, 0, -1);
+        public static MergeTowerResult Fail(long tick, long senderUid, string reason)
+            => new MergeTowerResult(tick, senderUid, false, reason, 0, 0, 0, null, null, 0, -1);
     }
 
     /// <summary>
     /// 캐릭터 이동 Command입니다.
     /// </summary>
-    public sealed class MoveCharacterCommand : MergeCommand
+    public sealed class MoveTowerCommand : MergeCommand
     {
         /// <summary>
         /// 이동할 캐릭터가 있는 슬롯 인덱스입니다.
@@ -387,7 +387,7 @@ namespace MyProject.MergeGame.Commands
         /// </summary>
         public int ToSlotIndex { get; }
 
-        public MoveCharacterCommand(long senderUid, int fromSlotIndex, int toSlotIndex) : base(senderUid)
+        public MoveTowerCommand(long senderUid, int fromSlotIndex, int toSlotIndex) : base(senderUid)
         {
             FromSlotIndex = fromSlotIndex;
             ToSlotIndex = toSlotIndex;
@@ -397,12 +397,12 @@ namespace MyProject.MergeGame.Commands
     /// <summary>
     /// 캐릭터 이동 Result입니다.
     /// </summary>
-    public sealed class MoveCharacterResult : MergeCommandResult
+    public sealed class MoveTowerResult : MergeCommandResult
     {
         /// <summary>
         /// 이동한 캐릭터 UID입니다.
         /// </summary>
-        public long CharacterUid { get; }
+        public long TowerUid { get; }
 
         /// <summary>
         /// 이동 전 슬롯 인덱스입니다.
@@ -414,26 +414,26 @@ namespace MyProject.MergeGame.Commands
         /// </summary>
         public int ToSlotIndex { get; }
 
-        private MoveCharacterResult(
+        private MoveTowerResult(
             long tick,
             long senderUid,
             bool success,
             string reason,
-            long characterUid,
+            long towerUid,
             int fromSlotIndex,
             int toSlotIndex)
             : base(tick, senderUid, success, reason)
         {
-            CharacterUid = characterUid;
+            TowerUid = towerUid;
             FromSlotIndex = fromSlotIndex;
             ToSlotIndex = toSlotIndex;
         }
 
-        public static MoveCharacterResult Ok(long tick, long senderUid, long characterUid, int fromSlotIndex, int toSlotIndex)
-            => new MoveCharacterResult(tick, senderUid, true, null, characterUid, fromSlotIndex, toSlotIndex);
+        public static MoveTowerResult Ok(long tick, long senderUid, long towerUid, int fromSlotIndex, int toSlotIndex)
+            => new MoveTowerResult(tick, senderUid, true, null, towerUid, fromSlotIndex, toSlotIndex);
 
-        public static MoveCharacterResult Fail(long tick, long senderUid, string reason)
-            => new MoveCharacterResult(tick, senderUid, false, reason, 0, -1, -1);
+        public static MoveTowerResult Fail(long tick, long senderUid, string reason)
+            => new MoveTowerResult(tick, senderUid, false, reason, 0, -1, -1);
     }
 
     #endregion
@@ -549,3 +549,4 @@ namespace MyProject.MergeGame.Commands
 
     #endregion
 }
+

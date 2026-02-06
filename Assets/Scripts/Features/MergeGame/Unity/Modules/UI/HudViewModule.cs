@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+using MyProject.Common.UI;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace MyProject.MergeGame.Unity
@@ -10,6 +11,9 @@ namespace MyProject.MergeGame.Unity
     [DisallowMultipleComponent]
     public sealed class HudViewModule : MergeViewModuleBase
     {
+        [Header("Main HUD Page (Optional)")]
+        [SerializeField] private Page_MainHud _mainHudPrefab;
+
         [Header("UI (Optional)")]
         [SerializeField] private Text _hpText;
         [SerializeField] private Text _goldText;
@@ -29,6 +33,9 @@ namespace MyProject.MergeGame.Unity
         [SerializeField] private Color _panelColor = new Color(0f, 0f, 0f, 0.6f);
         [SerializeField] private Vector2 _panelPadding = new Vector2(10f, 10f);
 
+        private Page_MainHud _mainHudInstance;
+        private bool _boundMainHudButtons;
+
         private bool _createdCanvas;
         private bool _createdContainer;
 
@@ -38,6 +45,9 @@ namespace MyProject.MergeGame.Unity
             {
                 return;
             }
+
+            // UIManager 초기화 타이밍(씬/부트스트랩)에 따라 늦게 준비될 수 있어 스냅샷 루프에서도 보장합니다.
+            EnsureMainHudPage();
 
             EnsureHud();
 
@@ -69,6 +79,55 @@ namespace MyProject.MergeGame.Unity
                     $"Time: {snapshot.ElapsedTime:F1}s\n" +
                     $"Tick: {snapshot.Tick}";
             }
+        }
+
+        private void EnsureMainHudPage()
+        {
+            if (_boundMainHudButtons && _mainHudInstance != null)
+            {
+                return;
+            }
+
+            if (GameView == null)
+            {
+                return;
+            }
+
+            var ui = UIManager.Instance;
+            if (ui == null)
+            {
+                return;
+            }
+
+            if (_mainHudInstance == null)
+            {
+                _mainHudInstance = _mainHudPrefab != null
+                    ? ui.OpenPage(_mainHudPrefab)
+                    : ui.OpenPage<Page_MainHud>();
+            }
+
+            if (_mainHudInstance == null)
+            {
+                return;
+            }
+
+            var input = GameView.GetModule<InputViewModule>();
+            if (input == null)
+            {
+                return;
+            }
+
+            if (_mainHudInstance.SpawnTowerButton != null)
+            {
+                _mainHudInstance.SpawnTowerButton.onClick.AddListener(input.OnClickSpawn);
+            }
+
+            if (_mainHudInstance.StartWaveButton != null)
+            {
+                _mainHudInstance.StartWaveButton.onClick.AddListener(input.OnClickStartWave);
+            }
+
+            _boundMainHudButtons = true;
         }
 
         private void EnsureHud()
@@ -216,6 +275,27 @@ namespace MyProject.MergeGame.Unity
 
         protected override void OnShutdown()
         {
+            // UI 버튼 리스너를 제거합니다. (UI는 UIManager가 재사용/관리)
+            if (_boundMainHudButtons && _mainHudInstance != null && GameView != null)
+            {
+                var input = GameView.GetModule<InputViewModule>();
+                if (input != null)
+                {
+                    if (_mainHudInstance.SpawnTowerButton != null)
+                    {
+                        _mainHudInstance.SpawnTowerButton.onClick.RemoveListener(input.OnClickSpawn);
+                    }
+
+                    if (_mainHudInstance.StartWaveButton != null)
+                    {
+                        _mainHudInstance.StartWaveButton.onClick.RemoveListener(input.OnClickStartWave);
+                    }
+                }
+            }
+
+            _boundMainHudButtons = false;
+            _mainHudInstance = null;
+
             base.OnShutdown();
 
             // 런타임에 만든 HUD 오브젝트만 정리합니다.

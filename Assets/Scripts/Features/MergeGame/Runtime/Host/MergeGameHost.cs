@@ -33,7 +33,7 @@ namespace MyProject.MergeGame
         /// <summary>
         /// 캐릭터 정의/랜덤 선택을 제공하는 데이터베이스입니다.
         /// </summary>
-        private readonly ICharacterDatabase _characterDatabase;
+        private readonly ITowerDatabase _towerDatabase;
 
         /// <summary>
         /// 전투 시스템입니다.
@@ -54,7 +54,7 @@ namespace MyProject.MergeGame
         /// 스냅샷 빌드용 임시 리스트입니다.
         /// </summary>
         private readonly List<SlotSnapshot> _tempSlotSnapshots = new();
-        private readonly List<CharacterSnapshot> _tempCharacterSnapshots = new();
+        private readonly List<TowerSnapshot> _tempTowerSnapshots = new();
         private readonly List<MonsterSnapshot> _tempMonsterSnapshots = new();
 
         /// <summary>
@@ -119,10 +119,10 @@ namespace MyProject.MergeGame
 
         #endregion
 
-        public MergeGameHost(MergeHostConfig config, ICharacterDatabase characterDatabase)
+        public MergeGameHost(MergeHostConfig config, ITowerDatabase towerDatabase)
         {
             _config = config ?? throw new ArgumentNullException(nameof(config));
-            _characterDatabase = characterDatabase ?? throw new ArgumentNullException(nameof(characterDatabase));
+            _towerDatabase = towerDatabase ?? throw new ArgumentNullException(nameof(towerDatabase));
             _state = new MergeHostState();
 
             _combatSystem = new MergeCombatSystem(_state, _config.DefaultAttackRange);
@@ -152,14 +152,14 @@ namespace MyProject.MergeGame
                     return HandleEndGame(endCommand);
 
                 // 새 커맨드 핸들러
-                case SpawnCharacterCommand spawnCharCmd:
-                    return HandleSpawnCharacter(spawnCharCmd);
+                case SpawnTowerCommand spawnCharCmd:
+                    return HandleSpawnTower(spawnCharCmd);
 
-                case MergeCharacterCommand mergeCharCmd:
-                    return HandleMergeCharacter(mergeCharCmd);
+                case MergeTowerCommand mergeCharCmd:
+                    return HandleMergeTower(mergeCharCmd);
 
-                case MoveCharacterCommand moveCharCmd:
-                    return HandleMoveCharacter(moveCharCmd);
+                case MoveTowerCommand moveCharCmd:
+                    return HandleMoveTower(moveCharCmd);
 
                 case StartWaveCommand startWaveCmd:
                     return HandleStartWave(startWaveCmd);
@@ -224,7 +224,7 @@ namespace MyProject.MergeGame
         protected override MergeHostSnapshot BuildSnapshotInternal()
         {
             _tempSlotSnapshots.Clear();
-            _tempCharacterSnapshots.Clear();
+            _tempTowerSnapshots.Clear();
             _tempMonsterSnapshots.Clear();
 
             for (var i = 0; i < _state.Slots.Count; i++)
@@ -232,24 +232,24 @@ namespace MyProject.MergeGame
                 var slot = _state.Slots[i];
                 _tempSlotSnapshots.Add(new SlotSnapshot(
                     slot.Index,
-                    slot.UnitUid,
-                    slot.UnitGrade
+                    slot.TowerUid,
+                    slot.TowerGrade
                 ));
             }
 
-            foreach (var character in _state.Characters.Values)
+            foreach (var tower in _state.Towers.Values)
             {
-                _tempCharacterSnapshots.Add(new CharacterSnapshot(
-                    character.Uid,
-                    character.CharacterId,
-                    character.CharacterType,
-                    character.Grade,
-                    character.SlotIndex,
-                    character.Position.X,
-                    character.Position.Y,
-                    character.ASC.Get(AttributeId.AttackDamage),
-                    character.ASC.Get(AttributeId.AttackSpeed),
-                    character.ASC.Get(AttributeId.AttackRange)
+                _tempTowerSnapshots.Add(new TowerSnapshot(
+                    tower.Uid,
+                    tower.TowerId,
+                    tower.TowerType,
+                    tower.Grade,
+                    tower.SlotIndex,
+                    tower.Position.X,
+                    tower.Position.Y,
+                    tower.ASC.Get(AttributeId.AttackDamage),
+                    tower.ASC.Get(AttributeId.AttackSpeed),
+                    tower.ASC.Get(AttributeId.AttackRange)
                 ));
             }
 
@@ -281,7 +281,7 @@ namespace MyProject.MergeGame
                 playerGold: _state.PlayerGold,
                 currentWaveNumber: _state.CurrentWaveNumber,
                 wavePhase: _state.CurrentWavePhase,
-                characters: _tempCharacterSnapshots.ToArray(),
+                towers: _tempTowerSnapshots.ToArray(),
                 monsters: _tempMonsterSnapshots.ToArray()
             );
         }
@@ -415,16 +415,16 @@ namespace MyProject.MergeGame
                     MergeUnitResult.Fail(Tick, command.SenderUid, "빈 슬롯으로는 머지할 수 없습니다."));
             }
 
-            if (fromSlot.UnitGrade != toSlot.UnitGrade)
+            if (fromSlot.TowerGrade != toSlot.TowerGrade)
             {
                 return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
                     MergeUnitResult.Fail(Tick, command.SenderUid, "같은 등급의 유닛만 머지할 수 있습니다."));
             }
 
             // 머지 실행
-            var sourceUid1 = fromSlot.UnitUid;
-            var sourceUid2 = toSlot.UnitUid;
-            var newGrade = fromSlot.UnitGrade + 1;
+            var sourceUid1 = fromSlot.TowerUid;
+            var sourceUid2 = toSlot.TowerUid;
+            var newGrade = fromSlot.TowerGrade + 1;
             var newUnitUid = _state.GenerateUnitUid();
 
             // 소스 슬롯 비우기
@@ -474,12 +474,12 @@ namespace MyProject.MergeGame
 
         #region Command Handlers - New
 
-        private GameCommandOutcome<MergeCommandResult, MergeHostEvent> HandleSpawnCharacter(SpawnCharacterCommand command)
+        private GameCommandOutcome<MergeCommandResult, MergeHostEvent> HandleSpawnTower(SpawnTowerCommand command)
         {
             if (_state.SessionPhase != MergeSessionPhase.Playing)
             {
                 return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
-                    SpawnCharacterResult.Fail(Tick, command.SenderUid, "게임이 진행 중이 아닙니다."));
+                    SpawnTowerResult.Fail(Tick, command.SenderUid, "게임이 진행 중이 아닙니다."));
             }
 
             // 슬롯 인덱스 결정
@@ -492,28 +492,28 @@ namespace MyProject.MergeGame
             if (slotIndex < 0)
             {
                 return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
-                    SpawnCharacterResult.Fail(Tick, command.SenderUid, "빈 슬롯이 없습니다."));
+                    SpawnTowerResult.Fail(Tick, command.SenderUid, "빈 슬롯이 없습니다."));
             }
 
             var slot = _state.GetSlot(slotIndex);
             if (slot == null || !slot.IsEmpty)
             {
                 return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
-                    SpawnCharacterResult.Fail(Tick, command.SenderUid, "해당 슬롯이 비어있지 않습니다."));
+                    SpawnTowerResult.Fail(Tick, command.SenderUid, "해당 슬롯이 비어있지 않습니다."));
             }
 
             // 캐릭터 정의 조회
-            var definition = _characterDatabase.GetDefinition(command.CharacterId);
+            var definition = _towerDatabase.GetDefinition(command.TowerId);
             if (definition == null)
             {
                 return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
-                    SpawnCharacterResult.Fail(Tick, command.SenderUid, "캐릭터 정의를 찾을 수 없습니다."));
+                    SpawnTowerResult.Fail(Tick, command.SenderUid, "캐릭터 정의를 찾을 수 없습니다."));
             }
 
             // 캐릭터 생성
-            var character = _state.CreateCharacter(
-                definition.CharacterId,
-                definition.CharacterType,
+            var tower = _state.CreateTower(
+                definition.TowerId,
+                definition.TowerType,
                 definition.InitialGrade,
                 slotIndex,
                 slot.Position,
@@ -522,50 +522,50 @@ namespace MyProject.MergeGame
             );
 
             // ASC 초기화
-            character.ASC.Set(AttributeId.AttackDamage, definition.BaseAttackDamage);
-            character.ASC.Set(AttributeId.AttackSpeed, definition.BaseAttackSpeed);
-            character.ASC.Set(AttributeId.AttackRange, definition.BaseAttackRange);
+            tower.ASC.Set(AttributeId.AttackDamage, definition.BaseAttackDamage);
+            tower.ASC.Set(AttributeId.AttackSpeed, definition.BaseAttackSpeed);
+            tower.ASC.Set(AttributeId.AttackRange, definition.BaseAttackRange);
 
             // 슬롯에 캐릭터 배치
-            slot.SetUnit(character.Uid, character.Grade);
+            slot.SetUnit(tower.Uid, tower.Grade);
 
             // 슬롯 상태 변경 알림 (내부 - MapModule용)
             _innerEventBus.Publish(new SlotStateChangedInnerEvent(Tick, slotIndex, true));
 
             var events = new List<MergeHostEvent>
             {
-                new CharacterSpawnedEvent(
+                new TowerSpawnedEvent(
                     Tick,
-                    character.Uid,
-                    character.CharacterId,
-                    character.CharacterType,
-                    character.Grade,
+                    tower.Uid,
+                    tower.TowerId,
+                    tower.TowerType,
+                    tower.Grade,
                     slotIndex,
-                    character.Position.X,
-                    character.Position.Y
+                    tower.Position.X,
+                    tower.Position.Y
                 )
             };
 
             return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
-                SpawnCharacterResult.Ok(
+                SpawnTowerResult.Ok(
                     Tick,
                     command.SenderUid,
-                    character.Uid,
-                    character.CharacterId,
-                    character.CharacterType,
-                    character.Grade,
+                    tower.Uid,
+                    tower.TowerId,
+                    tower.TowerType,
+                    tower.Grade,
                     slotIndex
                 ),
                 events
             );
         }
 
-        private GameCommandOutcome<MergeCommandResult, MergeHostEvent> HandleMergeCharacter(MergeCharacterCommand command)
+        private GameCommandOutcome<MergeCommandResult, MergeHostEvent> HandleMergeTower(MergeTowerCommand command)
         {
             if (_state.SessionPhase != MergeSessionPhase.Playing)
             {
                 return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
-                    MergeCharacterResult.Fail(Tick, command.SenderUid, "게임이 진행 중이 아닙니다."));
+                    MergeTowerResult.Fail(Tick, command.SenderUid, "게임이 진행 중이 아닙니다."));
             }
 
             var fromSlot = _state.GetSlot(command.FromSlotIndex);
@@ -574,42 +574,42 @@ namespace MyProject.MergeGame
             if (fromSlot == null || toSlot == null)
             {
                 return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
-                    MergeCharacterResult.Fail(Tick, command.SenderUid, "잘못된 슬롯 인덱스입니다."));
+                    MergeTowerResult.Fail(Tick, command.SenderUid, "잘못된 슬롯 인덱스입니다."));
             }
 
             // 캐릭터 찾기
-            var sourceChar = _state.GetCharacterBySlot(command.FromSlotIndex);
-            var targetChar = _state.GetCharacterBySlot(command.ToSlotIndex);
+            var sourceChar = _state.GetTowerBySlot(command.FromSlotIndex);
+            var targetChar = _state.GetTowerBySlot(command.ToSlotIndex);
 
             if (sourceChar == null || targetChar == null)
             {
                 return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
-                    MergeCharacterResult.Fail(Tick, command.SenderUid, "캐릭터를 찾을 수 없습니다."));
+                    MergeTowerResult.Fail(Tick, command.SenderUid, "캐릭터를 찾을 수 없습니다."));
             }
 
             // 머지 가능 여부 확인
             if (!sourceChar.CanMergeWith(targetChar))
             {
                 return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
-                    MergeCharacterResult.Fail(Tick, command.SenderUid, "같은 타입과 등급의 캐릭터만 머지할 수 있습니다."));
+                    MergeTowerResult.Fail(Tick, command.SenderUid, "같은 타입과 등급의 캐릭터만 머지할 수 있습니다."));
             }
 
             // 새 등급 계산
             var newGrade = sourceChar.Grade + 1;
 
             // 새 캐릭터 ID 결정 (덱에서 랜덤)
-            var newCharacterId = _characterDatabase.GetRandomIdForGrade(newGrade);
-            if (string.IsNullOrEmpty(newCharacterId))
+            var newTowerId = _towerDatabase.GetRandomIdForGrade(newGrade);
+            if (string.IsNullOrEmpty(newTowerId))
             {
-                newCharacterId = sourceChar.CharacterId;
+                newTowerId = sourceChar.TowerId;
             }
 
-            var newDefinition = _characterDatabase.GetDefinition(newCharacterId);
+            var newDefinition = _towerDatabase.GetDefinition(newTowerId);
 
             // 결과 캐릭터 생성
-            var resultChar = _state.CreateCharacter(
-                newCharacterId,
-                newDefinition?.CharacterType ?? sourceChar.CharacterType,
+            var resultChar = _state.CreateTower(
+                newTowerId,
+                newDefinition?.TowerType ?? sourceChar.TowerType,
                 newGrade,
                 command.ToSlotIndex,
                 toSlot.Position,
@@ -633,11 +633,11 @@ namespace MyProject.MergeGame
             }
 
             // 소스 캐릭터 제거
-            _state.RemoveCharacter(sourceChar.Uid);
+            _state.RemoveTower(sourceChar.Uid);
             fromSlot.Clear();
 
             // 타겟 캐릭터 제거
-            _state.RemoveCharacter(targetChar.Uid);
+            _state.RemoveTower(targetChar.Uid);
 
             // 결과 캐릭터 슬롯에 배치
             toSlot.SetUnit(resultChar.Uid, resultChar.Grade);
@@ -653,13 +653,13 @@ namespace MyProject.MergeGame
 
             var events = new List<MergeHostEvent>
             {
-                new CharacterMergedEvent(
+                new TowerMergedEvent(
                     Tick,
                     sourceChar.Uid,
                     targetChar.Uid,
                     resultChar.Uid,
-                    resultChar.CharacterId,
-                    resultChar.CharacterType,
+                    resultChar.TowerId,
+                    resultChar.TowerType,
                     resultChar.Grade,
                     command.ToSlotIndex
                 ),
@@ -684,14 +684,14 @@ namespace MyProject.MergeGame
             }
 
             return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
-                MergeCharacterResult.Ok(
+                MergeTowerResult.Ok(
                     Tick,
                     command.SenderUid,
                     sourceChar.Uid,
                     targetChar.Uid,
                     resultChar.Uid,
-                    resultChar.CharacterId,
-                    resultChar.CharacterType,
+                    resultChar.TowerId,
+                    resultChar.TowerType,
                     resultChar.Grade,
                     command.ToSlotIndex
                 ),
@@ -699,12 +699,12 @@ namespace MyProject.MergeGame
             );
         }
 
-        private GameCommandOutcome<MergeCommandResult, MergeHostEvent> HandleMoveCharacter(MoveCharacterCommand command)
+        private GameCommandOutcome<MergeCommandResult, MergeHostEvent> HandleMoveTower(MoveTowerCommand command)
         {
             if (_state.SessionPhase != MergeSessionPhase.Playing)
             {
                 return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
-                    MoveCharacterResult.Fail(Tick, command.SenderUid, "게임이 진행 중이 아닙니다."));
+                    MoveTowerResult.Fail(Tick, command.SenderUid, "게임이 진행 중이 아닙니다."));
             }
 
             var fromSlot = _state.GetSlot(command.FromSlotIndex);
@@ -713,34 +713,34 @@ namespace MyProject.MergeGame
             if (fromSlot == null || toSlot == null)
             {
                 return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
-                    MoveCharacterResult.Fail(Tick, command.SenderUid, "잘못된 슬롯 인덱스입니다."));
+                    MoveTowerResult.Fail(Tick, command.SenderUid, "잘못된 슬롯 인덱스입니다."));
             }
 
             if (fromSlot.IsEmpty)
             {
                 return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
-                    MoveCharacterResult.Fail(Tick, command.SenderUid, "이동할 캐릭터가 없습니다."));
+                    MoveTowerResult.Fail(Tick, command.SenderUid, "이동할 캐릭터가 없습니다."));
             }
 
             if (!toSlot.IsEmpty)
             {
                 return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
-                    MoveCharacterResult.Fail(Tick, command.SenderUid, "대상 슬롯이 비어있지 않습니다."));
+                    MoveTowerResult.Fail(Tick, command.SenderUid, "대상 슬롯이 비어있지 않습니다."));
             }
 
-            var character = _state.GetCharacterBySlot(command.FromSlotIndex);
-            if (character == null)
+            var tower = _state.GetTowerBySlot(command.FromSlotIndex);
+            if (tower == null)
             {
                 return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
-                    MoveCharacterResult.Fail(Tick, command.SenderUid, "캐릭터를 찾을 수 없습니다."));
+                    MoveTowerResult.Fail(Tick, command.SenderUid, "캐릭터를 찾을 수 없습니다."));
             }
 
             // 캐릭터 이동
-            character.SlotIndex = command.ToSlotIndex;
-            character.Position = toSlot.Position;
+            tower.SlotIndex = command.ToSlotIndex;
+            tower.Position = toSlot.Position;
 
             // 슬롯 상태 업데이트
-            toSlot.SetUnit(fromSlot.UnitUid, fromSlot.UnitGrade);
+            toSlot.SetUnit(fromSlot.TowerUid, fromSlot.TowerGrade);
             fromSlot.Clear();
 
             // 슬롯 상태 변경 알림 (내부 - MapModule용)
@@ -749,21 +749,21 @@ namespace MyProject.MergeGame
 
             var events = new List<MergeHostEvent>
             {
-                new CharacterMovedEvent(
+                new TowerMovedEvent(
                     Tick,
-                    character.Uid,
+                    tower.Uid,
                     command.FromSlotIndex,
                     command.ToSlotIndex,
-                    character.Position.X,
-                    character.Position.Y
+                    tower.Position.X,
+                    tower.Position.Y
                 )
             };
 
             return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
-                MoveCharacterResult.Ok(
+                MoveTowerResult.Ok(
                     Tick,
                     command.SenderUid,
-                    character.Uid,
+                    tower.Uid,
                     command.FromSlotIndex,
                     command.ToSlotIndex
                 ),
@@ -1228,6 +1228,8 @@ namespace MyProject.MergeGame
     }
 
 }
+
+
 
 
 

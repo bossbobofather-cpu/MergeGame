@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Noname.GameAbilitySystem;
 using MyProject.MergeGame.Models;
@@ -25,8 +25,8 @@ namespace MyProject.MergeGame.Systems
             _targetingStrategy = new NearestEnemyTargetingStrategy(defaultAttackRange);
 
             _targetContext = new TargetContext(
-                getEnemies: GetEnemiesForCharacter,
-                getAllies: GetAlliesForCharacter,
+                getEnemies: GetEnemiesForTower,
+                getAllies: GetAlliesForTower,
                 getPosition: GetPositionForAsc
             );
         }
@@ -38,34 +38,34 @@ namespace MyProject.MergeGame.Systems
         {
             _eventBuffer.Clear();
 
-            foreach (var character in _state.Characters.Values)
+            foreach (var tower in _state.Towers.Values)
             {
-                ProcessCharacterAttack(currentTick, character, deltaTime);
+                ProcessTowerAttack(currentTick, tower, deltaTime);
             }
 
             return _eventBuffer;
         }
 
-        private void ProcessCharacterAttack(long tick, MergeCharacter character, float deltaTime)
+        private void ProcessTowerAttack(long tick, MergeTower tower, float deltaTime)
         {
             // 쿨타임 감소
-            character.AttackCooldownRemaining -= deltaTime;
+            tower.AttackCooldownRemaining -= deltaTime;
 
-            if (character.AttackCooldownRemaining > 0)
+            if (tower.AttackCooldownRemaining > 0)
             {
                 return;
             }
 
             // 공격 대상 찾기
-            var targetData = _targetingStrategy.FindTargets(character.ASC, _targetContext);
+            var targetData = _targetingStrategy.FindTargets(tower.ASC, _targetContext);
             if (targetData.Targets.Count == 0)
             {
                 return;
             }
 
             // 공격력과 공격 속도 가져오기
-            var attackDamage = character.ASC.Get(AttributeId.AttackDamage);
-            var attackSpeed = character.ASC.Get(AttributeId.AttackSpeed);
+            var attackDamage = tower.ASC.Get(AttributeId.AttackDamage);
+            var attackSpeed = tower.ASC.Get(AttributeId.AttackSpeed);
 
             if (attackDamage <= 0 || attackSpeed <= 0)
             {
@@ -73,7 +73,7 @@ namespace MyProject.MergeGame.Systems
             }
 
             // 쿨타임 리셋 (1.0 / 공격속도)
-            character.AttackCooldownRemaining = 1f / attackSpeed;
+            tower.AttackCooldownRemaining = 1f / attackSpeed;
 
             // 각 대상에게 데미지 적용
             foreach (var targetAsc in targetData.Targets)
@@ -88,13 +88,13 @@ namespace MyProject.MergeGame.Systems
                 monster.TakeDamage(attackDamage);
 
                 // 공격 이벤트 발행
-                _eventBuffer.Add(new CharacterAttackedEvent(
+                _eventBuffer.Add(new TowerAttackedEvent(
                     tick,
-                    character.Uid,
+                    tower.Uid,
                     monster.Uid,
                     attackDamage,
-                    character.Position.X,
-                    character.Position.Y,
+                    tower.Position.X,
+                    tower.Position.Y,
                     monster.Position.X,
                     monster.Position.Y
                 ));
@@ -105,7 +105,7 @@ namespace MyProject.MergeGame.Systems
                     monster.Uid,
                     attackDamage,
                     monster.ASC.Get(AttributeId.Health),
-                    character.Uid
+                    tower.Uid
                 ));
             }
         }
@@ -113,7 +113,7 @@ namespace MyProject.MergeGame.Systems
         /// <summary>
         /// 캐릭터 기준으로 적(몬스터) 목록을 반환합니다.
         /// </summary>
-        private IReadOnlyList<AbilitySystemComponent> GetEnemiesForCharacter(AbilitySystemComponent owner)
+        private IReadOnlyList<AbilitySystemComponent> GetEnemiesForTower(AbilitySystemComponent owner)
         {
             _monsterAscList.Clear();
 
@@ -131,15 +131,15 @@ namespace MyProject.MergeGame.Systems
         /// <summary>
         /// 캐릭터 기준으로 아군(다른 캐릭터) 목록을 반환합니다.
         /// </summary>
-        private IReadOnlyList<AbilitySystemComponent> GetAlliesForCharacter(AbilitySystemComponent owner)
+        private IReadOnlyList<AbilitySystemComponent> GetAlliesForTower(AbilitySystemComponent owner)
         {
             var allies = new List<AbilitySystemComponent>();
 
-            foreach (var character in _state.Characters.Values)
+            foreach (var tower in _state.Towers.Values)
             {
-                if (character.ASC != owner)
+                if (tower.ASC != owner)
                 {
-                    allies.Add(character.ASC);
+                    allies.Add(tower.ASC);
                 }
             }
 
@@ -152,11 +152,11 @@ namespace MyProject.MergeGame.Systems
         private Point2D GetPositionForAsc(AbilitySystemComponent asc)
         {
             // 캐릭터에서 찾기
-            foreach (var character in _state.Characters.Values)
+            foreach (var tower in _state.Towers.Values)
             {
-                if (character.ASC == asc)
+                if (tower.ASC == asc)
                 {
-                    return character.Position;
+                    return tower.Position;
                 }
             }
 
@@ -189,3 +189,4 @@ namespace MyProject.MergeGame.Systems
         }
     }
 }
+

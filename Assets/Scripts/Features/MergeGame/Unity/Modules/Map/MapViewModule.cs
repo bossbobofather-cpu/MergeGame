@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -5,13 +6,29 @@ namespace MyProject.MergeGame.Unity
 {
     /// <summary>
     /// View용 맵 모듈입니다.
-    /// 호스트의 MapInitializedEvent를 수신하여 슬롯/경로 프리팹을 배치합니다.
+    /// 호스트의 MapInitializedEvent를 수신하여 맵 배경/슬롯/경로 프리팹을 배치합니다.
     /// </summary>
-    public class MapViewModule : MergeViewModuleBase
+    [DisallowMultipleComponent]
+    public sealed class MapViewModule : MergeViewModuleBase
     {
+        [Serializable]
+        private sealed class MapBackgroundEntry
+        {
+            [SerializeField] private int _mapId;
+            [SerializeField] private GameObject _prefab;
+
+            public int MapId => _mapId;
+            public GameObject Prefab => _prefab;
+        }
+
+        [Header("Prefabs")]
+        [SerializeField] private GameObject _defaultBackgroundPrefab;
+        [SerializeField] private List<MapBackgroundEntry> _backgroundPrefabs = new();
         [SerializeField] private GameObject _slotPrefab;
         [SerializeField] private GameObject _pathPointPrefab;
         [SerializeField] private LineRenderer _pathLinePrefab;
+
+        private GameObject _backgroundInstance;
 
         private readonly Dictionary<int, GameObject> _slotObjects = new();
         private readonly List<GameObject> _pathObjects = new();
@@ -41,6 +58,8 @@ namespace MyProject.MergeGame.Unity
         {
             ClearMap();
 
+            BuildBackground(evt.MapId);
+
             // 슬롯 배치
             if (_slotPrefab != null)
             {
@@ -49,6 +68,10 @@ namespace MyProject.MergeGame.Unity
                     var slotObj = Instantiate(_slotPrefab, transform);
                     slotObj.transform.localPosition = new Vector3(slotPos.X, slotPos.Y, 0f);
                     slotObj.name = $"Slot_{slotPos.Index}";
+
+                    // 런타임에서 슬롯 인덱스를 주입합니다. (프리팹이 스크립트를 갖고 있지 않아도 됨)
+                    (slotObj.GetComponent<MergeSlotView>() ?? slotObj.AddComponent<MergeSlotView>()).SetSlotIndex(slotPos.Index);
+
                     _slotObjects[slotPos.Index] = slotObj;
                 }
             }
@@ -86,18 +109,59 @@ namespace MyProject.MergeGame.Unity
             // 웨이포인트 마커 배치
             if (_pathPointPrefab != null)
             {
-                foreach (var wp in pathData.Waypoints)
+                for (var i = 0; i < pathData.Waypoints.Count; i++)
                 {
+                    var wp = pathData.Waypoints[i];
+
                     var pointObj = Instantiate(_pathPointPrefab, transform);
                     pointObj.transform.localPosition = new Vector3(wp.X, wp.Y, 0f);
-                    pointObj.name = $"PathPoint_{pathData.PathIndex}";
+                    pointObj.name = $"PathPoint_{pathData.PathIndex}_{i}";
+
+                    // 런타임에서 (PathIndex, WaypointIndex)를 주입합니다.
+                    (pointObj.GetComponent<MergePathPointView>() ?? pointObj.AddComponent<MergePathPointView>()).SetIndices(pathData.PathIndex, i);
+
                     _pathObjects.Add(pointObj);
                 }
             }
         }
 
+        private void BuildBackground(int mapId)
+        {
+            var prefab = ResolveBackgroundPrefab(mapId);
+            if (prefab == null)
+            {
+                return;
+            }
+
+            _backgroundInstance = Instantiate(prefab, transform);
+            _backgroundInstance.name = $"MapBackground_{mapId}";
+            _backgroundInstance.transform.localPosition = Vector3.zero;
+            _backgroundInstance.transform.localRotation = Quaternion.identity;
+            _backgroundInstance.transform.localScale = Vector3.one;
+        }
+
+        private GameObject ResolveBackgroundPrefab(int mapId)
+        {
+            for (var i = 0; i < _backgroundPrefabs.Count; i++)
+            {
+                var entry = _backgroundPrefabs[i];
+                if (entry != null && entry.Prefab != null && entry.MapId == mapId)
+                {
+                    return entry.Prefab;
+                }
+            }
+
+            return _defaultBackgroundPrefab;
+        }
+
         private void ClearMap()
         {
+            if (_backgroundInstance != null)
+            {
+                Destroy(_backgroundInstance);
+                _backgroundInstance = null;
+            }
+
             foreach (var slotObj in _slotObjects.Values)
             {
                 if (slotObj != null)

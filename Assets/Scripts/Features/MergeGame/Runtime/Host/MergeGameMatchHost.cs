@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using MyProject.MergeGame.Commands;
 
 namespace MyProject.MergeGame
@@ -23,6 +23,8 @@ namespace MyProject.MergeGame
         private int _killsA;
         private int _killsB;
 
+        private bool _matchEnded;
+
         public MergeGameMatchHost(MergeGameHost hostA, MergeGameHost hostB, int killsPerGarbage = 10)
         {
             _hostA = hostA ?? throw new ArgumentNullException(nameof(hostA));
@@ -46,6 +48,30 @@ namespace MyProject.MergeGame
 
         private void OnHostAEvent(MergeHostEvent evt)
         {
+            if (evt == null)
+            {
+                return;
+            }
+
+            // 패배자가 결정되면 매치를 종료합니다.
+            if (!_matchEnded && evt is MergeGameOverEvent over)
+            {
+                _matchEnded = true;
+
+                // A가 패배했다면 B는 승리 처리합니다.
+                if (!over.IsVictory)
+                {
+                    _hostB.SendCommand(new EndMergeGameCommand(SERVER_UID));
+                }
+
+                return;
+            }
+
+            if (_matchEnded)
+            {
+                return;
+            }
+
             if (evt is MonsterDiedEvent)
             {
                 _killsA++;
@@ -55,6 +81,29 @@ namespace MyProject.MergeGame
 
         private void OnHostBEvent(MergeHostEvent evt)
         {
+            if (evt == null)
+            {
+                return;
+            }
+
+            if (!_matchEnded && evt is MergeGameOverEvent over)
+            {
+                _matchEnded = true;
+
+                // B가 패배했다면 A는 승리 처리합니다.
+                if (!over.IsVictory)
+                {
+                    _hostA.SendCommand(new EndMergeGameCommand(SERVER_UID));
+                }
+
+                return;
+            }
+
+            if (_matchEnded)
+            {
+                return;
+            }
+
             if (evt is MonsterDiedEvent)
             {
                 _killsB++;
