@@ -79,6 +79,11 @@ namespace MyProject.MergeGame
         public float PositionY { get; }
 
         /// <summary>
+        /// Z 좌표입니다.
+        /// </summary>
+        public float PositionZ { get; }
+
+        /// <summary>
         /// 공격력입니다.
         /// </summary>
         public float AttackDamage { get; }
@@ -93,6 +98,26 @@ namespace MyProject.MergeGame
         /// </summary>
         public float AttackRange { get; }
 
+        /// <summary>
+        /// 공격 방식입니다.
+        /// </summary>
+        public TowerAttackType AttackType { get; }
+
+        /// <summary>
+        /// 투사체 타입입니다.
+        /// </summary>
+        public ProjectileType ProjectileType { get; }
+
+        /// <summary>
+        /// 투사체 속도입니다.
+        /// </summary>
+        public float ProjectileSpeed { get; }
+
+        /// <summary>
+        /// Throw 타입의 반경입니다.
+        /// </summary>
+        public float ThrowRadius { get; }
+
         public TowerSnapshot(
             long uid,
             string towerId,
@@ -101,9 +126,14 @@ namespace MyProject.MergeGame
             int slotIndex,
             float positionX,
             float positionY,
+            float positionZ,
             float attackDamage,
             float attackSpeed,
-            float attackRange)
+            float attackRange,
+            TowerAttackType attackType,
+            ProjectileType projectileType,
+            float projectileSpeed,
+            float throwRadius)
         {
             Uid = uid;
             TowerId = towerId;
@@ -112,9 +142,14 @@ namespace MyProject.MergeGame
             SlotIndex = slotIndex;
             PositionX = positionX;
             PositionY = positionY;
+            PositionZ = positionZ;
             AttackDamage = attackDamage;
             AttackSpeed = attackSpeed;
             AttackRange = attackRange;
+            AttackType = attackType;
+            ProjectileType = projectileType;
+            ProjectileSpeed = projectileSpeed;
+            ThrowRadius = throwRadius;
         }
     }
 
@@ -154,6 +189,11 @@ namespace MyProject.MergeGame
         public float PositionY { get; }
 
         /// <summary>
+        /// Z 좌표입니다.
+        /// </summary>
+        public float PositionZ { get; }
+
+        /// <summary>
         /// 현재 체력입니다.
         /// </summary>
         public float CurrentHealth { get; }
@@ -175,6 +215,7 @@ namespace MyProject.MergeGame
             float pathProgress,
             float positionX,
             float positionY,
+            float positionZ,
             float currentHealth,
             float maxHealth)
         {
@@ -184,6 +225,7 @@ namespace MyProject.MergeGame
             PathProgress = pathProgress;
             PositionX = positionX;
             PositionY = positionY;
+            PositionZ = positionZ;
             CurrentHealth = currentHealth;
             MaxHealth = maxHealth;
         }
@@ -338,5 +380,3 @@ namespace MyProject.MergeGame
         }
     }
 }
-
-

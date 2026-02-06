@@ -7,7 +7,7 @@ using Noname.GameAbilitySystem;
 namespace MyProject.MergeGame
 {
     /// <summary>
-    /// MergeGame 내부 상태를 관리합니다.
+    /// MergeGame 게임 상태를 관리합니다.
     /// </summary>
     public sealed class MergeHostState : IDisposable
     {
@@ -24,7 +24,7 @@ namespace MyProject.MergeGame
             /// <summary>
             /// 슬롯 위치입니다.
             /// </summary>
-            public Point2D Position { get; }
+            public Point3D Position { get; }
 
             /// <summary>
             /// 타워 UID입니다. 비어있으면 0입니다.
@@ -41,7 +41,7 @@ namespace MyProject.MergeGame
             /// </summary>
             public bool IsEmpty => TowerUid == 0;
 
-            public SlotInfo(int index, Point2D position)
+            public SlotInfo(int index, Point3D position)
             {
                 Index = index;
                 Position = position;
@@ -69,11 +69,12 @@ namespace MyProject.MergeGame
                 SetTower(unitUid, grade);
             }
         }
-// 세션 상태
+
+        // 세션 상태
         private MergeSessionPhase _sessionPhase = MergeSessionPhase.None;
         private float _elapsedTime;
 
-        // 보드 및 캐릭터
+        // 슬롯 및 타워
         private readonly List<SlotInfo> _slots = new();
         private readonly Dictionary<long, MergeTower> _towers = new();
 
@@ -119,7 +120,7 @@ namespace MyProject.MergeGame
         public IReadOnlyList<SlotInfo> Slots => _slots;
 
         /// <summary>
-        /// 캐릭터 목록입니다.
+        /// 타워 목록입니다.
         /// </summary>
         public IReadOnlyDictionary<long, MergeTower> Towers => _towers;
 
@@ -164,7 +165,7 @@ namespace MyProject.MergeGame
         public float WaveTimer => _waveTimer;
 
         /// <summary>
-        /// 웨이브에서 남은 몬스터 수입니다.
+        /// 웨이브에 남은 몬스터 수입니다.
         /// </summary>
         public int MonstersRemainingInWave => _monstersRemainingInWave;
 
@@ -174,7 +175,7 @@ namespace MyProject.MergeGame
         public int Score => _score;
 
         /// <summary>
-        /// 도달한 최고 등급입니다.
+        /// 최고 등급입니다.
         /// </summary>
         public int MaxGrade => _maxGrade;
 
@@ -198,7 +199,7 @@ namespace MyProject.MergeGame
         }
 
         /// <summary>
-        /// 현재 생존 몬스터 수입니다.
+        /// 현재 살아있는 몬스터 수입니다.
         /// </summary>
         public int AliveMonsterCount => _monsters.Count;
 
@@ -207,7 +208,7 @@ namespace MyProject.MergeGame
         #region Initialization
 
         /// <summary>
-        /// MapModule의 슬롯 데이터로 보드를 초기화합니다.
+        /// MapModule의 슬롯 데이터를 기반으로 초기화합니다.
         /// </summary>
         public void InitializeSlots(IReadOnlyList<MapSlot> mapSlots)
         {
@@ -242,7 +243,7 @@ namespace MyProject.MergeGame
         #region Session Management
 
         /// <summary>
-        /// 세션 단계를 설정합니다.
+        /// 세션 단계를 변경합니다.
         /// </summary>
         public void SetSessionPhase(MergeSessionPhase phase)
         {
@@ -250,7 +251,7 @@ namespace MyProject.MergeGame
         }
 
         /// <summary>
-        /// 경과 시간을 갱신합니다.
+        /// 경과 시간을 누적합니다.
         /// </summary>
         public void AddElapsedTime(float deltaTime)
         {
@@ -262,7 +263,7 @@ namespace MyProject.MergeGame
         #region Slot Management
 
         /// <summary>
-        /// 슬롯 정보를 가져옵니다.
+        /// 슬롯을 가져옵니다.
         /// </summary>
         public SlotInfo GetSlot(int index)
         {
@@ -293,7 +294,7 @@ namespace MyProject.MergeGame
         #region Tower Management
 
         /// <summary>
-        /// 새 캐릭터 UID를 생성합니다.
+        /// 새 타워 UID를 생성합니다.
         /// </summary>
         public long GenerateTowerUid()
         {
@@ -301,7 +302,7 @@ namespace MyProject.MergeGame
         }
 
         /// <summary>
-        /// 캐릭터를 추가합니다.
+        /// 타워를 추가합니다.
         /// </summary>
         public void AddTower(MergeTower tower)
         {
@@ -319,7 +320,7 @@ namespace MyProject.MergeGame
         }
 
         /// <summary>
-        /// 캐릭터를 가져옵니다.
+        /// 타워를 가져옵니다.
         /// </summary>
         public MergeTower GetTower(long uid)
         {
@@ -327,7 +328,7 @@ namespace MyProject.MergeGame
         }
 
         /// <summary>
-        /// 슬롯의 캐릭터를 가져옵니다.
+        /// 슬롯에 있는 타워를 가져옵니다.
         /// </summary>
         public MergeTower GetTowerAtSlot(int slotIndex)
         {
@@ -338,7 +339,7 @@ namespace MyProject.MergeGame
         }
 
         /// <summary>
-        /// 캐릭터를 제거합니다.
+        /// 타워를 제거합니다.
         /// </summary>
         public void RemoveTower(long uid)
         {
@@ -355,14 +356,18 @@ namespace MyProject.MergeGame
         }
 
         /// <summary>
-        /// 캐릭터를 생성하고 등록합니다.
+        /// 타워를 생성하고 반환합니다.
         /// </summary>
         public MergeTower CreateTower(
             string towerId,
             string towerType,
             int grade,
             int slotIndex,
-            Point2D position,
+            Point3D position,
+            TowerAttackType attackType,
+            ProjectileType projectileType,
+            float projectileSpeed,
+            float throwRadius,
             string onMergeSourceEffectId = null,
             string onMergeTargetEffectId = null)
         {
@@ -374,6 +379,10 @@ namespace MyProject.MergeGame
                 grade,
                 slotIndex,
                 position,
+                attackType,
+                projectileType,
+                projectileSpeed,
+                throwRadius,
                 onMergeSourceEffectId,
                 onMergeTargetEffectId
             );
@@ -385,7 +394,7 @@ namespace MyProject.MergeGame
         }
 
         /// <summary>
-        /// 슬롯의 캐릭터를 가져옵니다 (GetTowerAtSlot 별칭).
+        /// 슬롯 인덱스로 타워를 가져옵니다.
         /// </summary>
         public MergeTower GetTowerBySlot(int slotIndex)
         {
@@ -393,7 +402,7 @@ namespace MyProject.MergeGame
         }
 
         /// <summary>
-        /// 캐릭터를 다른 슬롯으로 이동합니다.
+        /// 타워를 다른 슬롯으로 이동합니다.
         /// </summary>
         public bool MoveTower(long uid, int newSlotIndex)
         {
@@ -416,12 +425,14 @@ namespace MyProject.MergeGame
         }
 
         /// <summary>
-        /// 기존 유닛 UID 생성 (하위 호환).
+        /// 레거시 API 호환용 UID 생성입니다.
         /// </summary>
         public long GenerateUnitUid()
         {
             return GenerateTowerUid();
-        }#endregion
+        }
+
+        #endregion
 
         #region Monster Management
 
@@ -470,12 +481,12 @@ namespace MyProject.MergeGame
         }
 
         /// <summary>
-        /// 몬스터를 생성하고 등록합니다.
+        /// 몬스터를 생성하고 반환합니다.
         /// </summary>
         public MergeMonster CreateMonster(
             string monsterId,
             int pathIndex,
-            Point2D startPosition,
+            Point3D startPosition,
             int damageToPlayer,
             int goldReward)
         {
@@ -508,7 +519,7 @@ namespace MyProject.MergeGame
         }
 
         /// <summary>
-        /// 경로를 인덱스에 설정합니다.
+        /// 경로를 인덱스로 설정합니다.
         /// </summary>
         public void SetMonsterPath(int pathIndex, MonsterPath path)
         {
@@ -521,7 +532,7 @@ namespace MyProject.MergeGame
         }
 
         /// <summary>
-        /// 모든 몬스터를 순회합니다.
+        /// 모든 몬스터를 조회합니다.
         /// </summary>
         public IEnumerable<MergeMonster> GetAllMonsters()
         {
@@ -529,7 +540,7 @@ namespace MyProject.MergeGame
         }
 
         /// <summary>
-        /// 죽은 몬스터 목록을 반환합니다.
+        /// 사망한 몬스터 목록을 반환합니다.
         /// </summary>
         public List<MergeMonster> GetDeadMonsters()
         {
@@ -545,7 +556,7 @@ namespace MyProject.MergeGame
         }
 
         /// <summary>
-        /// 목적지에 도달한 몬스터 목록을 반환합니다.
+        /// 목표에 도달한 몬스터 목록을 반환합니다.
         /// </summary>
         public List<MergeMonster> GetGoalReachedMonsters()
         {
@@ -582,7 +593,7 @@ namespace MyProject.MergeGame
         }
 
         /// <summary>
-        /// 플레이어 골드를 추가합니다 (AddGold 별칭).
+        /// 플레이어 골드를 증가시킵니다. (AddGold 별칭)
         /// </summary>
         public void AddPlayerGold(int amount)
         {
@@ -590,7 +601,7 @@ namespace MyProject.MergeGame
         }
 
         /// <summary>
-        /// 플레이어에게 데미지를 줍니다.
+        /// 플레이어가 데미지를 받습니다.
         /// </summary>
         public int DamagePlayer(int damage)
         {
@@ -610,7 +621,7 @@ namespace MyProject.MergeGame
         }
 
         /// <summary>
-        /// 골드를 추가합니다.
+        /// 골드를 증가시킵니다.
         /// </summary>
         public void AddGold(int amount)
         {
@@ -618,7 +629,7 @@ namespace MyProject.MergeGame
         }
 
         /// <summary>
-        /// 골드를 사용합니다.
+        /// 골드를 소모합니다.
         /// </summary>
         public bool SpendGold(int amount)
         {
@@ -629,7 +640,7 @@ namespace MyProject.MergeGame
         }
 
         /// <summary>
-        /// 플레이어가 살아있는지 확인합니다.
+        /// 플레이어 생존 여부입니다.
         /// </summary>
         public bool IsPlayerAlive => _playerHp > 0;
 
@@ -666,7 +677,7 @@ namespace MyProject.MergeGame
         }
 
         /// <summary>
-        /// 웨이브 타이머를 갱신합니다.
+        /// 웨이브 타이머를 업데이트합니다.
         /// </summary>
         public void UpdateWaveTimer(float deltaTime)
         {
@@ -674,7 +685,7 @@ namespace MyProject.MergeGame
         }
 
         /// <summary>
-        /// 웨이브를 완료합니다.
+        /// 웨이브를 완료 처리합니다.
         /// </summary>
         public void CompleteWave()
         {
@@ -682,7 +693,7 @@ namespace MyProject.MergeGame
         }
 
         /// <summary>
-        /// 모든 몬스터가 처리되었는지 확인합니다.
+        /// 웨이브 클리어 여부입니다.
         /// </summary>
         public bool IsWaveClear => _wavePhase == WavePhase.InProgress && _monsters.Count == 0;
 
@@ -691,7 +702,7 @@ namespace MyProject.MergeGame
         #region Score
 
         /// <summary>
-        /// 점수를 추가합니다.
+        /// 점수를 증가시킵니다.
         /// </summary>
         public void AddScore(int amount)
         {
@@ -728,7 +739,7 @@ namespace MyProject.MergeGame
             }
             _slots.Clear();
 
-            // 캐릭터 정리
+            // 타워 정리
             foreach (var tower in _towers.Values)
             {
                 tower.Dispose();
@@ -776,7 +787,3 @@ namespace MyProject.MergeGame
 
     // WavePhase는 Shared/Enums/MergeEnums.cs에 정의됨
 }
-
-
-
-

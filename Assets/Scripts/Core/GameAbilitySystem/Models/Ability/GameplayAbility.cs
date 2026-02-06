@@ -4,54 +4,54 @@ using System.Collections.Generic;
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// 게임?�레???�빌리티 ?�정?�니??(?�수 C# 모델).
+    /// 주석 정리
     /// </summary>
     [Serializable]
     public sealed class GameplayAbility
     {
         /// <summary>
-        /// ?�빌리티 ?�그?�니??
+        /// 주석 정리
         /// </summary>
         public FGameplayTag AbilityTag { get; set; }
 
         /// <summary>
-        /// ?�시 ?�름?�니??
+        /// 주석 정리
         /// </summary>
         public string DisplayName { get; set; }
 
         /// <summary>
-        /// ?�명?�니??
+        /// 주석 정리
         /// </summary>
         public string Description { get; set; }
 
         /// <summary>
-        /// 쿨다???�과?�니??
-        /// ?�성?????�신?�게 ?�용?�어 쿨다???�그�?부?�합?�다.
+        /// 주석 정리
+        /// 주석 정리
         /// </summary>
         public GameplayEffect CooldownEffect { get; set; }
 
         /// <summary>
-        /// 비용?�로 ?�모?�는 ?�과 목록?�니??
+        /// 주석 정리
         /// </summary>
         public List<GameplayEffect> CostEffects { get; set; }
 
         /// <summary>
-        /// ?�용?�는 ?�과 목록?�니??
+        /// 주석 정리
         /// </summary>
         public List<GameplayEffect> AppliedEffects { get; set; }
 
         /// <summary>
-        /// ?�성???�수 ?�그 목록?�니??
+        /// 주석 정리
         /// </summary>
         public GameplayTagContainer  ActivationRequiredTags { get; set; }
 
         /// <summary>
-        /// ?�성??차단 ?�그 목록?�니??
+        /// 주석 정리
         /// </summary>
         public GameplayTagContainer ActivationBlockedTags { get; set; }
 
         /// <summary>
-        /// ?��??�정 ?�략?�니??
+        /// 주석 정리
         /// </summary>
         public ITargetingStrategy TargetingStrategy { get; set; }
 

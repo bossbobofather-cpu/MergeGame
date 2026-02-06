@@ -7,7 +7,7 @@ namespace Noname.GameCore.Helper
 {
     [CreateAssetMenu(menuName = "GameAbilitySystem/Config/GameplayAbilityConfig")]
     /// <summary>
-    /// ?대퉴由ы떚 ?뺤쓽 ?곗씠?곕? ?대뒗 ?먯뀑?낅땲??
+    /// 어빌리티 정의 데이터를 담는 ScriptableObject입니다.
     /// </summary>
     public sealed class GameplayAbilityConfig : ScriptableObject
     {
@@ -27,64 +27,63 @@ namespace Noname.GameCore.Helper
         [SerializeField] private float _targetingRadius = 0f;
 
         /// <summary>
-        /// ?대퉴由ы떚 ?쒓렇?낅땲??
+        /// 어빌리티 태그입니다.
         /// </summary>
         public FGameplayTagView AbilityTag => _abilityTag;
 
         /// <summary>
-        /// ?쒖떆?섎뒗 ?대쫫?낅땲??
+        /// 표시 이름입니다.
         /// </summary>
         public string DisplayName => _dpName;
 
         /// <summary>
-        /// ?쒖떆?섎뒗 ?ㅻ챸?낅땲??
+        /// 표시 설명입니다.
         /// </summary>
         public string Description => _dpDesc;    
         
         /// <summary>
-        /// ?λ젰 荑⑤떎???④낵?낅땲??
+        /// 쿨다운 효과입니다.
         /// </summary>
         public GameplayEffectConfig CooldownEffect => _cooldownEffect;
 
         /// <summary>
-        /// 鍮꾩슜?쇰줈 ?뚮え?섎뒗 ?④낵 紐⑸줉?낅땲??
+        /// 비용으로 소모되는 효과 목록입니다.
         /// </summary>
         public List<GameplayEffectConfig> CostEffects => _costEffects;
 
         /// <summary>
-        /// ?곸슜?섎뒗 ?④낵 紐⑸줉?낅땲??
+        /// 적용되는 효과 목록입니다.
         /// </summary>
         public List<GameplayEffectConfig> AppliedEffects => _appliedEffects;
 
         /// <summary>
-        /// ?쒖꽦???꾩닔 ?쒓렇 紐⑸줉?낅땲??
+        /// 활성화 필수 태그 목록입니다.
         /// </summary>
         public GameplayTagContainerView  ActivationRequiredTags => _activationRequiredTags;
 
         /// <summary>
-        /// ?쒖꽦??李⑤떒 ?쒓렇 紐⑸줉?낅땲??
+        /// 활성화 차단 태그 목록입니다.
         /// </summary>
         public GameplayTagContainerView ActivationBlockedTags => _activationBlockedTags;
 
         /// <summary>
-        /// ?寃잜똿 ?꾨왂 ??낆엯?덈떎.
+        /// 타겟팅 전략 타입입니다.
         /// </summary>
         public TargetingStrategyType TargetingStrategyType => _targetingStrategyType;
 
         /// <summary>
-        /// ?寃잜똿 理쒕? 踰붿쐞?낅땲?? (NearestEnemy, NearestN?먯꽌 ?ъ슜)
+        /// 타겟팅 최대 범위입니다. (NearestEnemy, NearestN에서 사용)
         /// </summary>
         public float TargetingMaxRange => _targetingMaxRange;
 
         /// <summary>
-        /// ?寃잜똿 理쒕? ????섏엯?덈떎. (NearestN?먯꽌 ?ъ슜)
+        /// 타겟팅 최대 대상 수입니다. (NearestN에서 사용)
         /// </summary>
         public int TargetingMaxTargets => _targetingMaxTargets;
 
         /// <summary>
-        /// ?寃잜똿 諛섍꼍?낅땲?? (Area?먯꽌 ?ъ슜)
+        /// 타겟팅 반경입니다. (Area에서 사용)
         /// </summary>
         public float TargetingRadius => _targetingRadius;
     }
 }
-

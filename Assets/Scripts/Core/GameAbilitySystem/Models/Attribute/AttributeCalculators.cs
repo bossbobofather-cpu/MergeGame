@@ -1,7 +1,7 @@
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// ?�?�의 최�? 체력 비율만큼 ?�복?�는 계산기입?�다.
+    /// 주석 정리
     /// </summary>
     public sealed class HealByTargetMaxHealthPercentCalculator : IAttributeCalculator
     {
@@ -19,7 +19,7 @@ namespace Noname.GameAbilitySystem
     }
 
     /// <summary>
-    /// ?�전?�의 최�? 체력 비율만큼 ?�복?�는 계산기입?�다.
+    /// 주석 정리
     /// </summary>
     public sealed class HealBySourceMaxHealthPercentCalculator : IAttributeCalculator
     {
@@ -37,7 +37,7 @@ namespace Noname.GameAbilitySystem
     }
 
     /// <summary>
-    /// ?�?�의 체력??최�? 체력?�로 ?�정?�는 계산기입?�다. (?�전 ?�복)
+    /// 주석 정리
     /// </summary>
     public sealed class FullHealCalculator : IAttributeCalculator
     {

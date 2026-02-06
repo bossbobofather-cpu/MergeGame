@@ -1,4 +1,5 @@
-using MyProject.Common.UI;
+﻿using MyProject.Common.UI;
+using MyProject.MergeGame.Commands;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,13 +7,17 @@ namespace MyProject.MergeGame.Unity
 {
     /// <summary>
     /// MergeGame HUD 모듈입니다.
-    /// 스냅샷을 받아 현재 상태(HP/Gold/Wave/Score 등)를 화면에 표시합니다.
+    /// 스냅샷을 받아 현재 상태(HP/Gold/Wave/Score)를 표시합니다.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class HudViewModule : MergeViewModuleBase
     {
         [Header("Main HUD Page (Optional)")]
         [SerializeField] private Page_MainHud _mainHudPrefab;
+
+        [Header("Spawn")]
+        [SerializeField] private bool _useTowerCommands = true;
+        [SerializeField] private string _spawnTowerId = "unit_basic";
 
         [Header("UI (Optional)")]
         [SerializeField] private Text _hpText;
@@ -46,9 +51,7 @@ namespace MyProject.MergeGame.Unity
                 return;
             }
 
-            // UIManager 초기화 타이밍(씬/부트스트랩)에 따라 늦게 준비될 수 있어 스냅샷 루프에서도 보장합니다.
             EnsureMainHudPage();
-
             EnsureHud();
 
             if (_hpText != null)
@@ -111,23 +114,56 @@ namespace MyProject.MergeGame.Unity
                 return;
             }
 
-            var input = GameView.GetModule<InputViewModule>();
-            if (input == null)
-            {
-                return;
-            }
-
             if (_mainHudInstance.SpawnTowerButton != null)
             {
-                _mainHudInstance.SpawnTowerButton.onClick.AddListener(input.OnClickSpawn);
+                _mainHudInstance.SpawnTowerButton.onClick.AddListener(HandleSpawnTowerClicked);
             }
 
             if (_mainHudInstance.StartWaveButton != null)
             {
-                _mainHudInstance.StartWaveButton.onClick.AddListener(input.OnClickStartWave);
+                _mainHudInstance.StartWaveButton.onClick.AddListener(HandleStartWaveClicked);
             }
 
             _boundMainHudButtons = true;
+        }
+
+        private void HandleSpawnTowerClicked()
+        {
+            if (GameView == null)
+            {
+                return;
+            }
+
+            if (_useTowerCommands)
+            {
+                if (string.IsNullOrEmpty(_spawnTowerId))
+                {
+                    Post("[스폰 실패] SpawnTowerId가 비어있습니다.");
+                    return;
+                }
+
+                GameView.SendCommand(new SpawnTowerCommand(GameView.LocalUserId, _spawnTowerId));
+            }
+            else
+            {
+                GameView.SendCommand(new SpawnUnitCommand(GameView.LocalUserId));
+            }
+        }
+
+        private void HandleStartWaveClicked()
+        {
+            if (GameView == null)
+            {
+                return;
+            }
+
+            GameView.SendCommand(new StartWaveCommand(GameView.LocalUserId));
+        }
+
+        private static void Post(string message)
+        {
+            SystemMessageBus.Publish(message);
+            Debug.Log(message);
         }
 
         private void EnsureHud()
@@ -275,21 +311,16 @@ namespace MyProject.MergeGame.Unity
 
         protected override void OnShutdown()
         {
-            // UI 버튼 리스너를 제거합니다. (UI는 UIManager가 재사용/관리)
-            if (_boundMainHudButtons && _mainHudInstance != null && GameView != null)
+            if (_boundMainHudButtons && _mainHudInstance != null)
             {
-                var input = GameView.GetModule<InputViewModule>();
-                if (input != null)
+                if (_mainHudInstance.SpawnTowerButton != null)
                 {
-                    if (_mainHudInstance.SpawnTowerButton != null)
-                    {
-                        _mainHudInstance.SpawnTowerButton.onClick.RemoveListener(input.OnClickSpawn);
-                    }
+                    _mainHudInstance.SpawnTowerButton.onClick.RemoveListener(HandleSpawnTowerClicked);
+                }
 
-                    if (_mainHudInstance.StartWaveButton != null)
-                    {
-                        _mainHudInstance.StartWaveButton.onClick.RemoveListener(input.OnClickStartWave);
-                    }
+                if (_mainHudInstance.StartWaveButton != null)
+                {
+                    _mainHudInstance.StartWaveButton.onClick.RemoveListener(HandleStartWaveClicked);
                 }
             }
 
@@ -298,7 +329,6 @@ namespace MyProject.MergeGame.Unity
 
             base.OnShutdown();
 
-            // 런타임에 만든 HUD 오브젝트만 정리합니다.
             if (_createdContainer && _container != null)
             {
                 Destroy(_container.gameObject);
@@ -322,3 +352,4 @@ namespace MyProject.MergeGame.Unity
         }
     }
 }
+

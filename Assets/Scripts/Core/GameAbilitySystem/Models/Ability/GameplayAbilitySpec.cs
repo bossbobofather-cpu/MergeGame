@@ -3,8 +3,8 @@ using System;
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// ?�력 ?�양 ?�보�??�는 구조?�니??
-    /// ASC??부?�된 ?�력???��????�태�?관리합?�다.
+    /// 주석 정리
+    /// 주석 정리
     /// </summary>
     public sealed class GameplayAbilitySpec
     {
@@ -27,37 +27,37 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�력 ?�의?�니??
+        /// 주석 정리
         /// </summary>
         public GameplayAbility Ability => _ability;
 
         /// <summary>
-        /// ?�력 ?�들?�니??
+        /// 주석 정리
         /// </summary>
         public FGameplayAbilitySpecHandle Handle => _handle;
 
         /// <summary>
-        /// ?�력 ?�그?�니??
+        /// 주석 정리
         /// </summary>
         public FGameplayTag AbilityTag => _ability.AbilityTag;
 
         /// <summary>
-        /// ?�성?�에 ?�수�??�요???�그 목록?�니??
+        /// 주석 정리
         /// </summary>
         public GameplayTagContainer ActivationRequiredTags => _ability.ActivationRequiredTags;
 
         /// <summary>
-        /// ?�성?��? 차단?�는 ?�그 목록?�니??
+        /// 주석 정리
         /// </summary>
         public GameplayTagContainer ActivationBlockedTags => _ability.ActivationBlockedTags;
 
         /// <summary>
-        /// ?�시 ?�름?�니??
+        /// 주석 정리
         /// </summary>
         public string DisplayName => _ability.DisplayName;
 
         /// <summary>
-        /// ?�력 ?�벨?�니??
+        /// 주석 정리
         /// </summary>
         public int Level
         {
@@ -66,12 +66,12 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�성??중인 ?�수?�니??
+        /// 주석 정리
         /// </summary>
         public int ActiveCount => _activeCount;
 
         /// <summary>
-        /// ?�성??카운?��? 증�??�킵?�다.
+        /// 주석 정리
         /// </summary>
         public void IncrementActiveCount()
         {
@@ -79,7 +79,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�성??카운?��? 감소?�킵?�다.
+        /// 주석 정리
         /// </summary>
         public void DecrementActiveCount()
         {

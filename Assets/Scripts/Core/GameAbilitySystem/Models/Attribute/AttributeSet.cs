@@ -3,20 +3,20 @@ using System.Collections.Generic;
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// ?�성 집합??관리합?�다 (?�수 C# 모델).
-    /// Unity???�존?��? ?�으�?Host ?�경?�서 ?�용 가?�합?�다.
+    /// 주석 정리
+    /// 주석 정리
     /// </summary>
     public sealed class AttributeSet
     {
         private readonly Dictionary<AttributeId, AttributeValue> _values = new();
 
         /// <summary>
-        /// 모든 ?�성 값을 반환?�니??
+        /// 주석 정리
         /// </summary>
         public IReadOnlyCollection<AttributeValue> Values => _values.Values;
 
         /// <summary>
-        /// ?�성??추�??�거???�데?�트?�니??
+        /// 주석 정리
         /// </summary>
         public void SetAttribute(AttributeId id, float baseValue, float minValue = 0f, float maxValue = 0f)
         {
@@ -34,7 +34,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�별?�로 값을 조회?�니??
+        /// 주석 정리
         /// </summary>
         public bool TryGet(AttributeId id, out AttributeValue value)
         {
@@ -42,7 +42,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�성 값을 ?�정?�니??
+        /// 주석 정리
         /// </summary>
         public void Set(AttributeId id, float value)
         {
@@ -57,7 +57,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�성 값을 가?�옵?�다. ?�으�?0??반환?�니??
+        /// 주석 정리
         /// </summary>
         public float Get(AttributeId id)
         {
@@ -65,7 +65,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// 모든 ?�성???�거?�니??
+        /// 주석 정리
         /// </summary>
         public void Clear()
         {

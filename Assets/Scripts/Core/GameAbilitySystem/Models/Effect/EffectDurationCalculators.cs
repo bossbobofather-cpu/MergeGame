@@ -3,7 +3,7 @@ using System;
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// 기본 공격 쿨다???�펙??지???�간 ?�책
+    /// 주석 정리
     /// </summary>
     public sealed class BaseAttackCooldownDurationPlicy : IEffectDurationPolicy
     {
@@ -12,7 +12,7 @@ namespace Noname.GameAbilitySystem
         {
             if(asc == null) return duration;
 
-            //?�무�?공격?�도가 빨라??쿨다??최소�?0.1 최�?�?10 부??
+            // 주석 정리
             duration = Clamp(duration / asc.Get(AttributeId.AttackSpeed), 0.1f, 10f);
             return duration;
         }

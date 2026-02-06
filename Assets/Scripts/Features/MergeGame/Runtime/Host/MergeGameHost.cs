@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MyProject.MergeGame.AI;
 using System.Linq;
 using MyProject.MergeGame.Commands;
 using MyProject.MergeGame.Models;
@@ -48,7 +49,8 @@ namespace MyProject.MergeGame
         /// <summary>
         /// 몬스터 이동 시스템입니다.
         /// </summary>
-        private readonly MonsterMovementSystem _movementSystem;
+        private readonly IMergeTowerAI _defaultTowerAI;
+        private readonly IMergeMonsterAI _defaultMonsterAI;
 
         /// <summary>
         /// 스냅샷 빌드용 임시 리스트입니다.
@@ -127,9 +129,10 @@ namespace MyProject.MergeGame
 
             _combatSystem = new MergeCombatSystem(_state, _config.DefaultAttackRange);
             _effectSystem = new MergeEffectSystem(_state);
-            _movementSystem = new MonsterMovementSystem(_state);
+            _defaultTowerAI = new TowerBaseAttackAI();
+            _defaultMonsterAI = new MonsterPathMoveAI();
 
-            // 내부 이벤트 구독 (모듈 → Host 통신용)
+            // 내부 이벤트 구독 (모듈 -> Host 통신용)
             _innerEventBus.Subscribe<MonsterSpawnRequestInnerEvent>(OnMonsterSpawnRequest);
         }
 
@@ -189,34 +192,38 @@ namespace MyProject.MergeGame
             // WaveModule 상태 동기화 및 웨이브 이벤트/보상 처리
             SyncWaveStateAndEmitWaveEvents();
 
-            // 1. 전투 시스템 업데이트
-            var combatEvents = _combatSystem.Tick(Tick, deltaTime);
-            foreach (var evt in combatEvents)
+            // 1. 타워/몬스터 ASC 및 AI 틱
+            foreach (var tower in _state.Towers.Values)
             {
-                _tickEventBuffer.Add(evt);
+                tower.ASC.Tick(deltaTime);
+                tower.AI?.Tick(Tick, deltaTime, tower, _state, _combatSystem, _tickEventBuffer);
             }
 
-            // 2. 몬스터 이동 업데이트
-            var moveEvents = _movementSystem.Tick(Tick, deltaTime);
-            foreach (var evt in moveEvents)
+            foreach (var monster in _state.Monsters.Values)
             {
-                _tickEventBuffer.Add(evt);
+                monster.ASC.Tick(deltaTime);
+                monster.AI?.Tick(Tick, deltaTime, monster, _state, _tickEventBuffer);
             }
+
+            // 2. 투사체 이동/충돌 처리
+            _combatSystem.TickProjectiles(Tick, deltaTime, _tickEventBuffer);
+
             // 3. 사망한 몬스터 처리
             ProcessDeadMonsters();
+
             // 게임 오버 체크: 몬스터가 너무 많이 쌓이면 패배합니다.
             if (_config.MaxMonsterStack > 0 && _state.Monsters.Count >= _config.MaxMonsterStack)
             {
                 HandleGameOver(false);
             }
+
             // 이벤트 발행
             foreach (var evt in _tickEventBuffer)
             {
                 PublishEvent(evt);
             }
         }
-
-        protected override void HandleInternalEvent(MergeHostEvent eventData)
+protected override void HandleInternalEvent(MergeHostEvent eventData)
         {
             // 내부 이벤트 처리가 필요한 경우 구현
         }
@@ -247,9 +254,14 @@ namespace MyProject.MergeGame
                     tower.SlotIndex,
                     tower.Position.X,
                     tower.Position.Y,
+                    tower.Position.Z,
                     tower.ASC.Get(AttributeId.AttackDamage),
                     tower.ASC.Get(AttributeId.AttackSpeed),
-                    tower.ASC.Get(AttributeId.AttackRange)
+                    tower.ASC.Get(AttributeId.AttackRange),
+                    tower.AttackType,
+                    tower.ProjectileType,
+                    tower.ProjectileSpeed,
+                    tower.ThrowRadius
                 ));
             }
 
@@ -262,6 +274,7 @@ namespace MyProject.MergeGame
                     monster.PathProgress,
                     monster.Position.X,
                     monster.Position.Y,
+                    monster.Position.Z,
                     monster.ASC.Get(AttributeId.Health),
                     monster.ASC.Get(AttributeId.MaxHealth)
                 ));
@@ -322,7 +335,7 @@ namespace MyProject.MergeGame
             var slotPositions = new List<SlotPositionData>();
             foreach (var slot in mapModule.Slots)
             {
-                slotPositions.Add(new SlotPositionData(slot.Index, slot.Position.X, slot.Position.Y));
+                slotPositions.Add(new SlotPositionData(slot.Index, slot.Position.X, slot.Position.Y, slot.Position.Z));
             }
 
             var pathDataList = new List<PathData>();
@@ -331,7 +344,7 @@ namespace MyProject.MergeGame
                 var waypoints = new List<PathWaypointData>();
                 foreach (var wp in path.Waypoints)
                 {
-                    waypoints.Add(new PathWaypointData(wp.X, wp.Y));
+                    waypoints.Add(new PathWaypointData(wp.X, wp.Y, wp.Z));
                 }
                 pathDataList.Add(new PathData(path.PathIndex, waypoints));
             }
@@ -517,14 +530,16 @@ namespace MyProject.MergeGame
                 definition.InitialGrade,
                 slotIndex,
                 slot.Position,
+                definition.AttackType,
+                definition.ProjectileType,
+                definition.ProjectileSpeed,
+                definition.ThrowRadius,
                 definition.OnMergeSourceEffectId,
                 definition.OnMergeTargetEffectId
             );
 
-            // ASC 초기화
-            tower.ASC.Set(AttributeId.AttackDamage, definition.BaseAttackDamage);
-            tower.ASC.Set(AttributeId.AttackSpeed, definition.BaseAttackSpeed);
-            tower.ASC.Set(AttributeId.AttackRange, definition.BaseAttackRange);
+            // 전투 스탯/능력 초기화
+            ConfigureTowerCombat(tower, definition, definition.InitialGrade);
 
             // 슬롯에 캐릭터 배치
             slot.SetUnit(tower.Uid, tower.Grade);
@@ -542,7 +557,8 @@ namespace MyProject.MergeGame
                     tower.Grade,
                     slotIndex,
                     tower.Position.X,
-                    tower.Position.Y
+                    tower.Position.Y,
+                    tower.Position.Z
                 )
             };
 
@@ -605,7 +621,6 @@ namespace MyProject.MergeGame
             }
 
             var newDefinition = _towerDatabase.GetDefinition(newTowerId);
-
             // 결과 캐릭터 생성
             var resultChar = _state.CreateTower(
                 newTowerId,
@@ -613,15 +628,16 @@ namespace MyProject.MergeGame
                 newGrade,
                 command.ToSlotIndex,
                 toSlot.Position,
+                newDefinition?.AttackType ?? sourceChar.AttackType,
+                newDefinition?.ProjectileType ?? sourceChar.ProjectileType,
+                newDefinition?.ProjectileSpeed ?? sourceChar.ProjectileSpeed,
+                newDefinition?.ThrowRadius ?? sourceChar.ThrowRadius,
                 newDefinition?.OnMergeSourceEffectId,
                 newDefinition?.OnMergeTargetEffectId
             );
-
-            // ASC 초기화 (등급에 따른 스케일링)
-            var gradeMultiplier = 1f + (newGrade - 1) * 0.2f;
-            resultChar.ASC.Set(AttributeId.AttackDamage, (newDefinition?.BaseAttackDamage ?? 10f) * gradeMultiplier);
-            resultChar.ASC.Set(AttributeId.AttackSpeed, newDefinition?.BaseAttackSpeed ?? 1f);
-            resultChar.ASC.Set(AttributeId.AttackRange, newDefinition?.BaseAttackRange ?? 5f);
+            // 전투 스탯/능력 초기화
+            var fallbackDefinition = newDefinition ?? CreateFallbackDefinition(sourceChar, newGrade);
+            ConfigureTowerCombat(resultChar, fallbackDefinition, newGrade);
 
             // 머지 이펙트 적용
             var effectResult = _effectSystem.ApplyMergeEffects(Tick, sourceChar, targetChar, resultChar);
@@ -755,7 +771,8 @@ namespace MyProject.MergeGame
                     command.FromSlotIndex,
                     command.ToSlotIndex,
                     tower.Position.X,
-                    tower.Position.Y
+                    tower.Position.Y,
+                    tower.Position.Z
                 )
             };
 
@@ -848,6 +865,7 @@ namespace MyProject.MergeGame
                     path.GetStartPosition(),
                     damageToPlayer: 0,
                     goldReward: 0);
+            monster.SetAI(_defaultMonsterAI);
 
                 // 최소 동작용 ASC 세팅 (추후 몬스터 정의/스케일링 정책으로 교체)
                 monster.ASC.Set(AttributeId.MaxHealth, 100f);
@@ -861,6 +879,7 @@ namespace MyProject.MergeGame
                     monster.PathIndex,
                     monster.Position.X,
                     monster.Position.Y,
+                    monster.Position.Z,
                     monster.ASC.Get(AttributeId.MaxHealth)
                 ));
 
@@ -913,6 +932,7 @@ namespace MyProject.MergeGame
                     monster.Uid,
                     monster.Position.X,
                     monster.Position.Y,
+                    monster.Position.Z,
                     monster.GoldReward,
                     0
                 ));
@@ -1011,12 +1031,98 @@ namespace MyProject.MergeGame
 
         #endregion
 
-        #region Helpers
+                #region Helpers
 
         private int CalculateMergeScore(int resultGrade)
         {
             // 등급이 높을수록 더 많은 점수
             return resultGrade * _config.ScorePerGrade;
+        }
+
+        /// <summary>
+        /// 타워 전투 스탯과 기본 공격 능력을 초기화합니다.
+        /// </summary>
+        private void ConfigureTowerCombat(MergeTower tower, TowerDefinition definition, int grade)
+        {
+            if (tower == null || definition == null)
+            {
+                return;
+            }
+
+            var gradeMultiplier = 1f + (grade - 1) * 0.2f;
+
+            tower.ASC.Set(AttributeId.AttackDamage, definition.BaseAttackDamage * gradeMultiplier);
+            tower.ASC.Set(AttributeId.AttackSpeed, definition.BaseAttackSpeed);
+            tower.ASC.Set(AttributeId.AttackRange, definition.BaseAttackRange);
+
+            var ability = BuildBaseAttackAbility(definition, definition.BaseAttackRange);
+            tower.ASC.GiveAbility(ability);
+            tower.SetAI(_defaultTowerAI);
+        }
+
+        private GameplayAbility BuildBaseAttackAbility(TowerDefinition definition, float range)
+        {
+            var ability = new GameplayAbility
+            {
+                AbilityTag = new FGameplayTag("Ability.BaseAttack"),
+                DisplayName = "BaseAttack",
+                CooldownEffect = new GameplayEffect
+                {
+                    DurationType = EffectDurationType.HasDuration,
+                    Duration = 1f,
+                    Period = 0f,
+                    GrantedTags = BuildTagContainer("Cooldown.BaseAttack"),
+                    DurationPolicy = BaseAttackCooldownDurationPlicy.Instance
+                },
+                ActivationBlockedTags = BuildTagContainer("Cooldown.BaseAttack"),
+                TargetingStrategy = CreateTargetingStrategy(definition.TargetingType, range)
+            };
+
+            return ability;
+        }
+
+        private static GameplayTagContainer BuildTagContainer(string tag)
+        {
+            var container = new GameplayTagContainer();
+            container.AddTag(new FGameplayTag(tag));
+            return container;
+        }
+
+        private static ITargetingStrategy CreateTargetingStrategy(TowerTargetingType targetingType, float range)
+        {
+            return targetingType switch
+            {
+                TowerTargetingType.Nearest => TargetingStrategyFactory.Create(TargetingStrategyType.NearestEnemy, maxRange: range),
+                TowerTargetingType.Random => TargetingStrategyFactory.Create(TargetingStrategyType.Random, maxRange: range),
+                TowerTargetingType.LowestHp => TargetingStrategyFactory.Create(TargetingStrategyType.LowestHp, maxRange: range),
+                TowerTargetingType.Area => TargetingStrategyFactory.Create(TargetingStrategyType.Area, radius: range),
+                _ => TargetingStrategyFactory.Create(TargetingStrategyType.NearestEnemy, maxRange: range)
+            };
+        }
+
+        private static TowerDefinition CreateFallbackDefinition(MergeTower source, int grade)
+        {
+            if (source == null)
+            {
+                return null;
+            }
+
+            var gradeMultiplier = 1f + (grade - 1) * 0.2f;
+
+            return new TowerDefinition
+            {
+                TowerId = source.TowerId,
+                TowerType = source.TowerType,
+                InitialGrade = grade,
+                BaseAttackDamage = source.ASC.Get(AttributeId.AttackDamage) / gradeMultiplier,
+                BaseAttackSpeed = source.ASC.Get(AttributeId.AttackSpeed),
+                BaseAttackRange = source.ASC.Get(AttributeId.AttackRange),
+                AttackType = source.AttackType,
+                ProjectileType = source.ProjectileType,
+                ProjectileSpeed = source.ProjectileSpeed,
+                ThrowRadius = source.ThrowRadius,
+                TargetingType = TowerTargetingType.Nearest
+            };
         }
 
         #endregion
@@ -1196,6 +1302,7 @@ namespace MyProject.MergeGame
                 damageToPlayer: 10,
                 goldReward: 10 + evt.WaveNumber
             );
+            monster.SetAI(_defaultMonsterAI);
 
             // ASC 초기화 (웨이브에 따라 스케일링)
             var waveMultiplier = 1f + (evt.WaveNumber - 1) * 0.1f;
@@ -1209,8 +1316,9 @@ namespace MyProject.MergeGame
                 monster.MonsterId,
                 monster.PathIndex,
                 monster.Position.X,
-                monster.Position.Y,
-                monster.ASC.Get(AttributeId.MaxHealth)
+                    monster.Position.Y,
+                    monster.Position.Z,
+                    monster.ASC.Get(AttributeId.MaxHealth)
             ));
 
             evt.Handled = true;
@@ -1228,6 +1336,28 @@ namespace MyProject.MergeGame
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

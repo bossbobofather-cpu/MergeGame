@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Noname.GameCore.Helper
 {
     /// <summary>
-    /// Unity?먯꽌 ?몄쭛 媛?ν븳 ?쒓렇 ?쒗쁽?낅땲??
+    /// Unity에서 사용 가능한 게임플레이 태그 뷰입니다.
     /// </summary>
     [Serializable]
     public struct FGameplayTagView : IEquatable<FGameplayTagView>
@@ -14,9 +14,9 @@ namespace Noname.GameCore.Helper
         [NonSerialized] private int _hash;
 
         /// <summary>
-        /// 臾몄옄??媛믪쓣 湲곕컲?쇰줈 ?쒓렇瑜??앹꽦?⑸땲??
+        /// 문자열 값을 기반으로 태그를 생성합니다.
         /// </summary>
-        /// <param name="value">?쒓렇 臾몄옄??/param>
+        /// <param name="value">태그 문자열</param>
         public FGameplayTagView(string value)
         {
             _value = value;
@@ -24,12 +24,12 @@ namespace Noname.GameCore.Helper
         }
 
         /// <summary>
-        /// ?쒓렇 臾몄옄?댁엯?덈떎.
+        /// 태그 문자열입니다.
         /// </summary>
         public string Value => _value;
 
         /// <summary>
-        /// ?쒓렇 ?댁떆 媛믪엯?덈떎.
+        /// 태그 해시 값입니다.
         /// </summary>
         public int Hash
         {
@@ -46,12 +46,12 @@ namespace Noname.GameCore.Helper
         }
 
         /// <summary>
-        /// ?쒓렇 臾몄옄?댁씠 ?좏슚?쒖? ?щ??낅땲??
+        /// 태그 문자열이 유효한지 확인합니다.
         /// </summary>
         public bool IsValid => GameplayTagUtility.IsValidTagString(_value);
 
         /// <summary>
-        /// Domain ?쒓렇濡?蹂?섑빀?덈떎.
+        /// Domain 태그로 변환합니다.
         /// </summary>
         public FGameplayTag ToDomain()
         {
@@ -59,7 +59,7 @@ namespace Noname.GameCore.Helper
         }
 
         /// <summary>
-        /// ?숈씪 ?щ?瑜?鍮꾧탳?⑸땲??
+        /// 동일한 태그인지 비교합니다.
         /// </summary>
         public bool Equals(FGameplayTagView other)
         {
@@ -67,7 +67,7 @@ namespace Noname.GameCore.Helper
         }
 
         /// <summary>
-        /// ?숈씪 ?щ?瑜?鍮꾧탳?⑸땲??
+        /// 동일한 태그인지 비교합니다.
         /// </summary>
         public override bool Equals(object obj)
         {
@@ -75,7 +75,7 @@ namespace Noname.GameCore.Helper
         }
 
         /// <summary>
-        /// ?댁떆 肄붾뱶瑜?諛섑솚?⑸땲??
+        /// 해시 코드를 반환합니다.
         /// </summary>
         public override int GetHashCode()
         {
@@ -83,7 +83,7 @@ namespace Noname.GameCore.Helper
         }
 
         /// <summary>
-        /// 臾몄옄???쒗쁽??諛섑솚?⑸땲??
+        /// 문자열 표현을 반환합니다.
         /// </summary>
         public override string ToString()
         {
@@ -91,4 +91,3 @@ namespace Noname.GameCore.Helper
         }
     }
 }
-

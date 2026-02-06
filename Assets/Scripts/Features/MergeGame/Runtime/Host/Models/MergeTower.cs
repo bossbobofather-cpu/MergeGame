@@ -1,11 +1,12 @@
 ﻿using System;
+using MyProject.MergeGame.AI;
 using Noname.GameAbilitySystem;
 
 namespace MyProject.MergeGame.Models
 {
     /// <summary>
-    /// 보드에 배치된 타워 정보입니다.
-    /// AbilitySystemComponent를 소유하여 능력/속성을 관리합니다.
+    /// 슬롯에 배치되는 타워 엔티티입니다.
+    /// AbilitySystemComponent를 통해 능력/속성을 관리합니다.
     /// </summary>
     public sealed class MergeTower : IAbilitySystemOwner, IDisposable
     {
@@ -20,7 +21,7 @@ namespace MyProject.MergeGame.Models
         public string TowerId { get; }
 
         /// <summary>
-        /// 타워 타입입니다 (머지 매칭용: warrior, mage 등).
+        /// 타워 타입입니다 (예: warrior, mage 등).
         /// </summary>
         public string TowerType { get; }
 
@@ -37,7 +38,7 @@ namespace MyProject.MergeGame.Models
         /// <summary>
         /// 타워 위치입니다.
         /// </summary>
-        public Point2D Position { get; set; }
+        public Point3D Position { get; set; }
 
         /// <summary>
         /// AbilitySystemComponent입니다.
@@ -45,17 +46,43 @@ namespace MyProject.MergeGame.Models
         public AbilitySystemComponent ASC { get; }
 
         /// <summary>
-        /// 공격 쿨타임 남은 시간입니다.
+        /// 타워 AI입니다.
+        /// </summary>
+        public IMergeTowerAI AI { get; private set; }
+
+        /// <summary>
+        /// 공격 방식입니다.
+        /// </summary>
+        public TowerAttackType AttackType { get; }
+
+        /// <summary>
+        /// 투사체 타입입니다.
+        /// </summary>
+        public ProjectileType ProjectileType { get; }
+
+        /// <summary>
+        /// 투사체 이동 속도입니다.
+        /// </summary>
+        public float ProjectileSpeed { get; }
+
+        /// <summary>
+        /// Throw 타입의 반경입니다.
+        /// </summary>
+        public float ThrowRadius { get; }
+
+        /// <summary>
+        /// 공격 쿨다운 잔여 시간입니다.
+        /// (현재는 Ability 기반 쿨다운을 사용하므로 미사용)
         /// </summary>
         public float AttackCooldownRemaining { get; set; }
 
         /// <summary>
-        /// 이 타워가 머지의 소스(흡수되는 쪽)일 때 발동하는 이펙트 ID입니다.
+        /// 머지 소스(흡수되는 쪽)에서 발동하는 이펙트 ID입니다.
         /// </summary>
         public string OnMergeSourceEffectId { get; }
 
         /// <summary>
-        /// 이 타워가 머지의 타겟(남는 쪽)일 때 발동하는 이펙트 ID입니다.
+        /// 머지 타겟(남는 쪽)에서 발동하는 이펙트 ID입니다.
         /// </summary>
         public string OnMergeTargetEffectId { get; }
 
@@ -65,7 +92,11 @@ namespace MyProject.MergeGame.Models
             string towerType,
             int grade,
             int slotIndex,
-            Point2D position,
+            Point3D position,
+            TowerAttackType attackType,
+            ProjectileType projectileType,
+            float projectileSpeed,
+            float throwRadius,
             string onMergeSourceEffectId = null,
             string onMergeTargetEffectId = null)
         {
@@ -75,6 +106,10 @@ namespace MyProject.MergeGame.Models
             Grade = grade;
             SlotIndex = slotIndex;
             Position = position;
+            AttackType = attackType;
+            ProjectileType = projectileType;
+            ProjectileSpeed = projectileSpeed;
+            ThrowRadius = throwRadius;
             OnMergeSourceEffectId = onMergeSourceEffectId;
             OnMergeTargetEffectId = onMergeTargetEffectId;
 
@@ -83,7 +118,15 @@ namespace MyProject.MergeGame.Models
         }
 
         /// <summary>
-        /// 등급을 설정합니다.
+        /// AI를 지정합니다.
+        /// </summary>
+        public void SetAI(IMergeTowerAI ai)
+        {
+            AI = ai;
+        }
+
+        /// <summary>
+        /// 등급을 변경합니다.
         /// </summary>
         public void SetGrade(int grade)
         {
@@ -91,7 +134,7 @@ namespace MyProject.MergeGame.Models
         }
 
         /// <summary>
-        /// 같은 타입과 등급인지 확인합니다 (머지 가능 여부).
+        /// 같은 타입/등급인지 확인합니다. (머지 가능 여부)
         /// </summary>
         public bool CanMergeWith(MergeTower other)
         {

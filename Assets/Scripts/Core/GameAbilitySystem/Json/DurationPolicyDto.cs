@@ -3,13 +3,13 @@ using System;
 namespace Noname.GameAbilitySystem.Json
 {
     /// <summary>
-    /// ?�과 지?�시�??�책 JSON DTO
+    /// 주석 정리
     /// </summary>
     [Serializable]
     public class DurationPolicyDto
     {
         /// <summary>
-        /// ?�책 ?�?? "BaseAttackCooldown"
+        /// 주석 정리
         /// </summary>
         public string Type;
     }

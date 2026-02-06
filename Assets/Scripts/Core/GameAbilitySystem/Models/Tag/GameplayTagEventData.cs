@@ -1,25 +1,25 @@
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// ê²Œì„?Œë ˆ???´ë²¤???„ë‹¬???°ì´?°ì…?ˆë‹¤.
+    /// ì£¼ì„ ì •ë¦¬
     /// </summary>
     public struct GameplayTagEventData
     {
         /// <summary>
-        /// ?´ë²¤???œê·¸?…ë‹ˆ??
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public FGameplayTag EventTag;
         /// <summary>
-        /// ?´ë²¤???°ì´?°ì…?ˆë‹¤.
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public object Payload;
 
         /// <summary>
-        /// ?´ë²¤???œê·¸?€ ?°ì´?°ë¡œ ?ì„±?©ë‹ˆ??
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public GameplayTagEventData(FGameplayTag eventTag, object payload = null)
         {
-            // ?„ë‹¬ ?•ë³´ë¥?ê·¸ë?ë¡?ë³´ê?
+            // ì£¼ì„ ì •ë¦¬
             EventTag = eventTag;
             Payload = payload;
         }

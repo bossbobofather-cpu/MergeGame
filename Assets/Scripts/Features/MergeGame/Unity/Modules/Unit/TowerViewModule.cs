@@ -1,10 +1,10 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace MyProject.MergeGame.Unity
 {
     /// <summary>
-    /// 타워(플레이어 유닛) 뷰 모듈입니다.
+    /// 타워 뷰 모듈입니다.
     /// 스냅샷을 Source of Truth로 삼아 오브젝트를 생성/갱신/제거합니다.
     /// </summary>
     [DisallowMultipleComponent]
@@ -17,9 +17,34 @@ namespace MyProject.MergeGame.Unity
         [SerializeField] private bool _usePrimitiveFallback = true;
         [SerializeField] private Vector3 _towerScale = new Vector3(0.8f, 0.8f, 0.8f);
 
+        [Header("HitScan Visual")]
+        [SerializeField] private bool _enableHitScanLine = true;
+        [SerializeField] private LineRenderer _hitScanLinePrefab;
+        [SerializeField] private float _hitScanLineDuration = 0.08f;
+        [SerializeField] private float _hitScanLineWidth = 0.05f;
+        [SerializeField] private Color _hitScanLineColor = new Color(1f, 0.8f, 0.2f, 1f);
+
         private readonly Dictionary<long, GameObject> _towerObjects = new();
         private readonly HashSet<long> _seen = new();
         private readonly List<long> _removeBuffer = new();
+
+        public override void OnHostEvent(MergeHostEvent evt)
+        {
+            switch (evt)
+            {
+                case TowerSpawnedEvent spawned:
+                    EnsureTowerFromEvent(spawned);
+                    break;
+
+                case TowerAttackedEvent attacked:
+                    HandleTowerAttack(attacked);
+                    break;
+
+                case TowerRemovedEvent removed:
+                    RemoveTower(removed.TowerUid);
+                    break;
+            }
+        }
 
         public override void OnSnapshotUpdated(MergeHostSnapshot snapshot)
         {
@@ -43,19 +68,95 @@ namespace MyProject.MergeGame.Unity
 
                 if (!_towerObjects.TryGetValue(t.Uid, out var obj) || obj == null)
                 {
-                    obj = CreateTowerObject(t);
+                    obj = CreateTowerObject();
                     _towerObjects[t.Uid] = obj;
+                    InitializeTowerObject(obj);
                 }
 
                 // 좌표계는 Host/Map과 동일한 로컬 좌표계를 가정합니다.
-                obj.transform.localPosition = new Vector3(t.PositionX, t.PositionY, 0f);
-                obj.transform.localScale = _towerScale;
+                obj.transform.localPosition = new Vector3(t.PositionX, t.PositionY, t.PositionZ);
                 obj.name = $"Tower_{t.Uid}_G{t.Grade}";
 
                 ApplyGradeColor(obj, t.Grade);
             }
 
             RemoveNotSeen(_towerObjects);
+        }
+
+        private void EnsureTowerFromEvent(TowerSpawnedEvent evt)
+        {
+            if (evt == null)
+            {
+                return;
+            }
+
+            if (_towerObjects.TryGetValue(evt.TowerUid, out var obj) && obj != null)
+            {
+                return;
+            }
+
+            obj = CreateTowerObject();
+            _towerObjects[evt.TowerUid] = obj;
+            InitializeTowerObject(obj);
+
+            obj.transform.localPosition = new Vector3(evt.PositionX, evt.PositionY, evt.PositionZ);
+            obj.name = $"Tower_{evt.TowerUid}_G{evt.Grade}";
+            ApplyGradeColor(obj, evt.Grade);
+        }
+
+        private void HandleTowerAttack(TowerAttackedEvent evt)
+        {
+            if (evt == null)
+            {
+                return;
+            }
+
+            if (_towerObjects.TryGetValue(evt.AttackerUid, out var obj) && obj != null)
+            {
+                var state = obj.GetComponent<TowerViewState>() ?? obj.AddComponent<TowerViewState>();
+                state.SetBaseScale(_towerScale);
+                state.TriggerAttack();
+            }
+
+            if (evt.AttackType == TowerAttackType.HitScan && _enableHitScanLine)
+            {
+                var start = new Vector3(evt.AttackerX, evt.AttackerY, evt.AttackerZ);
+                var target = new Vector3(evt.TargetX, evt.TargetY, evt.TargetZ);
+                SpawnHitScanLine(start, target);
+            }
+        }
+
+        private void SpawnHitScanLine(Vector3 start, Vector3 target)
+        {
+            var line = _hitScanLinePrefab != null
+                ? Instantiate(_hitScanLinePrefab, transform)
+                : CreateLineRendererFallback();
+
+            if (line == null)
+            {
+                return;
+            }
+
+            line.positionCount = 2;
+            line.SetPosition(0, start);
+            line.SetPosition(1, target);
+            line.startWidth = _hitScanLineWidth;
+            line.endWidth = _hitScanLineWidth;
+            line.startColor = _hitScanLineColor;
+            line.endColor = _hitScanLineColor;
+
+            Destroy(line.gameObject, _hitScanLineDuration);
+        }
+
+        private LineRenderer CreateLineRendererFallback()
+        {
+            var obj = new GameObject("HitScanLine");
+            obj.transform.SetParent(transform, false);
+
+            var line = obj.AddComponent<LineRenderer>();
+            line.material = new Material(Shader.Find("Sprites/Default"));
+            line.useWorldSpace = false;
+            return line;
         }
 
         private void RemoveNotSeen(Dictionary<long, GameObject> dict)
@@ -82,7 +183,7 @@ namespace MyProject.MergeGame.Unity
             }
         }
 
-        private GameObject CreateTowerObject(TowerSnapshot snapshot)
+        private GameObject CreateTowerObject()
         {
             if (_towerPrefab != null)
             {
@@ -99,6 +200,29 @@ namespace MyProject.MergeGame.Unity
             var obj = new GameObject("Tower");
             obj.transform.SetParent(transform, false);
             return obj;
+        }
+
+        private void InitializeTowerObject(GameObject obj)
+        {
+            if (obj == null)
+            {
+                return;
+            }
+
+            obj.transform.localScale = _towerScale;
+
+            var state = obj.GetComponent<TowerViewState>() ?? obj.AddComponent<TowerViewState>();
+            state.SetBaseScale(_towerScale);
+        }
+
+        private void RemoveTower(long uid)
+        {
+            if (_towerObjects.TryGetValue(uid, out var obj) && obj != null)
+            {
+                Destroy(obj);
+            }
+
+            _towerObjects.Remove(uid);
         }
 
         private static void ApplyGradeColor(GameObject obj, int grade)

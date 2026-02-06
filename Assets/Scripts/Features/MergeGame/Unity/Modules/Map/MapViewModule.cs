@@ -1,12 +1,12 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace MyProject.MergeGame.Unity
 {
     /// <summary>
-    /// View용 맵 모듈입니다.
-    /// 호스트의 MapInitializedEvent를 수신하여 맵 배경/슬롯/경로 프리팹을 배치합니다.
+    /// 맵 View 모듈입니다.
+    /// MapInitializedEvent를 수신해 배경/슬롯/경로 오브젝트를 배치합니다.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class MapViewModule : MergeViewModuleBase
@@ -27,6 +27,11 @@ namespace MyProject.MergeGame.Unity
         [SerializeField] private GameObject _slotPrefab;
         [SerializeField] private GameObject _pathPointPrefab;
         [SerializeField] private LineRenderer _pathLinePrefab;
+
+        [Header("Slot Interaction")]
+        [SerializeField] private bool _autoAddSlotCollider = true;
+        [SerializeField] private Vector3 _slotColliderSize = new Vector3(1f, 1f, 1f);
+        [SerializeField] private Vector3 _slotColliderCenter = Vector3.zero;
 
         private GameObject _backgroundInstance;
 
@@ -66,10 +71,15 @@ namespace MyProject.MergeGame.Unity
                 foreach (var slotPos in evt.SlotPositions)
                 {
                     var slotObj = Instantiate(_slotPrefab, transform);
-                    slotObj.transform.localPosition = new Vector3(slotPos.X, slotPos.Y, 0f);
+                    slotObj.transform.localPosition = new Vector3(slotPos.X, slotPos.Y, slotPos.Z);
                     slotObj.name = $"Slot_{slotPos.Index}";
 
-                    // 런타임에서 슬롯 인덱스를 주입합니다. (프리팹이 스크립트를 갖고 있지 않아도 됨)
+                    if (_autoAddSlotCollider)
+                    {
+                        EnsureSlotCollider(slotObj);
+                    }
+
+                    // 슬롯 오브젝트에 슬롯 인덱스를 주입합니다.
                     (slotObj.GetComponent<MergeSlotView>() ?? slotObj.AddComponent<MergeSlotView>()).SetSlotIndex(slotPos.Index);
 
                     _slotObjects[slotPos.Index] = slotObj;
@@ -90,7 +100,7 @@ namespace MyProject.MergeGame.Unity
                 return;
             }
 
-            // LineRenderer로 경로 시각화
+            // LineRenderer로 경로 선을 그립니다.
             if (_pathLinePrefab != null)
             {
                 var lineObj = Instantiate(_pathLinePrefab, transform);
@@ -100,13 +110,13 @@ namespace MyProject.MergeGame.Unity
                 for (var i = 0; i < pathData.Waypoints.Count; i++)
                 {
                     var wp = pathData.Waypoints[i];
-                    lineObj.SetPosition(i, new Vector3(wp.X, wp.Y, 0f));
+                    lineObj.SetPosition(i, new Vector3(wp.X, wp.Y, wp.Z));
                 }
 
                 _pathObjects.Add(lineObj.gameObject);
             }
 
-            // 웨이포인트 마커 배치
+            // 경로 포인트 마커 배치
             if (_pathPointPrefab != null)
             {
                 for (var i = 0; i < pathData.Waypoints.Count; i++)
@@ -114,10 +124,10 @@ namespace MyProject.MergeGame.Unity
                     var wp = pathData.Waypoints[i];
 
                     var pointObj = Instantiate(_pathPointPrefab, transform);
-                    pointObj.transform.localPosition = new Vector3(wp.X, wp.Y, 0f);
+                    pointObj.transform.localPosition = new Vector3(wp.X, wp.Y, wp.Z);
                     pointObj.name = $"PathPoint_{pathData.PathIndex}_{i}";
 
-                    // 런타임에서 (PathIndex, WaypointIndex)를 주입합니다.
+                    // 경로 포인트에 (PathIndex, WaypointIndex)를 주입합니다.
                     (pointObj.GetComponent<MergePathPointView>() ?? pointObj.AddComponent<MergePathPointView>()).SetIndices(pathData.PathIndex, i);
 
                     _pathObjects.Add(pointObj);
@@ -184,6 +194,23 @@ namespace MyProject.MergeGame.Unity
         protected override void OnShutdown()
         {
             ClearMap();
+        }
+
+        private void EnsureSlotCollider(GameObject slotObj)
+        {
+            if (slotObj == null)
+            {
+                return;
+            }
+
+            if (slotObj.GetComponent<Collider>() != null)
+            {
+                return;
+            }
+
+            var box = slotObj.AddComponent<BoxCollider>();
+            box.size = _slotColliderSize;
+            box.center = _slotColliderCenter;
         }
     }
 }

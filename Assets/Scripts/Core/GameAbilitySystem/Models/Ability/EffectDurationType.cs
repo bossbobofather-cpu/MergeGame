@@ -1,15 +1,15 @@
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// 게임?�레???�과??지???�?�입?�다.
+    /// 주석 정리
     /// </summary>
     public enum EffectDurationType
     {
-        /// <summary>즉시 ?�용</summary>
+        /// 주석 정리
         Instant,
-        /// <summary>무한 지??/summary>
+        /// 주석 정리
         Infinite,
-        /// <summary>?�간 기반 지??/summary>
+        /// 주석 정리
         HasDuration
     }
 }

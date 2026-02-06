@@ -5,7 +5,7 @@ using UnityEngine;
 namespace MyProject.Common.UI
 {
     /// <summary>
-    /// UI ??낃낵 ?꾨━?뱀쓣 ?곌껐?섎뒗 ?덉??ㅽ듃由ъ엯?덈떎.
+    /// UI 타입과 프리팹을 매핑하는 레지스트리입니다.
     /// </summary>
     [CreateAssetMenu(menuName = "UI/UI Registry")]
     public sealed class UIRegistry : ScriptableObject
@@ -13,7 +13,7 @@ namespace MyProject.Common.UI
         [SerializeField] private List<Entry> _entries = new();
 
         /// <summary>
-        /// ??낆쑝濡?UI ?꾨━?뱀쓣 李얠뒿?덈떎.
+        /// 타입으로 UI 프리팹을 찾습니다.
         /// </summary>
         public bool TryGetPrefab<T>(out T prefab) where T : UIBase
         {
@@ -28,7 +28,7 @@ namespace MyProject.Common.UI
         }
 
         /// <summary>
-        /// ??낆쑝濡?UI ?꾨━?뱀쓣 李얠뒿?덈떎.
+        /// 타입으로 UI 프리팹을 찾습니다.
         /// </summary>
         public bool TryGetPrefab(Type type, out UIBase prefab)
         {
@@ -147,5 +147,3 @@ namespace MyProject.Common.UI
         }
     }
 }
-
-

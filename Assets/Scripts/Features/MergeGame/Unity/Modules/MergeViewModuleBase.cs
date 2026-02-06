@@ -1,4 +1,4 @@
-using MyProject.Common.GameMode;
+﻿using MyProject.Common.GameMode;
 
 namespace MyProject.MergeGame.Unity
 {
@@ -9,7 +9,7 @@ namespace MyProject.MergeGame.Unity
     public abstract class MergeViewModuleBase : ModuleBase, IMergeViewModule
     {
         /// <summary>
-        /// 연결된 MergeGameView입니다.
+        /// 현재 연결된 MergeGameView입니다.
         /// </summary>
         protected MergeGameView GameView { get; private set; }
 
@@ -19,7 +19,7 @@ namespace MyProject.MergeGame.Unity
         }
 
         /// <summary>
-        /// 호스트 이벤트 수신 시 호출됩니다.
+        /// Host 이벤트를 수신했을 때 호출됩니다.
         /// 필요한 이벤트만 override하여 처리합니다.
         /// </summary>
         public virtual void OnHostEvent(MergeHostEvent evt)
@@ -27,7 +27,7 @@ namespace MyProject.MergeGame.Unity
         }
 
         /// <summary>
-        /// 스냅샷 갱신 시 호출됩니다.
+        /// 스냅샷이 갱신되었을 때 호출됩니다.
         /// </summary>
         public virtual void OnSnapshotUpdated(MergeHostSnapshot snapshot)
         {

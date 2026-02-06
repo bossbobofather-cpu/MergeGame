@@ -1,12 +1,12 @@
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// ?€ê²ŸíŒ… ?„ëµ ?©í† ë¦¬ì…?ˆë‹¤.
+    /// ì£¼ì„ ì •ë¦¬
     /// </summary>
     public static class TargetingStrategyFactory
     {
         /// <summary>
-        /// enum ?€?…ê³¼ ?Œë¼ë¯¸í„°ë¡??„ëµ ?¸ìŠ¤?´ìŠ¤ë¥??ì„±?©ë‹ˆ??
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public static ITargetingStrategy Create(
             TargetingStrategyType type,
@@ -27,7 +27,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ë¬¸ì???€?…ëª…ê³??Œë¼ë¯¸í„°ë¡??„ëµ ?¸ìŠ¤?´ìŠ¤ë¥??ì„±?©ë‹ˆ?? (JSON ??§?¬í™”??
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public static ITargetingStrategy Create(
             string typeName,
@@ -51,7 +51,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?„ëµ ?¸ìŠ¤?´ìŠ¤?ì„œ ?€??enum??ë°˜í™˜?©ë‹ˆ??
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public static TargetingStrategyType GetStrategyType(ITargetingStrategy strategy)
         {
@@ -68,7 +68,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?„ëµ ?¸ìŠ¤?´ìŠ¤?ì„œ ?€?…ëª… ë¬¸ì?´ì„ ë°˜í™˜?©ë‹ˆ?? (JSON ì§ë ¬?”ìš©)
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public static string GetStrategyTypeName(ITargetingStrategy strategy)
         {

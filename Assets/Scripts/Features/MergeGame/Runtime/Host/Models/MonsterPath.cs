@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Noname.GameAbilitySystem;
 
@@ -9,7 +9,7 @@ namespace MyProject.MergeGame.Models
     /// </summary>
     public sealed class MonsterPath
     {
-        private readonly List<Point2D> _waypoints;
+        private readonly List<Point3D> _waypoints;
         private readonly List<float> _segmentLengths;
         private float _totalLength;
 
@@ -21,17 +21,17 @@ namespace MyProject.MergeGame.Models
         /// <summary>
         /// 경로의 웨이포인트 목록입니다.
         /// </summary>
-        public IReadOnlyList<Point2D> Waypoints => _waypoints;
+        public IReadOnlyList<Point3D> Waypoints => _waypoints;
 
         /// <summary>
         /// 경로의 총 길이입니다.
         /// </summary>
         public float TotalLength => _totalLength;
 
-        public MonsterPath(int pathIndex, IEnumerable<Point2D> waypoints)
+        public MonsterPath(int pathIndex, IEnumerable<Point3D> waypoints)
         {
             PathIndex = pathIndex;
-            _waypoints = new List<Point2D>(waypoints);
+            _waypoints = new List<Point3D>(waypoints);
             _segmentLengths = new List<float>();
 
             CalculateSegmentLengths();
@@ -44,7 +44,7 @@ namespace MyProject.MergeGame.Models
 
             for (var i = 0; i < _waypoints.Count - 1; i++)
             {
-                var length = MathF.Sqrt(Point2D.DistanceSquared(_waypoints[i], _waypoints[i + 1]));
+                var length = MathF.Sqrt(Point3D.DistanceSquared(_waypoints[i], _waypoints[i + 1]));
                 _segmentLengths.Add(length);
                 _totalLength += length;
             }
@@ -54,9 +54,9 @@ namespace MyProject.MergeGame.Models
         /// 진행도에 해당하는 위치를 반환합니다.
         /// </summary>
         /// <param name="progress">0.0 ~ 1.0 사이의 진행도</param>
-        public Point2D GetPositionAtProgress(float progress)
+        public Point3D GetPositionAtProgress(float progress)
         {
-            if (_waypoints.Count == 0) return Point2D.zero;
+            if (_waypoints.Count == 0) return Point3D.zero;
             if (_waypoints.Count == 1) return _waypoints[0];
 
             progress = Math.Clamp(progress, 0f, 1f);
@@ -79,9 +79,10 @@ namespace MyProject.MergeGame.Models
                     var p1 = _waypoints[i];
                     var p2 = _waypoints[i + 1];
 
-                    return new Point2D(
+                    return new Point3D(
                         p1.X + (p2.X - p1.X) * t,
-                        p1.Y + (p2.Y - p1.Y) * t
+                        p1.Y + (p2.Y - p1.Y) * t,
+                        p1.Z + (p2.Z - p1.Z) * t
                     );
                 }
 
@@ -94,17 +95,19 @@ namespace MyProject.MergeGame.Models
         /// <summary>
         /// 시작점을 반환합니다.
         /// </summary>
-        public Point2D GetStartPosition()
+        public Point3D GetStartPosition()
         {
-            return _waypoints.Count > 0 ? _waypoints[0] : Point2D.zero;
+            return _waypoints.Count > 0 ? _waypoints[0] : Point3D.zero;
         }
 
         /// <summary>
         /// 도착점을 반환합니다.
         /// </summary>
-        public Point2D GetEndPosition()
+        public Point3D GetEndPosition()
         {
-            return _waypoints.Count > 0 ? _waypoints[^1] : Point2D.zero;
+            return _waypoints.Count > 0 ? _waypoints[^1] : Point3D.zero;
         }
     }
 }
+
+

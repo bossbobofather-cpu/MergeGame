@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Noname.GameAbilitySystem
@@ -28,6 +28,7 @@ namespace Noname.GameAbilitySystem
         private readonly List<ActiveGameplayEffect> _activeEffects = new();
         private long _nextEffectUid = 1;
         private int _nextAbilityHandleId = 1;
+        private bool _abilityDirty = true;
 
         /// <summary>
         /// 속성 컨테이너입니다. (스레드 안전하지 않음 - 직접 수정 금지)
@@ -47,6 +48,29 @@ namespace Noname.GameAbilitySystem
         public event Action OnChangedTags;
         public event Action OnAddedAbility;
         public event Action<GameplayAbility, TargetData> OnActivateAbility;
+
+        /// <summary>
+        /// 능력 활성화 점검이 필요한지 여부를 소비합니다.
+        /// true면 플래그를 false로 되돌립니다.
+        /// </summary>
+        public bool ConsumeAbilityDirty()
+        {
+            lock (_modelLock)
+            {
+                if (!_abilityDirty)
+                {
+                    return false;
+                }
+
+                _abilityDirty = false;
+                return true;
+            }
+        }
+
+        private void MarkAbilityDirty()
+        {
+            _abilityDirty = true;
+        }
 
         public IAbilitySystemOwner Owner => _owner;
 
@@ -183,6 +207,8 @@ namespace Noname.GameAbilitySystem
                 var spec = new GameplayAbilitySpec(ability, _nextAbilityHandleId++);
                 _abilitySpecs.Add(spec);
 
+                MarkAbilityDirty();
+                OnAddedAbility?.Invoke();
                 OnChangedTags?.Invoke();
 
                 return spec.Handle;
@@ -211,6 +237,7 @@ namespace Noname.GameAbilitySystem
 
                     _abilitySpecs.RemoveAt(lastIndex);
 
+                    MarkAbilityDirty();
                     return true;
                 }
 
@@ -239,6 +266,7 @@ namespace Noname.GameAbilitySystem
                     }
 
                     _abilitySpecs.RemoveAt(lastIndex);
+                    MarkAbilityDirty();
                     return true;
                 }
 
@@ -423,6 +451,8 @@ namespace Noname.GameAbilitySystem
                 // 계산을 통해 수정한다
                 target.AddActiveEffect(effect, effect.Duration);
             }
+
+            target.MarkAbilityDirty();
         }
 
         /// <summary>
@@ -626,6 +656,7 @@ namespace Noname.GameAbilitySystem
                     Effect = effect,
                     EndTime = CalculateDuration  // 카운트다운 방식으로 사용
                 });
+                MarkAbilityDirty();
                 return uid;
             }
         }
@@ -681,6 +712,7 @@ namespace Noname.GameAbilitySystem
                 _activeEffects[index] = _activeEffects[lastIndex];
             }
             _activeEffects.RemoveAt(lastIndex);
+            MarkAbilityDirty();
         }
 
         /// <summary>
@@ -703,6 +735,7 @@ namespace Noname.GameAbilitySystem
                         _activeEffects[i] = _activeEffects[lastIndex];
                     }
                     _activeEffects.RemoveAt(lastIndex);
+                    MarkAbilityDirty();
                     return true;
                 }
 
@@ -735,6 +768,7 @@ namespace Noname.GameAbilitySystem
                         _activeEffects[i] = _activeEffects[lastIndex];
                     }
                     _activeEffects.RemoveAt(lastIndex);
+                    MarkAbilityDirty();
                     return true;
                 }
 
@@ -780,6 +814,7 @@ namespace Noname.GameAbilitySystem
                         _activeEffects[i] = _activeEffects[lastIndex];
                     }
                     _activeEffects.RemoveAt(lastIndex);
+                    MarkAbilityDirty();
                 }
             }
         }
@@ -857,6 +892,7 @@ namespace Noname.GameAbilitySystem
             {
                 if (_ownedTags.AddTag(tag))
                 {
+                    MarkAbilityDirty();
                     OnChangedTags?.Invoke();
                     return true;
                 }
@@ -896,6 +932,7 @@ namespace Noname.GameAbilitySystem
             if (totalCount == 0)
             {
                 _ownedTags.RemoveTag(tag);
+                MarkAbilityDirty();
                 OnChangedTags?.Invoke();
 
                 return true;
@@ -974,3 +1011,8 @@ namespace Noname.GameAbilitySystem
         }
     }
 }
+
+
+
+
+

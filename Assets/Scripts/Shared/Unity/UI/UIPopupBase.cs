@@ -1,11 +1,9 @@
 ﻿namespace MyProject.Common.UI
 {
     /// <summary>
-    /// ?앹뾽 ?덉씠?댁슜 UI 踰좎씠?ㅼ엯?덈떎.
+    /// 팝업 UI 베이스입니다.
     /// </summary>
     public abstract class UIPopupBase : UIBase
     {
     }
 }
-
-

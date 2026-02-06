@@ -3,7 +3,7 @@
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// ?먭린 ?먯떊???寃잛쑝濡??좏깮?⑸땲??
+    /// 자기 자신을 타겟으로 선택합니다.
     /// </summary>
     public sealed class SelfTargetingStrategy : ITargetingStrategy
     {
@@ -16,7 +16,7 @@ namespace Noname.GameAbilitySystem
     }
 
     /// <summary>
-    /// ?쒕뜡 ?곸쓣 ?좏깮?⑸땲??
+    /// 적 중에서 랜덤 1명을 선택합니다.
     /// </summary>
     public sealed class RandomTargetingStrategy : ITargetingStrategy
     {
@@ -41,7 +41,7 @@ namespace Noname.GameAbilitySystem
     }
 
     /// <summary>
-    /// 媛??媛源뚯슫 ?곸쓣 ?좏깮?⑸땲??
+    /// 가장 가까운 적 1명을 선택합니다.
     /// </summary>
     public sealed class NearestEnemyTargetingStrategy : ITargetingStrategy
     {
@@ -75,7 +75,7 @@ namespace Noname.GameAbilitySystem
             {
                 var enemy = enemies[i];
                 var pos = context.ResolvePosition(enemy);
-                var distance = Point2D.DistanceSquared(origin, pos);
+                var distance = Point3D.DistanceSquared(origin, pos);
                 if (distance > maxRangeSq)
                 {
                     continue;
@@ -94,7 +94,7 @@ namespace Noname.GameAbilitySystem
     }
 
     /// <summary>
-    /// 泥대젰??媛????? ?곸쓣 ?좏깮?⑸땲??
+    /// 체력이 가장 낮은 적을 선택합니다.
     /// </summary>
     public sealed class LowestHpTargetingStrategy : ITargetingStrategy
     {
@@ -141,7 +141,7 @@ namespace Noname.GameAbilitySystem
     }
 
     /// <summary>
-    /// 媛??媛源뚯슫 N紐낆쓽 ?곸쓣 ?좏깮?⑸땲??
+    /// 가까운 적 N명을 선택합니다.
     /// </summary>
     public sealed class NearestNEnemiesTargetingStrategy : ITargetingStrategy
     {
@@ -171,7 +171,7 @@ namespace Noname.GameAbilitySystem
             var origin = context.ResolvePosition(owner);
             var maxRangeSq = _maxRange * _maxRange;
 
-            // 嫄곕━? ?④퍡 ???           
+            // 거리 배열 구성
             var distances = new (AbilitySystemComponent enemy, float distSq)[enemies.Count];
             var validCount = 0;
 
@@ -179,7 +179,7 @@ namespace Noname.GameAbilitySystem
             {
                 var enemy = enemies[i];
                 var pos = context.ResolvePosition(enemy);
-                var distSq = Point2D.DistanceSquared(origin, pos);
+                var distSq = Point3D.DistanceSquared(origin, pos);
                 if (distSq <= maxRangeSq)
                 {
                     distances[validCount++] = (enemy, distSq);
@@ -187,8 +187,8 @@ namespace Noname.GameAbilitySystem
             }
 
             var addExtraTargetCount = Math.Min(10, _maxTargets + owner.Get(AttributeId.ExtraTargetCount));
-            
-            // 嫄곕━???뺣젹 (媛꾨떒???좏깮 ?뺣젹)
+
+            // 가까운 순서로 정렬하면서 추출
             for (var i = 0; i < Math.Min(addExtraTargetCount, validCount); i++)
             {
                 var minIdx = i;
@@ -211,7 +211,7 @@ namespace Noname.GameAbilitySystem
     }
 
     /// <summary>
-    /// ?뱀젙 諛섍꼍 ?댁쓽 紐⑤뱺 ?곸쓣 ?좏깮?⑸땲??
+    /// 반경 내 모든 적을 선택합니다.
     /// </summary>
     public sealed class AreaTargetingStrategy : ITargetingStrategy
     {
@@ -243,7 +243,7 @@ namespace Noname.GameAbilitySystem
             {
                 var enemy = enemies[i];
                 var pos = context.ResolvePosition(enemy);
-                var distance = Point2D.DistanceSquared(origin, pos);
+                var distance = Point3D.DistanceSquared(origin, pos);
                 if (distance <= rangeSq)
                 {
                     data.AddTarget(enemy);
@@ -254,6 +254,3 @@ namespace Noname.GameAbilitySystem
         }
     }
 }
-
-
-

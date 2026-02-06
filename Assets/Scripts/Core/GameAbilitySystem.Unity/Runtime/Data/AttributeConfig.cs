@@ -4,11 +4,11 @@ using Noname.GameAbilitySystem;
 
 namespace Noname.GameCore.Helper
 {
-    // AttributeId??Domain ?덉씠?대줈 ?대룞?덉뒿?덈떎.
-    // Domain.AttributeId瑜??ъ슜?섏꽭??
+    // AttributeId는 Domain 레이어로 이동했습니다.
+    // Domain.AttributeId를 사용하세요.
 
     /// <summary>
-    /// ?띿꽦 ?뺤쓽??ScriptableObject?낅땲??
+    /// 속성 정의 ScriptableObject입니다.
     /// </summary>
     [CreateAssetMenu(menuName = "GameAbilitySystem/AttributeConfig")]
     public sealed class AttributeConfig : ScriptableObject
@@ -18,22 +18,21 @@ namespace Noname.GameCore.Helper
         [SerializeField] private float _minValue = 0f;
         [SerializeField] private float _maxValue = 0f;
         /// <summary>
-        /// ?띿꽦 ?앸퀎?먯엯?덈떎 (Domain ?덉씠??.
+        /// 속성 식별자입니다. (Domain AttributeId)
         /// </summary>
         public AttributeId Id => new AttributeId(_attributeName);
 
         /// <summary>
-        /// 湲곕낯 踰좎씠??媛믪엯?덈떎.
+        /// 기본 베이스 값입니다.
         /// </summary>
         public float DefaultBaseValue => _defaultBaseValue;
         /// <summary>
-        /// 理쒖냼媛믪엯?덈떎.
+        /// 최소 값입니다.
         /// </summary>
         public float MinValue => _minValue;
         /// <summary>
-        /// 理쒕?媛믪엯?덈떎.
+        /// 최대 값입니다.
         /// </summary>
         public float MaxValue => _maxValue;
     }
 }
-

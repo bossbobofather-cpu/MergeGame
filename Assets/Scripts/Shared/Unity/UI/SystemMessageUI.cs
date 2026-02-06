@@ -5,62 +5,62 @@ using UnityEngine.UI;
 namespace MyProject.Common.UI
 {
     /// <summary>
-    /// ?붾㈃ 以묒븰 ?곷떒 ?깆뿉 ?쒖뒪??硫붿떆吏瑜??꾩슦??UI 留ㅻ땲??낅땲??
-    /// SystemMessageBus ?대깽?몃? 援щ룆?섏뿬 硫붿떆吏瑜??쒖떆?⑸땲??
+    /// 화면 중앙 하단에 시스템 메시지를 표시하는 UI 매니저입니다.
+    /// SystemMessageBus 이벤트를 구독해 메시지를 표시합니다.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class SystemMessageUI : MonoBehaviour
     {
         [Header("UI")]
         /// <summary>
-        /// 硫붿떆吏媛 ?앹꽦??遺紐?而⑦뀒?대꼫?낅땲??
+        /// 메시지가 생성될 부모 컨테이너입니다.
         /// </summary>
         [SerializeField] private RectTransform _container;
         
         /// <summary>
-        /// 硫붿떆吏???ъ슜???고듃?낅땲??
+        /// 메시지에 사용할 폰트입니다.
         /// </summary>
         [SerializeField] private Font _font;
         
         /// <summary>
-        /// 硫붿떆吏 ?띿뒪???ш린?낅땲??
+        /// 메시지 텍스트 크기입니다.
         /// </summary>
         [SerializeField] private int _fontSize = 24;
         
         /// <summary>
-        /// 硫붿떆吏 ?띿뒪???됱긽?낅땲??
+        /// 메시지 텍스트 색상입니다.
         /// </summary>
         [SerializeField] private Color _textColor = Color.white;
         
         /// <summary>
-        /// 硫붿떆吏 諛곌꼍 ?됱긽?낅땲??
+        /// 메시지 배경 색상입니다.
         /// </summary>
         [SerializeField] private Color _backgroundColor = new Color(0f, 0f, 0f, 0.6f);
         
         /// <summary>
-        /// 硫붿떆吏 ?대? ?щ갚(padding)?낅땲??
+        /// 메시지 내부 여백(padding)입니다.
         /// </summary>
         [SerializeField] private Vector2 _padding = new Vector2(10f, 4f);
         
         /// <summary>
-        /// 硫붿떆吏 媛꾩쓽 媛꾧꺽?낅땲??
+        /// 메시지 간격입니다.
         /// </summary>
         [SerializeField] private float _rowSpacing = 2f;
 
         [Header("Behavior")]
         /// <summary>
-        /// ?붾㈃???숈떆???쒖떆??理쒕? 硫붿떆吏 媛쒖닔?낅땲??
+        /// 화면에 동시에 표시할 최대 메시지 수입니다.
         /// </summary>
         [SerializeField] private int _maxVisible = 30;
 
         [Header("Auto Setup")]
         /// <summary>
-        /// UI媛 諛곗튂??罹붾쾭?ㅼ엯?덈떎.
+        /// UI가 배치될 캔버스입니다.
         /// </summary>
         [SerializeField] private Canvas _canvas;
         
         /// <summary>
-        /// 罹붾쾭?ㅺ? ?놁쓣 寃쎌슦 ?먮룞 ?앹꽦 ?щ??낅땲??
+        /// 캔버스가 없으면 자동 생성합니다.
         /// </summary>
         [SerializeField] private bool _autoCreateCanvas = true;
 
@@ -92,12 +92,12 @@ namespace MyProject.Common.UI
             SystemMessageBus.MessagePublished -= HandleMessage;
         }
 
-        // Update??媛쒖닔 湲곕컲?쇰줈留??숈옉?섎?濡??쒓굅
+        // Update 기반 호출만으로 동작하도록 유지
 
         /// <summary>
-        /// ?쒖뒪??硫붿떆吏瑜?寃뚯떆?⑸땲??
+        /// 시스템 메시지를 게시합니다.
         /// </summary>
-        /// <param name="message">?쒖떆??硫붿떆吏 ?댁슜</param>
+        /// <param name="message">표시할 메시지 내용</param>
         public static void Post(string message)
         {
             SystemMessageBus.Publish(message);
@@ -113,7 +113,7 @@ namespace MyProject.Common.UI
             var row = GetOrCreateRow();
             row.Label.text = message.Text;
 
-            // 諛곌꼍???곸슜
+            // 배경색 적용
             if (row.Background != null)
             {
                 row.Background.color = message.BackgroundColor;
@@ -124,7 +124,7 @@ namespace MyProject.Common.UI
                 row.Group.alpha = 1f;
             }
 
-            // 理쒖떊 硫붿떆吏瑜??섎떒??異붽? (?꾨줈 ?볦엫)
+            // 최신 메시지를 하단에 추가 (아래로 쌓임)
             row.Root.transform.SetAsLastSibling();
             _activeRows.Add(row);
             TrimOverflow();
@@ -144,7 +144,7 @@ namespace MyProject.Common.UI
 
         private MessageRow CreateRow()
         {
-            // 硫붿떆吏 ??Row) UI ?숈쟻 ?앹꽦
+            // 메시지 행 UI 동적 생성
             var root = new GameObject("SystemMessageRow", typeof(RectTransform));
             var rect = root.GetComponent<RectTransform>();
             rect.SetParent(_container, false);
@@ -200,7 +200,7 @@ namespace MyProject.Common.UI
 
         private void TrimOverflow()
         {
-            // 理쒕? ?쒖떆 媛쒖닔瑜?珥덇낵?섎㈃ 媛???ㅻ옒??硫붿떆吏遺???쒓굅 (留??꾨???
+            // 최대 표시 개수를 초과하면 가장 오래된 메시지를 제거
             var max = Mathf.Max(1, _maxVisible);
             while (_activeRows.Count > max)
             {
@@ -256,14 +256,14 @@ namespace MyProject.Common.UI
                 return;
             }
 
-            // ?붾㈃ 理쒗븯??以묒븰??諛곗튂 (?꾨줈 ?볦씠???ㅽ깮??
+            // 화면 하단 중앙에 배치 (아래로 쌓이도록)
             var obj = new GameObject("SystemMessageContainer", typeof(RectTransform));
             _container = obj.GetComponent<RectTransform>();
             _container.SetParent(_canvas.transform, false);
             _container.anchorMin = new Vector2(0.5f, 0f);
             _container.anchorMax = new Vector2(0.5f, 0f);
             _container.pivot = new Vector2(0.5f, 0f);
-            _container.anchoredPosition = new Vector2(0f, 10f); // ?섎떒?먯꽌 10px ??
+            _container.anchoredPosition = new Vector2(0f, 10f); // 하단에서 10px
             _container.sizeDelta = new Vector2(1200f, 0f);
 
             var layout = obj.AddComponent<VerticalLayoutGroup>();
@@ -297,5 +297,3 @@ namespace MyProject.Common.UI
         }
     }
 }
-
-

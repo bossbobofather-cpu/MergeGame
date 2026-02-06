@@ -14,7 +14,7 @@ namespace Noname.GameAbilitySystem.Json
         public string Description;
 
         /// <summary>
-        /// 지???�?? "Instant", "Infinite", "HasDuration"
+        /// 주석 정리
         /// </summary>
         
         public string DurationType;

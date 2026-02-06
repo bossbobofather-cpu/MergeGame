@@ -212,6 +212,7 @@ namespace MyProject.MergeGame
         /// </summary>
         public float PositionX { get; }
         public float PositionY { get; }
+        public float PositionZ { get; }
 
         public TowerSpawnedEvent(
             long tick,
@@ -221,7 +222,8 @@ namespace MyProject.MergeGame
             int grade,
             int slotIndex,
             float positionX,
-            float positionY) : base(tick)
+            float positionY,
+            float positionZ) : base(tick)
         {
             TowerUid = towerUid;
             TowerId = towerId;
@@ -230,6 +232,7 @@ namespace MyProject.MergeGame
             SlotIndex = slotIndex;
             PositionX = positionX;
             PositionY = positionY;
+            PositionZ = positionZ;
         }
     }
 
@@ -258,12 +261,34 @@ namespace MyProject.MergeGame
         /// </summary>
         public float AttackerX { get; }
         public float AttackerY { get; }
+        public float AttackerZ { get; }
 
         /// <summary>
         /// 대상 위치입니다.
         /// </summary>
         public float TargetX { get; }
         public float TargetY { get; }
+        public float TargetZ { get; }
+
+        /// <summary>
+        /// 공격 방식입니다.
+        /// </summary>
+        public TowerAttackType AttackType { get; }
+
+        /// <summary>
+        /// 투사체 타입입니다.
+        /// </summary>
+        public ProjectileType ProjectileType { get; }
+
+        /// <summary>
+        /// 투사체 속도입니다.
+        /// </summary>
+        public float ProjectileSpeed { get; }
+
+        /// <summary>
+        /// Throw 타입의 반경입니다.
+        /// </summary>
+        public float ThrowRadius { get; }
 
         public TowerAttackedEvent(
             long tick,
@@ -272,16 +297,28 @@ namespace MyProject.MergeGame
             float damage,
             float attackerX,
             float attackerY,
+            float attackerZ,
             float targetX,
-            float targetY) : base(tick)
+            float targetY,
+            float targetZ,
+            TowerAttackType attackType,
+            ProjectileType projectileType,
+            float projectileSpeed,
+            float throwRadius) : base(tick)
         {
             AttackerUid = attackerUid;
             TargetUid = targetUid;
             Damage = damage;
             AttackerX = attackerX;
             AttackerY = attackerY;
+            AttackerZ = attackerZ;
             TargetX = targetX;
             TargetY = targetY;
+            TargetZ = targetZ;
+            AttackType = attackType;
+            ProjectileType = projectileType;
+            ProjectileSpeed = projectileSpeed;
+            ThrowRadius = throwRadius;
         }
     }
 
@@ -398,6 +435,7 @@ namespace MyProject.MergeGame
         /// </summary>
         public float PositionX { get; }
         public float PositionY { get; }
+        public float PositionZ { get; }
 
         public TowerMovedEvent(
             long tick,
@@ -405,13 +443,15 @@ namespace MyProject.MergeGame
             int fromSlotIndex,
             int toSlotIndex,
             float positionX,
-            float positionY) : base(tick)
+            float positionY,
+            float positionZ) : base(tick)
         {
             TowerUid = towerUid;
             FromSlotIndex = fromSlotIndex;
             ToSlotIndex = toSlotIndex;
             PositionX = positionX;
             PositionY = positionY;
+            PositionZ = positionZ;
         }
     }
 
@@ -430,6 +470,7 @@ namespace MyProject.MergeGame
         /// </summary>
         public float PositionX { get; }
         public float PositionY { get; }
+        public float PositionZ { get; }
 
         /// <summary>
         /// 소스 이펙트인지 타겟 이펙트인지 여부입니다.
@@ -456,6 +497,7 @@ namespace MyProject.MergeGame
             string effectId,
             float positionX,
             float positionY,
+            float positionZ,
             bool isSourceEffect,
             long sourceTowerUid,
             long targetTowerUid,
@@ -464,6 +506,7 @@ namespace MyProject.MergeGame
             EffectId = effectId;
             PositionX = positionX;
             PositionY = positionY;
+            PositionZ = positionZ;
             IsSourceEffect = isSourceEffect;
             SourceTowerUid = sourceTowerUid;
             TargetTowerUid = targetTowerUid;
@@ -500,6 +543,7 @@ namespace MyProject.MergeGame
         /// </summary>
         public float PositionX { get; }
         public float PositionY { get; }
+        public float PositionZ { get; }
 
         /// <summary>
         /// 최대 체력입니다.
@@ -513,6 +557,7 @@ namespace MyProject.MergeGame
             int pathIndex,
             float positionX,
             float positionY,
+            float positionZ,
             float maxHealth) : base(tick)
         {
             MonsterUid = monsterUid;
@@ -520,6 +565,7 @@ namespace MyProject.MergeGame
             PathIndex = pathIndex;
             PositionX = positionX;
             PositionY = positionY;
+            PositionZ = positionZ;
             MaxHealth = maxHealth;
         }
     }
@@ -578,6 +624,7 @@ namespace MyProject.MergeGame
         /// </summary>
         public float PositionX { get; }
         public float PositionY { get; }
+        public float PositionZ { get; }
 
         /// <summary>
         /// 획득 골드입니다.
@@ -594,12 +641,14 @@ namespace MyProject.MergeGame
             long monsterUid,
             float positionX,
             float positionY,
+            float positionZ,
             int goldReward,
             long killerUid) : base(tick)
         {
             MonsterUid = monsterUid;
             PositionX = positionX;
             PositionY = positionY;
+            PositionZ = positionZ;
             GoldReward = goldReward;
             KillerUid = killerUid;
         }
@@ -642,6 +691,7 @@ namespace MyProject.MergeGame
         /// </summary>
         public float PositionX { get; }
         public float PositionY { get; }
+        public float PositionZ { get; }
 
         /// <summary>
         /// 경로 진행도입니다 (0.0 ~ 1.0).
@@ -653,11 +703,13 @@ namespace MyProject.MergeGame
             long monsterUid,
             float positionX,
             float positionY,
+            float positionZ,
             float pathProgress) : base(tick)
         {
             MonsterUid = monsterUid;
             PositionX = positionX;
             PositionY = positionY;
+            PositionZ = positionZ;
             PathProgress = pathProgress;
         }
     }
@@ -788,12 +840,14 @@ namespace MyProject.MergeGame
         public int Index { get; }
         public float X { get; }
         public float Y { get; }
+        public float Z { get; }
 
-        public SlotPositionData(int index, float x, float y)
+        public SlotPositionData(int index, float x, float y, float z)
         {
             Index = index;
             X = x;
             Y = y;
+            Z = z;
         }
     }
 
@@ -804,11 +858,13 @@ namespace MyProject.MergeGame
     {
         public float X { get; }
         public float Y { get; }
+        public float Z { get; }
 
-        public PathWaypointData(float x, float y)
+        public PathWaypointData(float x, float y, float z)
         {
             X = x;
             Y = y;
+            Z = z;
         }
     }
 
@@ -869,4 +925,3 @@ namespace MyProject.MergeGame
 
     #endregion
 }
-

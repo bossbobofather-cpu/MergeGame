@@ -3,67 +3,67 @@ using System;
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// ?�력 ?�양???�별?�기 ?�한 ?�들?�니??
+    /// 주석 정리
     /// </summary>
     public struct FGameplayAbilitySpecHandle : IEquatable<FGameplayAbilitySpecHandle>
     {
         /// <summary>
-        /// ?�효?��? ?��? ?�들 값입?�다.
+        /// 주석 정리
         /// </summary>
         public static readonly FGameplayAbilitySpecHandle Invalid = new FGameplayAbilitySpecHandle { Id = 0 };
 
         /// <summary>
-        /// ?�별??값입?�다.
+        /// 주석 정리
         /// </summary>
         public int Id;
 
         /// <summary>
-        /// ?�른 ?�들�??�일?��? 비교?�니??
+        /// 주석 정리
         /// </summary>
-        /// <param name="other">비교 ?�??/param>
-        /// <returns>?�일 ?��?</returns>
+        /// 주석 정리
+        /// 주석 정리
         public bool Equals(FGameplayAbilitySpecHandle other)
         {
-            // ?�별??값으�?비교?�다.
+            // 주석 정리
             return Id == other.Id;
         }
 
         /// <summary>
-        /// 객체 ?�일 ?��?�?비교?�니??
+        /// 주석 정리
         /// </summary>
-        /// <param name="obj">비교 ?�??/param>
-        /// <returns>?�일 ?��?</returns>
+        /// 주석 정리
+        /// 주석 정리
         public override bool Equals(object obj)
         {
-            // 같�? ?�?�인지 ?�인????비교?�다.
+            // 주석 정리
             return obj is FGameplayAbilitySpecHandle other && Equals(other);
         }
 
         /// <summary>
-        /// ?�시 코드�?반환?�니??
+        /// 주석 정리
         /// </summary>
-        /// <returns>?�시 �?/returns>
+        /// 주석 정리
         public override int GetHashCode()
         {
-            // ?�별??값을 그�?�??�용?�다.
+            // 주석 정리
             return Id;
         }
 
         /// <summary>
-        /// ?�일 ?�산?�입?�다.
+        /// 주석 정리
         /// </summary>
         public static bool operator ==(FGameplayAbilitySpecHandle a, FGameplayAbilitySpecHandle b)
         {
-            // ?�별??값으�?비교?�다.
+            // 주석 정리
             return a.Id == b.Id;
         }
 
         /// <summary>
-        /// ?�름 ?�산?�입?�다.
+        /// 주석 정리
         /// </summary>
         public static bool operator !=(FGameplayAbilitySpecHandle a, FGameplayAbilitySpecHandle b)
         {
-            // ?�별??값으�?비교?�다.
+            // 주석 정리
             return a.Id != b.Id;
         }
     }

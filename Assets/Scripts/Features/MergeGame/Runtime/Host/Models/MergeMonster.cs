@@ -1,4 +1,5 @@
-using System;
+﻿using System;
+using MyProject.MergeGame.AI;
 using Noname.GameAbilitySystem;
 
 namespace MyProject.MergeGame.Models
@@ -31,12 +32,17 @@ namespace MyProject.MergeGame.Models
         /// <summary>
         /// 현재 위치입니다.
         /// </summary>
-        public Point2D Position { get; set; }
+        public Point3D Position { get; set; }
 
         /// <summary>
         /// AbilitySystemComponent입니다.
         /// </summary>
         public AbilitySystemComponent ASC { get; }
+
+        /// <summary>
+        /// 몬스터 AI입니다.
+        /// </summary>
+        public IMergeMonsterAI AI { get; private set; }
 
         /// <summary>
         /// 목적지 도달 시 플레이어에게 주는 데미지입니다.
@@ -62,7 +68,7 @@ namespace MyProject.MergeGame.Models
             long uid,
             string monsterId,
             int pathIndex,
-            Point2D startPosition,
+            Point3D startPosition,
             int damageToPlayer,
             int goldReward)
         {
@@ -76,6 +82,14 @@ namespace MyProject.MergeGame.Models
 
             ASC = new AbilitySystemComponent();
             ASC.SetOwner(this);
+        }
+
+        /// <summary>
+        /// AI를 지정합니다.
+        /// </summary>
+        public void SetAI(IMergeMonsterAI ai)
+        {
+            AI = ai;
         }
 
         /// <summary>

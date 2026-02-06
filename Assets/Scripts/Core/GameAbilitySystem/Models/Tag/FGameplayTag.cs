@@ -3,8 +3,8 @@ using System;
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// 게임?�레???�그 구조체입?�다 (?�수 C# 모델).
-    /// Unity???�존?��? ?�으�?Host ?�경?�서 ?�용 가?�합?�다.
+    /// 주석 정리
+    /// 주석 정리
     /// </summary>
     [Serializable]
     public struct FGameplayTag : IEquatable<FGameplayTag>
@@ -13,9 +13,9 @@ namespace Noname.GameAbilitySystem
         private int _hash;
 
         /// <summary>
-        /// 문자??값을 기반?�로 ?�그�??�성?�니??
+        /// 주석 정리
         /// </summary>
-        /// <param name="value">?�그 문자??/param>
+        /// 주석 정리
         public FGameplayTag(string value)
         {
             _value = value;
@@ -27,12 +27,12 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�그 문자?�입?�다.
+        /// 주석 정리
         /// </summary>
         public string Value => _value;
 
         /// <summary>
-        /// ?�그 ?�시 값입?�다.
+        /// 주석 정리
         /// </summary>
         public int Hash
         {
@@ -40,7 +40,7 @@ namespace Noname.GameAbilitySystem
             {
                 if (_hash == 0 && !string.IsNullOrEmpty(_value))
                 {
-                    // ?�요?????�시�?계산?�다.
+                    // 주석 정리
                     _hash = GameplayTagUtility.Fnv1a32(_value);
                 }
                 return _hash;
@@ -48,43 +48,43 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�그 문자?�이 ?�효?��? ?��??�니??
+        /// 주석 정리
         /// </summary>
         public bool IsValid => GameplayTagUtility.IsValidTagString(_value);
 
         /// <summary>
-        /// ?�른 ?�그?� ?�일?��? 비교?�니??
+        /// 주석 정리
         /// </summary>
-        /// <param name="other">비교 ?�??/param>
-        /// <returns>?�일 ?��?</returns>
+        /// 주석 정리
+        /// 주석 정리
         public bool Equals(FGameplayTag other)
         {
             return Hash == other.Hash;
         }
 
         /// <summary>
-        /// 객체 ?�일 ?��?�?비교?�니??
+        /// 주석 정리
         /// </summary>
-        /// <param name="obj">비교 ?�??/param>
-        /// <returns>?�일 ?��?</returns>
+        /// 주석 정리
+        /// 주석 정리
         public override bool Equals(object obj)
         {
             return obj is FGameplayTag other && Equals(other);
         }
 
         /// <summary>
-        /// ?�시 코드�?반환?�니??
+        /// 주석 정리
         /// </summary>
-        /// <returns>?�시 �?/returns>
+        /// 주석 정리
         public override int GetHashCode()
         {
             return Hash;
         }
 
         /// <summary>
-        /// 문자???�현??반환?�니??
+        /// 주석 정리
         /// </summary>
-        /// <returns>?�그 문자??/returns>
+        /// 주석 정리
         public override string ToString()
         {
             return _value ?? string.Empty;

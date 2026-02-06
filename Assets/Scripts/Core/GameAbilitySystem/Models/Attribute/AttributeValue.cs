@@ -1,8 +1,8 @@
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// ?��????�성 �?컨테?�너?�니??(?�수 C# 모델).
-    /// Unity???�존?��? ?�으�?Host ?�경?�서 ?�용 가?�합?�다.
+    /// 주석 정리
+    /// 주석 정리
     /// </summary>
     public sealed class AttributeValue
     {
@@ -18,24 +18,24 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�성 ?�별?�입?�다.
+        /// 주석 정리
         /// </summary>
         public AttributeId AttributeId { get; }
 
         /// <summary>
-        /// 베이??값입?�다.
+        /// 주석 정리
         /// </summary>
         public float BaseValue { get; set; }
 
         /// <summary>
-        /// ?�재 값입?�다.
+        /// 주석 정리
         /// </summary>
         public float CurrentValue
         {
             get => _currentValue;
             set
             {
-                // 범위 ?�으�?보정
+                // 주석 정리
                 if (MaxValue > 0f && value > MaxValue)
                 {
                     _currentValue = MaxValue;
@@ -52,12 +52,12 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// 최소값입?�다.
+        /// 주석 정리
         /// </summary>
         public float MinValue { get; set; }
 
         /// <summary>
-        /// 최�?값입?�다.
+        /// 주석 정리
         /// </summary>
         public float MaxValue { get; set; }
     }

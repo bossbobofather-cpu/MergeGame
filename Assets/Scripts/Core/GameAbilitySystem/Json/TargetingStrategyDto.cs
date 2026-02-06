@@ -3,28 +3,28 @@ using System;
 namespace Noname.GameAbilitySystem.Json
 {
     /// <summary>
-    /// ?�겟팅 ?�략 JSON DTO
+    /// 주석 정리
     /// </summary>
     [Serializable]
     public class TargetingStrategyDto
     {
         /// <summary>
-        /// ?�략 ?�?? "Self", "NearestEnemy", "NearestN", "LowestHp", "Area", "Random"
+        /// 주석 정리
         /// </summary>
         public string Type;
 
         /// <summary>
-        /// 최�? ?�거�?(NearestEnemy, NearestN?�서 ?�용)
+        /// 주석 정리
         /// </summary>
         public float MaxRange;
 
         /// <summary>
-        /// 최�? ?��???(NearestN?�서 ?�용)
+        /// 주석 정리
         /// </summary>
         public int MaxTargets;
 
         /// <summary>
-        /// 범위 반경 (Area?�서 ?�용)
+        /// 주석 정리
         /// </summary>
         public float Radius;
     }

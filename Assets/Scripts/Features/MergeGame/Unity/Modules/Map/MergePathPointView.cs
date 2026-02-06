@@ -1,10 +1,10 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MyProject.MergeGame.Unity
 {
     /// <summary>
-    /// ?? ????? ???? ???? ? ???????.
-    /// Host?? ??? (PathIndex, WaypointIndex)? ?????.
+    /// 경로 포인트 오브젝트에 부착되는 뷰 컴포넌트입니다.
+    /// Host에서 전달받은 (PathIndex, WaypointIndex)를 보관합니다.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class MergePathPointView : MonoBehaviour
@@ -22,4 +22,3 @@ namespace MyProject.MergeGame.Unity
         }
     }
 }
-

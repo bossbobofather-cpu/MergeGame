@@ -1,7 +1,7 @@
-namespace MyProject.MergeGame
+﻿namespace MyProject.MergeGame
 {
     /// <summary>
-    /// MergeGame 호스트 설정입니다.
+    /// MergeGame 호스트 설정값입니다.
     /// </summary>
     public class MergeHostConfig
     {
@@ -20,16 +20,16 @@ namespace MyProject.MergeGame
         private float _waveSpawnInterval = 1f;
         private int _waveCompletionBonusGold = 50;
 
-        // 패배 규칙
+        // 몬스터 누적 패배 기준
         private int _maxMonsterStack = 100;
 
         /// <summary>
-        /// 초기 유닛 등급입니다.
+        /// 초기 유닛(타워) 등급입니다.
         /// </summary>
         public int InitialUnitGrade => _initialUnitGrade;
 
         /// <summary>
-        /// 최대 유닛 등급입니다.
+        /// 최대 유닛(타워) 등급입니다.
         /// </summary>
         public int MaxUnitGrade => _maxUnitGrade;
 
@@ -54,7 +54,7 @@ namespace MyProject.MergeGame
         public float DefaultAttackRange => _defaultAttackRange;
 
         /// <summary>
-        /// 웨이브 몬스터 스폰 간격 (초)입니다.
+        /// 웨이브 몬스터 스폰 간격(초)입니다.
         /// </summary>
         public float WaveSpawnInterval => _waveSpawnInterval;
 
@@ -64,12 +64,13 @@ namespace MyProject.MergeGame
         public int WaveCompletionBonusGold => _waveCompletionBonusGold;
 
         /// <summary>
-        /// 현재 보드에 존재하는 몬스터가 이 수 이상 쌓이면 패배합니다. (0 이하면 체크하지 않습니다)
+        /// 보드에 존재하는 몬스터 수가 이 값 이상이면 패배합니다.
+        /// (0 이하이면 체크하지 않습니다.)
         /// </summary>
         public int MaxMonsterStack => _maxMonsterStack;
 
         /// <summary>
-        /// 설정을 빌더 패턴으로 구성합니다.
+        /// 플레이어 HP를 설정합니다.
         /// </summary>
         public MergeHostConfig WithPlayerHp(int maxHp)
         {

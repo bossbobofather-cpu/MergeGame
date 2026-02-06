@@ -1,7 +1,7 @@
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// ?�성 ?�별?�입?�다 (?�수 C# 구조�?.
+    /// 주석 정리
     /// </summary>
     public struct AttributeId
     {
@@ -27,7 +27,7 @@ namespace Noname.GameAbilitySystem
             return Name ?? string.Empty;
         }
 
-        // 기본 ?�성 ?�수
+        // 주석 정리
         public static readonly AttributeId Level = new("Level");
         public static readonly AttributeId MoveSpeed = new AttributeId("MoveSpeed");
         public static readonly AttributeId JumpSpeed = new AttributeId("JumpSpeed");

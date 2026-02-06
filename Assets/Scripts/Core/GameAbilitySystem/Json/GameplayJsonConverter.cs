@@ -4,14 +4,14 @@ using System.Collections.Generic;
 namespace Noname.GameAbilitySystem.Json
 {
     /// <summary>
-    /// JSON DTO?� Domain 모델 �?변???�틸리티
+    /// 주석 정리
     /// </summary>
     public static class GameplayJsonConverter
     {
-        #region DTO ??Domain 변??
+        #region DTO -> Domain 변환
 
         /// <summary>
-        /// GameplayAbilityDto ??GameplayAbility 변??
+        /// 주석 정리
         /// </summary>
         public static GameplayAbility FromDto(GameplayAbilityDto dto)
         {
@@ -32,7 +32,7 @@ namespace Noname.GameAbilitySystem.Json
         }
 
         /// <summary>
-        /// GameplayEffectDto ??GameplayEffect 변??
+        /// 주석 정리
         /// </summary>
         public static GameplayEffect FromDto(GameplayEffectDto dto)
         {
@@ -56,7 +56,7 @@ namespace Noname.GameAbilitySystem.Json
         }
 
         /// <summary>
-        /// AttributeModifierDto ??AttributeModifier 변??
+        /// 주석 정리
         /// </summary>
         public static AttributeModifier FromDto(AttributeModifierDto dto)
         {
@@ -65,21 +65,21 @@ namespace Noname.GameAbilitySystem.Json
             return new AttributeModifier
             {
                 ValueMode = ParseValueMode(dto.ValueMode),
-                // Static 모드 ?�드
+                // 주석 정리
                 AttributeId = new AttributeId(dto.AttributeId ?? ""),
                 Operation = ParseOperation(dto.Operation),
                 Magnitude = dto.Magnitude,
-                // Calculated 모드 ?�드
+                // 주석 정리
                 CalculatorType = dto.CalculatorType,
             };
         }
 
         #endregion
 
-        #region Domain ??DTO 변??
+        #region Domain -> DTO 변환
 
         /// <summary>
-        /// GameplayAbility ??GameplayAbilityDto 변??
+        /// 주석 정리
         /// </summary>
         public static GameplayAbilityDto ToDto(GameplayAbility ability)
         {
@@ -100,7 +100,7 @@ namespace Noname.GameAbilitySystem.Json
         }
 
         /// <summary>
-        /// GameplayEffect ??GameplayEffectDto 변??
+        /// 주석 정리
         /// </summary>
         public static GameplayEffectDto ToDto(GameplayEffect effect)
         {
@@ -124,28 +124,28 @@ namespace Noname.GameAbilitySystem.Json
         }
 
         /// <summary>
-        /// AttributeModifier ??AttributeModifierDto 변??
+        /// 주석 정리
         /// </summary>
         public static AttributeModifierDto ToDto(AttributeModifier modifier)
         {
             return new AttributeModifierDto
             {
                 ValueMode = modifier.ValueMode.ToString(),
-                // Static 모드 ?�드
+                // 주석 정리
                 AttributeId = modifier.AttributeId.Name,
                 Operation = modifier.Operation.ToString(),
                 Magnitude = modifier.Magnitude,
-                // Calculated 모드 ?�드
+                // 주석 정리
                 CalculatorType = modifier.CalculatorType,
             };
         }
 
         #endregion
 
-        #region ?�겟팅 ?�략 변??
+        #region 변환 섹션
 
         /// <summary>
-        /// TargetingStrategyDto ??ITargetingStrategy ?�성
+        /// 주석 정리
         /// </summary>
         public static ITargetingStrategy CreateTargetingStrategy(TargetingStrategyDto dto)
         {
@@ -160,7 +160,7 @@ namespace Noname.GameAbilitySystem.Json
         }
 
         /// <summary>
-        /// ITargetingStrategy ??TargetingStrategyDto 변??
+        /// 주석 정리
         /// </summary>
         public static TargetingStrategyDto ToDto(ITargetingStrategy strategy)
         {
@@ -193,10 +193,10 @@ namespace Noname.GameAbilitySystem.Json
 
         #endregion
 
-        #region 지?�시�??�책 변??
+        #region 변환 섹션
 
         /// <summary>
-        /// DurationPolicyDto ??IEffectDurationPolicy ?�성
+        /// 주석 정리
         /// </summary>
         public static IEffectDurationPolicy CreateDurationPolicy(DurationPolicyDto dto)
         {
@@ -205,7 +205,7 @@ namespace Noname.GameAbilitySystem.Json
         }
 
         /// <summary>
-        /// EffectDurationPolicyType ??IEffectDurationPolicy ?�성
+        /// 주석 정리
         /// </summary>
         public static IEffectDurationPolicy CreateDurationPolicy(EffectDurationPolicyType type)
         {
@@ -213,7 +213,7 @@ namespace Noname.GameAbilitySystem.Json
         }
 
         /// <summary>
-        /// IEffectDurationPolicy ??DurationPolicyDto 변??
+        /// 주석 정리
         /// </summary>
         public static DurationPolicyDto ToDto(IEffectDurationPolicy policy)
         {
@@ -225,7 +225,7 @@ namespace Noname.GameAbilitySystem.Json
 
         #endregion
 
-        #region ?�퍼 메서??
+        #region 변환 섹션
 
         private static List<GameplayEffect> FromDtoList(List<GameplayEffectDto> dtos)
         {
@@ -346,7 +346,7 @@ namespace Noname.GameAbilitySystem.Json
             return AttributeCalculatorType.None;
         }
 
-        // Reflection???�하�?직접 ?�근?�기 ?�려?��?�?기본�?반환
+        // 주석 정리
         private static float GetMaxRange(NearestEnemyTargetingStrategy s) => float.PositiveInfinity;
         private static float GetMaxRange(NearestNEnemiesTargetingStrategy s) => float.PositiveInfinity;
         private static int GetMaxTargets(NearestNEnemiesTargetingStrategy s) => 1;
@@ -355,4 +355,5 @@ namespace Noname.GameAbilitySystem.Json
         #endregion
     }
 }
+
 

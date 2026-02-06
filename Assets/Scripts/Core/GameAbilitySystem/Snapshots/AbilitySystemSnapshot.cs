@@ -3,29 +3,29 @@ using System.Collections.Generic;
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// AbilitySystem??ë¶ˆë? ?¤ëƒ…?·ì…?ˆë‹¤ (?œìˆ˜ C# ëª¨ë¸).
-    /// ?¤ë ˆ??ê°??ˆì „???°ì´???„ì†¡???„í•´ ?¬ìš©?©ë‹ˆ??
-    /// Unity???˜ì¡´?˜ì? ?Šìœ¼ë©?Host ?˜ê²½?ì„œ ?¬ìš© ê°€?¥í•©?ˆë‹¤.
+    /// ì£¼ì„ ì •ë¦¬
+    /// ì£¼ì„ ì •ë¦¬
+    /// ì£¼ì„ ì •ë¦¬
     /// </summary>
     public sealed class AbilitySystemSnapshot
     {
         /// <summary>
-        /// ?ì„± ê°??¤ëƒ…?·ì…?ˆë‹¤.
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public IReadOnlyDictionary<AttributeId, float> Attributes { get; }
 
         /// <summary>
-        /// ?Œìœ ???œê·¸ ?¤ëƒ…?·ì…?ˆë‹¤.
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public IReadOnlyList<FGameplayTag> OwnedTags { get; }
 
         /// <summary>
-        /// ?¤í‚¬ ëª©ë¡ ?¤ëƒ…?·ì…?ˆë‹¤.
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public IReadOnlyList<GameplayAbility> Abilities { get; }
 
         /// <summary>
-        /// ?œì„± ?¨ê³¼ ?¤ëƒ…?·ì…?ˆë‹¤.
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public IReadOnlyList<ActiveGameplayEffectSnapshot> ActiveEffects { get; }
 
@@ -43,7 +43,7 @@ namespace Noname.GameAbilitySystem
     }
 
     /// <summary>
-    /// ?œì„± ?¨ê³¼??ë¶ˆë? ?¤ëƒ…?·ì…?ˆë‹¤ (?œìˆ˜ C# ëª¨ë¸).
+    /// ì£¼ì„ ì •ë¦¬
     /// </summary>
     public struct ActiveGameplayEffectSnapshot
     {

@@ -1,6 +1,7 @@
 ﻿using MyProject.Common.UI;
 using MyProject.MergeGame.Commands;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
@@ -9,14 +10,21 @@ using UnityEngine.InputSystem;
 namespace MyProject.MergeGame.Unity
 {
     /// <summary>
-    /// 키보드 기반의 최소 입력 모듈입니다.
-    /// 드래그/터치는 나중에 추가하고, 우선 커맨드 파이프라인을 검증하는 용도입니다.
+    /// 입력을 받아 Move/Merge 커맨드를 발행하는 모듈입니다.
+    /// Spawn은 HUD 버튼에서 처리하고, 여기서는 드래그/키보드 입력만 처리합니다.
     /// </summary>
     public sealed class InputViewModule : MergeViewModuleBase
     {
-        [Header("Spawn")]
+        [Header("Keyboard Input")]
+        [SerializeField] private bool _enableKeyboardInput = false;
+
+        [Header("Drag & Drop Input")]
+        [SerializeField] private bool _enableDragInput = true;
+        [SerializeField] private Camera _raycastCamera;
+        [SerializeField] private LayerMask _slotLayerMask = ~0;
+
+        [Header("Command Mode")]
         [SerializeField] private bool _useTowerCommands = true;
-        [SerializeField] private string _spawnTowerId = "unit_basic";
 
         [Header("Message")]
         [SerializeField] private Color _infoColor = new Color(0f, 0f, 0f, 0.6f);
@@ -24,6 +32,8 @@ namespace MyProject.MergeGame.Unity
         [SerializeField] private Color _warnColor = new Color(1f, 0.55f, 0.1f, 0.6f);
 
         private int _selectedSlotIndex = -1;
+        private int _dragFromSlotIndex = -1;
+        private bool _isDragging;
 
         /// <summary>
         /// MergeGameView.Update에서 호출되는 입력 처리 루프입니다.
@@ -41,18 +51,19 @@ namespace MyProject.MergeGame.Unity
                 return;
             }
 
-            // Space: 자동 스폰
-            if (WasPressedSpawn())
+            if (_enableKeyboardInput)
             {
-                SpawnAuto();
+                HandleKeyboardInput(snapshot);
             }
 
-            // W: 웨이브 시작
-            if (WasPressedStartWave())
+            if (_enableDragInput)
             {
-                GameView.SendCommand(new StartWaveCommand(GameView.LocalUserId));
+                HandleDragInput(snapshot);
             }
+        }
 
+        private void HandleKeyboardInput(MergeHostSnapshot snapshot)
+        {
             // Esc: 선택 취소
             if (WasPressedCancel())
             {
@@ -68,56 +79,92 @@ namespace MyProject.MergeGame.Unity
             }
         }
 
-
-        /// <summary>
-        /// UI 버튼 바인딩용: 자동 스폰을 요청합니다.
-        /// </summary>
-        public void OnClickSpawn()
+        private void HandleDragInput(MergeHostSnapshot snapshot)
         {
-            if (GameView == null)
+            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
             {
                 return;
             }
 
-            SpawnAuto();
-        }
-
-        /// <summary>
-        /// UI 버튼 바인딩용: 웨이브 시작을 요청합니다.
-        /// </summary>
-        public void OnClickStartWave()
-        {
-            if (GameView == null)
+            if (!_isDragging && WasPointerDown())
             {
-                return;
-            }
-
-            GameView.SendCommand(new StartWaveCommand(GameView.LocalUserId));
-        }
-
-        /// <summary>
-        /// UI 버튼 바인딩용: 슬롯 선택을 취소합니다.
-        /// </summary>
-        public void OnClickCancelSelection()
-        {
-            _selectedSlotIndex = -1;
-            Post("[선택 취소]", _infoColor);
-        }
-        private void SpawnAuto()
-        {
-            if (_useTowerCommands)
-            {
-                if (string.IsNullOrEmpty(_spawnTowerId))
+                if (TryGetSlotUnderPointer(out var slotIndex))
                 {
-                    Post("[스폰 실패] SpawnTowerId가 비어있습니다.", _warnColor);
+                    if (slotIndex < 0 || slotIndex >= snapshot.Slots.Count)
+                    {
+                        return;
+                    }
+
+                    var slot = snapshot.Slots[slotIndex];
+                    if (slot.IsEmpty)
+                    {
+                        Post($"[드래그 실패] 슬롯 {slotIndex}이 비어있습니다.", _warnColor);
+                        return;
+                    }
+
+                    _dragFromSlotIndex = slotIndex;
+                    _isDragging = true;
+                    Post($"[드래그 시작] 슬롯 {slotIndex}", _selectColor);
+                }
+
+                return;
+            }
+
+            if (_isDragging && WasPointerUp())
+            {
+                var from = _dragFromSlotIndex;
+                _dragFromSlotIndex = -1;
+                _isDragging = false;
+
+                if (!TryGetSlotUnderPointer(out var to))
+                {
+                    Post("[드래그 종료] 슬롯이 선택되지 않았습니다.", _infoColor);
                     return;
                 }
 
-                GameView.SendCommand(new SpawnTowerCommand(GameView.LocalUserId, _spawnTowerId));
-            }
-            else
-            {
-                GameView.SendCommand(new SpawnUnitCommand(GameView.LocalUserId));
+                if (from < 0 || from >= snapshot.Slots.Count || to < 0 || to >= snapshot.Slots.Count)
+                {
+                    Post("[드래그 실패] 슬롯 범위를 벗어났습니다.", _warnColor);
+                    return;
+                }
+
+                if (from == to)
+                {
+                    Post("[드래그 종료] 동일 슬롯입니다.", _infoColor);
+                    return;
+                }
+
+                var fromSlot = snapshot.Slots[from];
+                var toSlot = snapshot.Slots[to];
+
+                if (fromSlot.IsEmpty)
+                {
+                    Post($"[실패] From 슬롯({from})이 비어있습니다.", _warnColor);
+                    return;
+                }
+
+                if (toSlot.IsEmpty)
+                {
+                    if (_useTowerCommands)
+                    {
+                        GameView.SendCommand(new MoveTowerCommand(GameView.LocalUserId, from, to));
+                    }
+                    else
+                    {
+                        Post("[이동] Legacy(Unit) 모드에서는 Move를 지원하지 않습니다.", _warnColor);
+                    }
+
+                    return;
+                }
+
+                if (_useTowerCommands)
+                {
+                    GameView.SendCommand(new MergeTowerCommand(GameView.LocalUserId, from, to));
+                }
+                else
+                {
+                    GameView.SendCommand(new MergeUnitCommand(GameView.LocalUserId, from, to));
+                }
             }
         }
 
@@ -182,29 +229,55 @@ namespace MyProject.MergeGame.Unity
             }
         }
 
+        private bool TryGetSlotUnderPointer(out int slotIndex)
+        {
+            slotIndex = -1;
+
+            var camera = _raycastCamera != null ? _raycastCamera : Camera.main;
+            if (camera == null)
+            {
+                return false;
+            }
+
+            var screenPos = GetPointerPosition();
+            var ray = camera.ScreenPointToRay(screenPos);
+
+            if (!Physics.Raycast(ray, out var hit, 1000f, _slotLayerMask))
+            {
+                return false;
+            }
+
+            var slotView = hit.collider != null
+                ? hit.collider.GetComponentInParent<MergeSlotView>()
+                : null;
+
+            if (slotView == null)
+            {
+                return false;
+            }
+
+            slotIndex = slotView.SlotIndex;
+            return true;
+        }
+
         private static void Post(string message, Color color)
         {
             SystemMessageBus.Publish(message, color);
             Debug.Log(message);
         }
 
-        private bool WasPressedSpawn()
+        private static Vector2 GetPointerPosition()
         {
 #if ENABLE_INPUT_SYSTEM
-            var keyboard = Keyboard.current;
-            return keyboard != null && keyboard.spaceKey.wasPressedThisFrame;
-#else
-            return Input.GetKeyDown(KeyCode.Space);
-#endif
-        }
+            var mouse = Mouse.current;
+            if (mouse == null)
+            {
+                return Vector2.zero;
+            }
 
-        private bool WasPressedStartWave()
-        {
-#if ENABLE_INPUT_SYSTEM
-            var keyboard = Keyboard.current;
-            return keyboard != null && keyboard.wKey.wasPressedThisFrame;
+            return mouse.position.ReadValue();
 #else
-            return Input.GetKeyDown(KeyCode.W);
+            return Input.mousePosition;
 #endif
         }
 
@@ -215,6 +288,26 @@ namespace MyProject.MergeGame.Unity
             return keyboard != null && keyboard.escapeKey.wasPressedThisFrame;
 #else
             return Input.GetKeyDown(KeyCode.Escape);
+#endif
+        }
+
+        private static bool WasPointerDown()
+        {
+#if ENABLE_INPUT_SYSTEM
+            var mouse = Mouse.current;
+            return mouse != null && mouse.leftButton.wasPressedThisFrame;
+#else
+            return Input.GetMouseButtonDown(0);
+#endif
+        }
+
+        private static bool WasPointerUp()
+        {
+#if ENABLE_INPUT_SYSTEM
+            var mouse = Mouse.current;
+            return mouse != null && mouse.leftButton.wasReleasedThisFrame;
+#else
+            return Input.GetMouseButtonUp(0);
 #endif
         }
 
@@ -252,5 +345,3 @@ namespace MyProject.MergeGame.Unity
         }
     }
 }
-
-

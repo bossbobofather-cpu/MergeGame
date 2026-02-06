@@ -1,29 +1,29 @@
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// ?�겟팅 ?�략 ?�?�입?�다.
+    /// 주석 정리
     /// </summary>
     public enum TargetingStrategyType
     {
-        /// <summary>?�략 ?�음</summary>
+        /// 주석 정리
         None,
 
-        /// <summary>?�기 ?�신</summary>
+        /// 주석 정리
         Self,
 
-        /// <summary>?�덤 ??/summary>
+        /// 주석 정리
         Random,
 
-        /// <summary>가??가까운 ??(maxRange ?�용)</summary>
+        /// 주석 정리
         NearestEnemy,
 
-        /// <summary>가??가까운 N�?(maxTargets, maxRange ?�용)</summary>
+        /// 주석 정리
         NearestN,
 
-        /// <summary>체력 가????? ??/summary>
+        /// 주석 정리
         LowestHp,
 
-        /// <summary>범위 ??모든 ??(radius ?�용)</summary>
+        /// 주석 정리
         Area,
     }
 }

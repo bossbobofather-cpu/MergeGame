@@ -1,7 +1,7 @@
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// ?€κ²?? μ • ?„λµ ?Έν„°?μ΄?¤μ…?λ‹¤.
+    /// μ£Όμ„ μ •λ¦¬
     /// </summary>
     public interface ITargetingStrategy
     {

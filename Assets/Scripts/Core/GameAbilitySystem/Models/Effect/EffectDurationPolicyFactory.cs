@@ -1,12 +1,12 @@
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// ?¨ê³¼ ì§€?ì‹œê°??•ì±… ?©í† ë¦¬ì…?ˆë‹¤.
+    /// ì£¼ì„ ì •ë¦¬
     /// </summary>
     public static class EffectDurationPolicyFactory
     {
         /// <summary>
-        /// enum ?€?…ìœ¼ë¡??•ì±… ?¸ìŠ¤?´ìŠ¤ë¥??ì„±?©ë‹ˆ??
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public static IEffectDurationPolicy Create(EffectDurationPolicyType type)
         {
@@ -18,7 +18,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ë¬¸ì???€?…ëª…?¼ë¡œ ?•ì±… ?¸ìŠ¤?´ìŠ¤ë¥??ì„±?©ë‹ˆ?? (JSON ??§?¬í™”??
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public static IEffectDurationPolicy Create(string typeName)
         {
@@ -32,7 +32,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?•ì±… ?¸ìŠ¤?´ìŠ¤?ì„œ ?€??enum??ë°˜í™˜?©ë‹ˆ??
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public static EffectDurationPolicyType GetPolicyType(IEffectDurationPolicy policy)
         {
@@ -44,7 +44,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?•ì±… ?¸ìŠ¤?´ìŠ¤?ì„œ ?€?…ëª… ë¬¸ì?´ì„ ë°˜í™˜?©ë‹ˆ?? (JSON ì§ë ¬?”ìš©)
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public static string GetTypeName(IEffectDurationPolicy policy)
         {

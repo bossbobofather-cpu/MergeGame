@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using MyProject.Common.Bootstrap;
 using MyProject.MergeGame.Modules;
@@ -8,8 +8,8 @@ using UnityEngine;
 namespace MyProject.MergeGame.Unity
 {
     /// <summary>
-    /// MergeGame 실행 진입점입니다.
-    /// Host를 조립/초기화한 뒤 MergeGameView를 생성해 Host를 주입합니다.
+    /// MergeGame 부트스트래퍼입니다.
+    /// Host를 생성/초기화한 뒤 MergeGameView를 생성하고 Host를 주입합니다.
     /// </summary>
     public class MergeGameBootstrapper : BootstrapperBase
     {
@@ -29,11 +29,11 @@ namespace MyProject.MergeGame.Unity
         {
             if (_gameViewPrefab == null)
             {
-                Debug.LogError("[MergeGameBootstrapper] GameView Prefab이 설정되지 않았습니다.");
+                Debug.LogError("[MergeGameBootstrapper] GameView Prefab이 할당되지 않았습니다.");
                 return;
             }
 
-            // Host 조립: StartSimulation 이전에 모듈 구성/초기화를 끝내야 합니다.
+            // Host 생성: StartSimulation 전에 모듈을 등록/초기화합니다.
             var hostConfig = _config ?? new MergeHostConfig();
             var host = new MergeGameHost(hostConfig, new DevTowerDatabase());
 
@@ -56,7 +56,7 @@ namespace MyProject.MergeGame.Unity
 
             _gameViewInstance = instance;
 
-            // 프리팹/씬 설정이 아직 없더라도, 프로토타입이 최소 동작하도록 기본 모듈을 자동 추가합니다.
+            // 기본 뷰 모듈을 자동으로 구성합니다.
             EnsureViewModules(_gameViewInstance);
 
             _gameViewInstance.Initialize(host);
@@ -72,6 +72,7 @@ namespace MyProject.MergeGame.Unity
             EnsureModule<MapViewModule>(view, "MapViewModule");
             EnsureModule<TowerViewModule>(view, "TowerViewModule");
             EnsureModule<MonsterViewModule>(view, "MonsterViewModule");
+            EnsureModule<ProjectileViewModule>(view, "ProjectileViewModule");
             EnsureModule<HudViewModule>(view, "HudViewModule");
             EnsureModule<InputViewModule>(view, "InputViewModule");
         }
@@ -100,12 +101,12 @@ namespace MyProject.MergeGame.Unity
                 {
                     new PathDefinition(
                         pathIndex: 0,
-                        waypoints: new List<Point2D>
+                        waypoints: new List<Point3D>
                         {
-                            new Point2D(-6f, 3f),
-                            new Point2D(-2f, 3f),
-                            new Point2D( 2f, 3f),
-                            new Point2D( 6f, 3f)
+                            new Point3D(-6f, 3f, 0f),
+                            new Point3D(-2f, 3f, 0f),
+                            new Point3D( 2f, 3f, 0f),
+                            new Point3D( 6f, 3f, 0f)
                         }
                     )
                 }
@@ -114,7 +115,7 @@ namespace MyProject.MergeGame.Unity
 
         private static RuleModuleConfig BuildRuleConfig(MergeHostConfig hostConfig)
         {
-            // Host의 기본 설정을 RuleModuleConfig에 반영합니다.
+            // Host 기본 설정을 RuleModuleConfig에 반영합니다.
             return new RuleModuleConfig
             {
                 PlayerMaxHp = hostConfig.PlayerMaxHp,
@@ -128,7 +129,7 @@ namespace MyProject.MergeGame.Unity
 
         private static WaveModuleConfig BuildWaveConfig(MergeHostConfig hostConfig)
         {
-            // 프로토타입: 자동 웨이브 + 기본 몬스터 스폰
+            // 프로토타입용: 기본 웨이브 테이블 + 기본 증가값
             return new WaveModuleConfig
             {
                 AutoStartWaves = true,
@@ -142,8 +143,8 @@ namespace MyProject.MergeGame.Unity
         }
 
         /// <summary>
-        /// 개발용 하드코딩 캐릭터 DB입니다.
-        /// 이후 SO/JSON/서버로 교체할 수 있도록 인터페이스로 한 겹 감쌌습니다.
+        /// 프로토타입용 하드코딩 타워 DB입니다.
+        /// 나중에 SO/JSON/서버 데이터로 교체할 수 있도록 인터페이스로 분리합니다.
         /// </summary>
         private sealed class DevTowerDatabase : ITowerDatabase
         {
@@ -159,6 +160,10 @@ namespace MyProject.MergeGame.Unity
                         BaseAttackDamage = 10f,
                         BaseAttackSpeed = 1f,
                         BaseAttackRange = 10f,
+                        AttackType = TowerAttackType.HitScan,
+                        ProjectileType = ProjectileType.Direct,
+                        ProjectileSpeed = 8f,
+                        ThrowRadius = 1.5f,
                     }
                 },
             };
@@ -175,10 +180,11 @@ namespace MyProject.MergeGame.Unity
 
             public string GetRandomIdForGrade(int grade)
             {
-                // 프로토타입: 등급에 따라 별도 캐릭터를 쓰지 않고 동일 ID를 반환합니다.
+                // 프로토타입에서는 기본 ID를 반환합니다.
                 return "unit_basic";
             }
         }
     }
 }
+
 

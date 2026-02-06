@@ -3,37 +3,37 @@ using System;
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// ?�성 ?�정???�의?�니??
+    /// 주석 정리
     /// </summary>
     [Serializable]
     public struct AttributeModifier
     {
         /// <summary>
-        /// �?계산 방식?�니??
+        /// 주석 정리
         /// </summary>
         public AttributeModifierValueMode ValueMode;
 
-        // ===== Static 모드 ?�드 =====
+        // 주석 정리
 
         /// <summary>
-        /// ?�정???�???�성 Id?�니?? (Static 모드?�서 ?�용)
+        /// 주석 정리
         /// </summary>
         public AttributeId AttributeId;
 
         /// <summary>
-        /// ?�용 ?�산?�니?? (Static 모드?�서 ?�용)
+        /// 주석 정리
         /// </summary>
         public AttributeModifierOperationType Operation;
 
         /// <summary>
-        /// ?�적 ?�기 값입?�다. (Static 모드?�서 ?�용)
+        /// 주석 정리
         /// </summary>
         public float Magnitude;
 
-        // ===== Calculated 모드 ?�드 =====
+        // 주석 정리
 
         /// <summary>
-        /// ?�성 계산�??�?�입?�다. (Calculated 모드?�서 ?�용)
+        /// 주석 정리
         /// </summary>
         public AttributeCalculatorType CalculatorType;
     }

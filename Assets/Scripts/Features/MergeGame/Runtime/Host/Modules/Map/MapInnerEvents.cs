@@ -1,4 +1,4 @@
-using Noname.GameAbilitySystem;
+﻿using Noname.GameAbilitySystem;
 using Noname.GameHost.Module;
 
 namespace MyProject.MergeGame.Modules
@@ -25,7 +25,7 @@ namespace MyProject.MergeGame.Modules
     public sealed class SlotPositionRequestInnerEvent : InnerEventBase
     {
         public int SlotIndex { get; }
-        public Point2D Position { get; set; }
+        public Point3D Position { get; set; }
 
         public SlotPositionRequestInnerEvent(long tick, int slotIndex)
             : base(tick)
@@ -62,3 +62,4 @@ namespace MyProject.MergeGame.Modules
         }
     }
 }
+

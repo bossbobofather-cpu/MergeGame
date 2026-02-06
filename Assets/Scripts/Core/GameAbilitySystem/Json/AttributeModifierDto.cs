@@ -3,37 +3,37 @@ using System;
 namespace Noname.GameAbilitySystem.Json
 {
     /// <summary>
-    /// ?�성 ?�정??JSON DTO
+    /// 주석 정리
     /// </summary>
     [Serializable]
     public class AttributeModifierDto
     {
         /// <summary>
-        /// �?계산 방식 ("Static", "Calculated")
+        /// 주석 정리
         /// </summary>
         public string ValueMode;
 
-        // ===== Static 모드 ?�드 =====
+        // 주석 정리
 
         /// <summary>
-        /// ?�???�성 ID (Static 모드)
+        /// 주석 정리
         /// </summary>
         public string AttributeId;
 
         /// <summary>
-        /// ?�용 ?�산 ("Add", "Multiply", "Override") (Static 모드)
+        /// 주석 정리
         /// </summary>
         public string Operation;
 
         /// <summary>
-        /// ?�적 �?(Static 모드)
+        /// 주석 정리
         /// </summary>
         public float Magnitude;
 
-        // ===== Calculated 모드 ?�드 =====
+        // 주석 정리
 
         /// <summary>
-        /// 계산�??�??("HealByTargetMaxHealthPercent", "HealBySourceMaxHealthPercent", "FullHeal")
+        /// 주석 정리
         /// </summary>
         public AttributeCalculatorType CalculatorType;
     }

@@ -1,38 +1,38 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// ?�겟팅 결과�??�는 ?�이?�입?�다.
+    /// 타겟팅 결과를 담는 컨테이너입니다.
     /// </summary>
     public sealed class TargetData
     {
         private readonly HashSet<AbilitySystemComponent> _targetSet = new();
         private readonly List<AbilitySystemComponent> _targets = new();
 
-        public TargetData(AbilitySystemComponent source, Point2D? hitLocation = null)
+        public TargetData(AbilitySystemComponent source, Point3D? hitLocation = null)
         {
             Source = source;
             HitLocation = hitLocation;
         }
 
         /// <summary>
-        /// ?�겟팅???�행??주체?�니??
+        /// 타겟팅 기준이 되는 소스입니다.
         /// </summary>
         public AbilitySystemComponent Source { get; }
 
         /// <summary>
-        /// ?��?목록?�니??
+        /// 선택된 타겟 목록입니다.
         /// </summary>
         public IReadOnlyList<AbilitySystemComponent> Targets => _targets;
 
         /// <summary>
-        /// 범위 공격 ?�에???�용??기�? ?�치?�니??
+        /// 범위 공격 등의 충돌 지점입니다.
         /// </summary>
-        public Point2D? HitLocation { get; }
+        public Point3D? HitLocation { get; }
 
         /// <summary>
-        /// ?�겟을 추�??�니??
+        /// 타겟을 추가합니다. 중복은 무시됩니다.
         /// </summary>
         public void AddTarget(AbilitySystemComponent target)
         {
@@ -48,4 +48,3 @@ namespace Noname.GameAbilitySystem
         }
     }
 }
-

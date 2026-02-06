@@ -1,12 +1,12 @@
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// ?ì„± ê³„ì‚°ê¸??©í† ë¦¬ì…?ˆë‹¤.
+    /// ì£¼ì„ ì •ë¦¬
     /// </summary>
     public static class AttributeCalculatorFactory
     {
         /// <summary>
-        /// ê³„ì‚°ê¸??€?…ì— ?´ë‹¹?˜ëŠ” ?¸ìŠ¤?´ìŠ¤ë¥?ë°˜í™˜?©ë‹ˆ??
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public static IAttributeCalculator Create(AttributeCalculatorType type)
         {
@@ -20,7 +20,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ë¬¸ì???€?…ëª…?¼ë¡œ ê³„ì‚°ê¸??¸ìŠ¤?´ìŠ¤ë¥?ë°˜í™˜?©ë‹ˆ?? (JSON ??§?¬í™”??
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public static IAttributeCalculator Create(string typeName)
         {
@@ -36,7 +36,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ê³„ì‚°ê¸??¸ìŠ¤?´ìŠ¤???€?…ëª…??ë°˜í™˜?©ë‹ˆ?? (JSON ì§ë ¬?”ìš©)
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public static string GetTypeName(IAttributeCalculator calculator)
         {

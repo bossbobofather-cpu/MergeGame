@@ -4,17 +4,17 @@ using UnityEngine;
 namespace MyProject.Common.UI
 {
     /// <summary>
-    /// ?쒖뒪??硫붿떆吏 ?꾨떖???꾪븳 ?뺤쟻 ?대깽??踰꾩뒪?낅땲??
+    /// 시스템 메시지 전달을 위한 정적 이벤트 버스입니다.
     /// </summary>
     public static class SystemMessageBus
     {
         /// <summary>
-        /// 硫붿떆吏媛 諛쒗뻾?섏뿀????諛쒖깮?섎뒗 ?대깽?몄엯?덈떎.
+        /// 메시지가 발행될 때 발생하는 이벤트입니다.
         /// </summary>
         public static event Action<SystemMessage> MessagePublished;
 
         /// <summary>
-        /// 硫붿떆吏瑜?諛쒗뻾?⑸땲??(湲곕낯 ?됱긽).
+        /// 메시지를 발행합니다. (기본 배경색)
         /// </summary>
         public static void Publish(string message)
         {
@@ -22,7 +22,7 @@ namespace MyProject.Common.UI
         }
 
         /// <summary>
-        /// 硫붿떆吏瑜?諛쒗뻾?⑸땲??(?됱긽 吏??.
+        /// 메시지를 발행합니다. (배경색 지정)
         /// </summary>
         public static void Publish(string message, Color backgroundColor)
         {
@@ -40,20 +40,18 @@ namespace MyProject.Common.UI
     }
 
     /// <summary>
-    /// ?쒖뒪??硫붿떆吏 ?곗씠?곗엯?덈떎.
+    /// 시스템 메시지 데이터입니다.
     /// </summary>
     public struct SystemMessage
     {
         /// <summary>
-        /// 硫붿떆吏 ?띿뒪?몄엯?덈떎.
+        /// 메시지 텍스트입니다.
         /// </summary>
         public string Text;
 
         /// <summary>
-        /// 諛곌꼍 ?됱긽?낅땲??
+        /// 배경 색상입니다.
         /// </summary>
         public Color BackgroundColor;
     }
 }
-
-

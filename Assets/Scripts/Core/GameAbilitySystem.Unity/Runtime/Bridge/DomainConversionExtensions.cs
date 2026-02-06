@@ -5,12 +5,12 @@ using Noname.GameAbilitySystem;
 namespace Noname.GameCore.Helper
 {
     /// <summary>
-    /// Domain ?덉씠?댁? Presentation ?덉씠??媛?蹂?섏쓣 ?꾪븳 ?뺤옣 硫붿꽌?쒖엯?덈떎.
+    /// Domain과 Presentation 간 변환을 위한 확장 메서드입니다.
     /// </summary>
     public static class DomainConversionExtensions
     {
         /// <summary>
-        /// Unity GameplayTagContainer瑜?Domain GameplayTagContainerModel濡?蹂?섑빀?덈떎.
+        /// Unity GameplayTagContainer를 Domain GameplayTagContainer로 변환합니다.
         /// </summary>
         public static GameplayTagContainer ToDomain(this GameplayTagContainerView container)
         {
@@ -41,7 +41,7 @@ namespace Noname.GameCore.Helper
         }
 
         /// <summary>
-        /// List<AttributeDefinition>??Domain AttributeSet 蹂?섑빀?덈떎.
+        /// List<AttributeConfig>를 Domain AttributeSet으로 변환합니다.
         /// </summary>
         public static AttributeSet ToDomain(this List<AttributeConfig> definitions)
         {
@@ -97,7 +97,7 @@ namespace Noname.GameCore.Helper
         }
 
         /// <summary>
-        /// GameplayEffectConfig瑜?Domain GameplayEffect 蹂?섑빀?덈떎.
+        /// GameplayEffectConfig를 Domain GameplayEffect로 변환합니다.
         /// </summary>
         public static GameplayEffect ToDomain(this GameplayEffectConfig config)
         {
@@ -122,7 +122,7 @@ namespace Noname.GameCore.Helper
         }
 
         /// <summary>
-        /// GameplayEffectConfig瑜?Domain GameplayEffect 蹂?섑빀?덈떎.
+        /// GameplayEffectConfig 목록을 Domain GameplayEffect 목록으로 변환합니다.
         /// </summary>
         public static List<GameplayEffect> ToDomain(this List<GameplayEffectConfig> config)
         {
@@ -164,4 +164,3 @@ namespace Noname.GameCore.Helper
         }
     }
 }
-

@@ -1,31 +1,32 @@
-namespace Noname.GameAbilitySystem
+ï»¿namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// ?„ë©”?¸ì—???¬ìš©?˜ëŠ” ì¢Œí‘œ ?°ì´?°ì…?ˆë‹¤.
-    /// Unity ?˜ì¡´???†ì´ ?„ì¹˜ë¥??œí˜„?©ë‹ˆ??
+    /// 3ì°¨ì› ì¢Œí‘œë¥¼ í‘œí˜„í•©ë‹ˆë‹¤.
     /// </summary>
-    public readonly struct Point2D
+    public readonly struct Point3D
     {
-        private static Point2D zeroVector = new(0f, 0f);
-
+        private static Point3D zeroVector = new(0f, 0f, 0f);
 
         public float X { get; }
         public float Y { get; }
+        public float Z { get; }
 
-        public Point2D(float x, float y)
+        public Point3D(float x, float y, float z)
         {
             X = x;
             Y = y;
+            Z = z;
         }
 
-        public static float DistanceSquared(in Point2D a, in Point2D b)
+        public static float DistanceSquared(in Point3D a, in Point3D b)
         {
             var dx = a.X - b.X;
             var dy = a.Y - b.Y;
-            return dx * dx + dy * dy;
+            var dz = a.Z - b.Z;
+            return dx * dx + dy * dy + dz * dz;
         }
 
-        public static Point2D zero
+        public static Point3D zero
         {
             get
             {
@@ -34,4 +35,3 @@ namespace Noname.GameAbilitySystem
         }
     }
 }
-

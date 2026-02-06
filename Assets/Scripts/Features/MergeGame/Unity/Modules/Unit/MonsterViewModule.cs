@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace MyProject.MergeGame.Unity
@@ -20,6 +20,24 @@ namespace MyProject.MergeGame.Unity
         private readonly Dictionary<long, GameObject> _monsterObjects = new();
         private readonly HashSet<long> _seen = new();
         private readonly List<long> _removeBuffer = new();
+
+        public override void OnHostEvent(MergeHostEvent evt)
+        {
+            switch (evt)
+            {
+                case MonsterSpawnedEvent spawned:
+                    EnsureMonsterFromEvent(spawned);
+                    break;
+
+                case MonsterMovedEvent moved:
+                    HandleMonsterMoved(moved);
+                    break;
+
+                case MonsterDiedEvent died:
+                    RemoveMonster(died.MonsterUid);
+                    break;
+            }
+        }
 
         public override void OnSnapshotUpdated(MergeHostSnapshot snapshot)
         {
@@ -43,12 +61,12 @@ namespace MyProject.MergeGame.Unity
 
                 if (!_monsterObjects.TryGetValue(m.Uid, out var obj) || obj == null)
                 {
-                    obj = CreateMonsterObject(m);
+                    obj = CreateMonsterObject();
                     _monsterObjects[m.Uid] = obj;
+                    InitializeMonsterObject(obj);
                 }
 
-                obj.transform.localPosition = new Vector3(m.PositionX, m.PositionY, 0f);
-                obj.transform.localScale = _monsterScale;
+                obj.transform.localPosition = new Vector3(m.PositionX, m.PositionY, m.PositionZ);
                 obj.name = $"Monster_{m.Uid}";
 
                 // 몬스터는 HP 비율로 색을 살짝 바꿉니다.
@@ -56,6 +74,41 @@ namespace MyProject.MergeGame.Unity
             }
 
             RemoveNotSeen(_monsterObjects);
+        }
+
+        private void EnsureMonsterFromEvent(MonsterSpawnedEvent evt)
+        {
+            if (evt == null)
+            {
+                return;
+            }
+
+            if (_monsterObjects.TryGetValue(evt.MonsterUid, out var obj) && obj != null)
+            {
+                return;
+            }
+
+            obj = CreateMonsterObject();
+            _monsterObjects[evt.MonsterUid] = obj;
+            InitializeMonsterObject(obj);
+
+            obj.transform.localPosition = new Vector3(evt.PositionX, evt.PositionY, evt.PositionZ);
+            obj.name = $"Monster_{evt.MonsterUid}";
+        }
+
+        private void HandleMonsterMoved(MonsterMovedEvent evt)
+        {
+            if (evt == null)
+            {
+                return;
+            }
+
+            if (_monsterObjects.TryGetValue(evt.MonsterUid, out var obj) && obj != null)
+            {
+                var state = obj.GetComponent<MonsterViewState>() ?? obj.AddComponent<MonsterViewState>();
+                state.SetBaseScale(_monsterScale);
+                state.MarkMoving();
+            }
         }
 
         private void RemoveNotSeen(Dictionary<long, GameObject> dict)
@@ -82,7 +135,7 @@ namespace MyProject.MergeGame.Unity
             }
         }
 
-        private GameObject CreateMonsterObject(MonsterSnapshot snapshot)
+        private GameObject CreateMonsterObject()
         {
             if (_monsterPrefab != null)
             {
@@ -99,6 +152,29 @@ namespace MyProject.MergeGame.Unity
             var obj = new GameObject("Monster");
             obj.transform.SetParent(transform, false);
             return obj;
+        }
+
+        private void InitializeMonsterObject(GameObject obj)
+        {
+            if (obj == null)
+            {
+                return;
+            }
+
+            obj.transform.localScale = _monsterScale;
+
+            var state = obj.GetComponent<MonsterViewState>() ?? obj.AddComponent<MonsterViewState>();
+            state.SetBaseScale(_monsterScale);
+        }
+
+        private void RemoveMonster(long uid)
+        {
+            if (_monsterObjects.TryGetValue(uid, out var obj) && obj != null)
+            {
+                Destroy(obj);
+            }
+
+            _monsterObjects.Remove(uid);
         }
 
         private static void ApplyMonsterHpTint(GameObject obj, float hpRatio)

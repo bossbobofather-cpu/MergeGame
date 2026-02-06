@@ -1,19 +1,19 @@
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// ?�과 지?�시�??�책 ?�?�입?�다.
+    /// 주석 정리
     /// </summary>
     public enum EffectDurationPolicyType
     {
-        /// <summary>?�책 ?�음 (기본 Duration ?�용)</summary>
+        /// 주석 정리
         None,
 
-        /// <summary>공격 ?�도 기반 쿨다??계산</summary>
+        /// 주석 정리
         BaseAttackCooldown,
 
-        // ?�후 추�? 가??
-        // CooldownReduction,    // 쿨다??감소 ?�용
-        // SkillHaste,           // ?�킬 가???�용
+        // 주석 정리
+        // 주석 정리
+        // 주석 정리
     }
 }
 

@@ -9,7 +9,7 @@ using UnityEngine;
 namespace Noname.GameCore.Helper.Editor
 {
     /// <summary>
-    /// GameplayAbilityConfig/EffectConfig瑜?JSON?쇰줈 ?대낫?대뒗 ?먮뵒???꾧뎄
+    /// GameplayAbilityConfig/EffectConfig를 JSON으로 내보내는 에디터 도구입니다.
     /// </summary>
     public static class GameplayConfigExporter
     {
@@ -112,7 +112,7 @@ namespace Noname.GameCore.Helper.Editor
         #region Conversion Methods
 
         /// <summary>
-        /// GameplayAbilityConfig ??GameplayAbilityDto 蹂??
+        /// GameplayAbilityConfig -> GameplayAbilityDto 변환
         /// </summary>
         public static GameplayAbilityDto ConvertToDto(GameplayAbilityConfig config)
         {
@@ -133,7 +133,7 @@ namespace Noname.GameCore.Helper.Editor
         }
 
         /// <summary>
-        /// GameplayEffectConfig ??GameplayEffectDto 蹂??
+        /// GameplayEffectConfig -> GameplayEffectDto 변환
         /// </summary>
         public static GameplayEffectDto ConvertToDto(this GameplayEffectConfig config)
         {
@@ -157,7 +157,7 @@ namespace Noname.GameCore.Helper.Editor
         }
 
         /// <summary>
-        /// EffectDurationPolicyType ??DurationPolicyDto 蹂??
+        /// EffectDurationPolicyType -> DurationPolicyDto 변환
         /// </summary>
         private static DurationPolicyDto ConvertToDTO(this EffectDurationPolicyType policyType)
         {
@@ -170,7 +170,7 @@ namespace Noname.GameCore.Helper.Editor
         }
 
         /// <summary>
-        /// GameplayAbilityConfig???寃잜똿 ?꾨왂 ??TargetingStrategyDto 蹂??
+        /// GameplayAbilityConfig의 타겟팅 옵션 -> TargetingStrategyDto 변환
         /// </summary>
         public static TargetingStrategyDto ConvertTargetingToDTO(this GameplayAbilityConfig config)
         {
@@ -268,4 +268,3 @@ namespace Noname.GameCore.Helper.Editor
         #endregion
     }
 }
-

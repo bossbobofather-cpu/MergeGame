@@ -1,7 +1,7 @@
 namespace Noname.GameAbilitySystem.Json
 {
     /// <summary>
-    /// °ÔÀÓ µ¥ÀÌÅÍ JSON Á÷·ÄÈ­ ÀÎÅÍÆäÀÌ½º.
+    /// ì£¼ì„ ì •ë¦¬
     /// </summary>
     public interface IGameplayJsonSerializer
     {

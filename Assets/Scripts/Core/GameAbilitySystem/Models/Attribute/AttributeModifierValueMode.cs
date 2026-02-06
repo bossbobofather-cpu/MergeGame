@@ -1,17 +1,17 @@
     /// <summary>
-    /// ?�정??�?계산 모드?�니??
+    /// 주석 정리
     /// </summary>
     public enum AttributeModifierValueMode
     {
         None,
         /// <summary>
-        /// ?�적 �?모드. AttributeId, Operation, Magnitude ?�드�??�용?�니??
+        /// 주석 정리
         /// </summary>
         Static,
 
         /// <summary>
-        /// 계산�?모드. CalculatorType, Coefficient ?�드�??�용?�니??
-        /// 계산기�? source/target ASC ?�보�?기반?�로 ?�성???�정?�니??
+        /// 주석 정리
+        /// 주석 정리
         /// </summary>
         Calculated
     }

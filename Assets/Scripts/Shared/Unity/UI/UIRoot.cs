@@ -3,7 +3,7 @@
 namespace MyProject.Common.UI
 {
     /// <summary>
-    /// UGUI 猷⑦듃 ?꾨━?뱀쓽 湲곕낯 援ъ꽦 ?붿냼瑜?愿由ы빀?덈떎.
+    /// UGUI 루트 오브젝트의 기본 구성 요소를 관리합니다.
     /// </summary>
     public sealed class UIRoot : MonoBehaviour
     {
@@ -26,37 +26,37 @@ namespace MyProject.Common.UI
         [SerializeField] private int _systemOrder = 200;
 
         /// <summary>
-        /// UI ?꾩슜 移대찓?쇱엯?덈떎.
+        /// UI 전용 카메라입니다.
         /// </summary>
         public Camera UICamera => _uiCamera;
 
         /// <summary>
-        /// ?섏씠吏 罹붾쾭?ㅼ엯?덈떎.
+        /// 페이지 캔버스입니다.
         /// </summary>
         public Canvas PageCanvas => _pageCanvas;
 
         /// <summary>
-        /// ?앹뾽 罹붾쾭?ㅼ엯?덈떎.
+        /// 팝업 캔버스입니다.
         /// </summary>
         public Canvas PopupCanvas => _popupCanvas;
 
         /// <summary>
-        /// ?쒖뒪??罹붾쾭?ㅼ엯?덈떎.
+        /// 시스템 캔버스입니다.
         /// </summary>
         public Canvas SystemCanvas => _systemCanvas;
 
         /// <summary>
-        /// ?섏씠吏 猷⑦듃?낅땲??
+        /// 페이지 루트입니다.
         /// </summary>
         public RectTransform PageRoot => _pageRoot;
 
         /// <summary>
-        /// ?앹뾽 猷⑦듃?낅땲??
+        /// 팝업 루트입니다.
         /// </summary>
         public RectTransform PopupRoot => _popupRoot;
 
         /// <summary>
-        /// ?쒖뒪??猷⑦듃?낅땲??
+        /// 시스템 루트입니다.
         /// </summary>
         public RectTransform SystemRoot => _systemRoot;
 
@@ -116,5 +116,3 @@ namespace MyProject.Common.UI
         }
     }
 }
-
-

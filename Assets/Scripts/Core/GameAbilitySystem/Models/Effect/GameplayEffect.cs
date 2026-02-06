@@ -4,63 +4,63 @@ using System.Collections.Generic;
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// 게임?�레???�과 ?�정?�니??(?�수 C# 모델).
+    /// 주석 정리
     /// </summary>
     [Serializable]
     public class GameplayEffect
     {
         /// <summary>
-        /// ?�과 ID?�니??
+        /// 주석 정리
         /// </summary>
         public string EffectId { get; set; }
 
         /// <summary>
-        /// ?�시 ?�름?�니??
+        /// 주석 정리
         /// </summary>
         public string DisplayName { get; set; }
 
         /// <summary>
-        /// ?�명?�니??
+        /// 주석 정리
         /// </summary>
         public string Description { get; set; }
 
         /// <summary>
-        /// 지???�?�입?�다.
+        /// 주석 정리
         /// </summary>
         public EffectDurationType DurationType { get; set; }
 
         /// <summary>
-        /// 지???�간?�니??(�?.
+        /// 주석 정리
         /// </summary>
         public float Duration { get; set; }
 
         /// <summary>
-        /// 주기 ?�간?�니??(�?.
+        /// 주석 정리
         /// </summary>
         public float Period { get; set; }
 
         /// <summary>
-        /// 최�? ?�택 ?�입?�다.
+        /// 주석 정리
         /// </summary>
         public int MaxStack { get; set; }
 
         /// <summary>
-        /// ?�정??그룹 목록?�니??
+        /// 주석 정리
         /// </summary>
         public List<AttributeModifier> Modifiers { get; set; }
 
         /// <summary>
-        /// 부?�되???�그 목록?�니??
+        /// 주석 정리
         /// </summary>
         public GameplayTagContainer GrantedTags { get; set; }
 
         /// <summary>
-        /// ?�용 ?�수 ?�그 목록?�니??
+        /// 주석 정리
         /// </summary>
         public GameplayTagContainer RequiredTags { get; set; }
 
         /// <summary>
-        /// ?�용 차단 ?�그 목록?�니??
+        /// 주석 정리
         /// </summary>
         public GameplayTagContainer BlockedTags { get; set; }
 

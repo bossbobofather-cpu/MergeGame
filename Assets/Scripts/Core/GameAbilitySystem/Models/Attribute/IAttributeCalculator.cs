@@ -1,16 +1,16 @@
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// ?�성 계산�??�터?�이?�입?�다.
-    /// source?� target??ASC ?�보�?기반?�로 ?�성 값을 계산?�고 ?�용?�니??
+    /// 주석 정리
+    /// 주석 정리
     /// </summary>
     public interface IAttributeCalculator
     {
         /// <summary>
-        /// ?�성 값을 계산?�고 ?�용?�니??
+        /// 주석 정리
         /// </summary>
-        /// <param name="source">?�과 ?�전?�의 ASC (null?????�음)</param>
-        /// <param name="target">?�과 ?�?�의 ASC</param>
+        /// 주석 정리
+        /// 주석 정리
         void Apply(AbilitySystemComponent source, AbilitySystemComponent target);
     }
 }

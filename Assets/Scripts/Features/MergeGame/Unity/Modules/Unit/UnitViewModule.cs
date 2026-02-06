@@ -52,7 +52,7 @@ namespace MyProject.MergeGame.Unity
                 }
 
                 // 좌표계는 Host/Map과 동일한 로컬 좌표계를 가정합니다.
-                obj.transform.localPosition = new Vector3(ch.PositionX, ch.PositionY, 0f);
+                obj.transform.localPosition = new Vector3(ch.PositionX, ch.PositionY, ch.PositionZ);
                 obj.transform.localScale = _towerScale;
                 obj.name = $"Tower_{ch.Uid}_G{ch.Grade}";
 
@@ -78,7 +78,7 @@ namespace MyProject.MergeGame.Unity
                     _monsterObjects[m.Uid] = obj;
                 }
 
-                obj.transform.localPosition = new Vector3(m.PositionX, m.PositionY, 0f);
+                obj.transform.localPosition = new Vector3(m.PositionX, m.PositionY, m.PositionZ);
                 obj.transform.localScale = _monsterScale;
                 obj.name = $"Monster_{m.Uid}";
 
@@ -216,4 +216,5 @@ namespace MyProject.MergeGame.Unity
         }
     }
 }
+
 

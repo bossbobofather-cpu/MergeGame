@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Noname.GameCore.Helper
 {
     /// <summary>
-    /// Unity?먯꽌 ?몄쭛 媛?ν븳 ?띿꽦 ?섏젙??酉곗엯?덈떎.
+    /// Unity에서 사용 가능한 속성 수정자 뷰입니다.
     /// </summary>
     [Serializable]
     public struct AttributeModifierView : IEquatable<AttributeModifierView>
@@ -21,32 +21,32 @@ namespace Noname.GameCore.Helper
         [SerializeField] private AttributeCalculatorType _calculatorType;
 
         /// <summary>
-        /// 媛?怨꾩궛 諛⑹떇?낅땲??
+        /// 값 계산 방식입니다.
         /// </summary>
         public AttributeModifierValueMode ValueMode => _valueMode;
 
         /// <summary>
-        /// ?섏젙??????띿꽦 Id?낅땲?? (Static 紐⑤뱶?먯꽌 ?ъ슜)
+        /// 수정할 속성 Id입니다. (Static 모드에서 사용)
         /// </summary>
         public string AttributeId => _attributeId;
 
         /// <summary>
-        /// ?곸슜 ?곗궛?낅땲?? (Static 紐⑤뱶?먯꽌 ?ъ슜)
+        /// 적용 연산입니다. (Static 모드에서 사용)
         /// </summary>
         public AttributeModifierOperationType Operation => _operation;
 
         /// <summary>
-        /// ?뺤쟻 ?ш린 媛믪엯?덈떎. (Static 紐⑤뱶?먯꽌 ?ъ슜)
+        /// 정적 값입니다. (Static 모드에서 사용)
         /// </summary>
         public float Magnitude => _magnitude;
 
         /// <summary>
-        /// ?띿꽦 怨꾩궛湲???낆엯?덈떎. (Calculated 紐⑤뱶?먯꽌 ?ъ슜)
+        /// 속성 계산기 타입입니다. (Calculated 모드에서 사용)
         /// </summary>
         public AttributeCalculatorType CalculatorType => _calculatorType;
 
         /// <summary>
-        /// ?숈씪 ?щ?瑜?鍮꾧탳?⑸땲??
+        /// 동일한 수정자인지 비교합니다.
         /// </summary>
         public bool Equals(AttributeModifierView other)
         {
@@ -58,7 +58,7 @@ namespace Noname.GameCore.Helper
         }
 
         /// <summary>
-        /// ?숈씪 ?щ?瑜?鍮꾧탳?⑸땲??
+        /// 동일한 수정자인지 비교합니다.
         /// </summary>
         public override bool Equals(object obj)
         {
@@ -66,7 +66,7 @@ namespace Noname.GameCore.Helper
         }
 
         /// <summary>
-        /// ?댁떆 肄붾뱶瑜?諛섑솚?⑸땲??
+        /// 해시 코드를 반환합니다.
         /// </summary>
         public override int GetHashCode()
         {
@@ -82,4 +82,3 @@ namespace Noname.GameCore.Helper
         }
     }
 }
-

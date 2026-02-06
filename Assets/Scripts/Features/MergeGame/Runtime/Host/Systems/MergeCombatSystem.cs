@@ -1,81 +1,120 @@
 ﻿using System;
 using System.Collections.Generic;
-using Noname.GameAbilitySystem;
 using MyProject.MergeGame.Models;
+using Noname.GameAbilitySystem;
 
 namespace MyProject.MergeGame.Systems
 {
     /// <summary>
-    /// 캐릭터의 자동 공격을 처리하는 전투 시스템입니다.
+    /// 타워 공격 및 투사체 처리를 담당하는 전투 시스템입니다.
+    /// 공격 판정은 Host에서만 수행합니다.
     /// </summary>
     public sealed class MergeCombatSystem
     {
+        private sealed class PendingProjectile
+        {
+            public long AttackerUid;
+            public long TargetUid;
+            public AbilitySystemComponent OwnerAsc;
+            public ITargetingStrategy TargetingStrategy;
+            public Point3D Start;
+            public Point3D Impact;
+            public float RemainingTime;
+            public float Damage;
+            public ProjectileType ProjectileType;
+            public float ThrowRadius;
+        }
+
         private readonly MergeHostState _state;
         private readonly TargetContext _targetContext;
-        private readonly ITargetingStrategy _targetingStrategy;
-        private readonly List<MergeHostEvent> _eventBuffer;
-        private readonly List<AbilitySystemComponent> _monsterAscList;
+        private readonly List<AbilitySystemComponent> _monsterAscList = new();
+        private readonly List<PendingProjectile> _projectiles = new();
+        private readonly List<PendingProjectile> _projectileRemoveBuffer = new();
+
+        public TargetContext TargetContext => _targetContext;
 
         public MergeCombatSystem(MergeHostState state, float defaultAttackRange = 10f)
         {
-            _state = state;
-            _eventBuffer = new List<MergeHostEvent>();
-            _monsterAscList = new List<AbilitySystemComponent>();
-
-            _targetingStrategy = new NearestEnemyTargetingStrategy(defaultAttackRange);
-
-            _targetContext = new TargetContext(
-                getEnemies: GetEnemiesForTower,
-                getAllies: GetAlliesForTower,
-                getPosition: GetPositionForAsc
-            );
+            _state = state ?? throw new ArgumentNullException(nameof(state));
+            _targetContext = new TargetContext(GetEnemiesForTower, GetAlliesForTower, GetPositionForAsc);
         }
 
         /// <summary>
-        /// 전투 시스템을 업데이트하고 발생한 이벤트를 반환합니다.
+        /// 타워의 능력 활성화 결과(TargetData)를 바탕으로 공격을 실행합니다.
         /// </summary>
-        public IReadOnlyList<MergeHostEvent> Tick(long currentTick, float deltaTime)
+        public void ExecuteTowerAttack(
+            long tick,
+            MergeTower tower,
+            GameplayAbility ability,
+            TargetData targetData,
+            List<MergeHostEvent> events)
         {
-            _eventBuffer.Clear();
-
-            foreach (var tower in _state.Towers.Values)
+            if (tower == null || targetData == null || events == null)
             {
-                ProcessTowerAttack(currentTick, tower, deltaTime);
+                return;
             }
 
-            return _eventBuffer;
+            var attackDamage = tower.ASC.Get(AttributeId.AttackDamage);
+            if (attackDamage <= 0f)
+            {
+                return;
+            }
+
+            if (tower.AttackType == TowerAttackType.HitScan)
+            {
+                ProcessHitScanAttack(tick, tower, attackDamage, targetData, events);
+                return;
+            }
+
+            ProcessProjectileAttack(tick, tower, ability, attackDamage, targetData, events);
         }
 
-        private void ProcessTowerAttack(long tick, MergeTower tower, float deltaTime)
+        /// <summary>
+        /// 투사체 이동 및 충돌 처리를 업데이트합니다.
+        /// </summary>
+        public void TickProjectiles(long tick, float deltaTime, List<MergeHostEvent> events)
         {
-            // 쿨타임 감소
-            tower.AttackCooldownRemaining -= deltaTime;
-
-            if (tower.AttackCooldownRemaining > 0)
+            if (events == null || _projectiles.Count == 0)
             {
                 return;
             }
 
-            // 공격 대상 찾기
-            var targetData = _targetingStrategy.FindTargets(tower.ASC, _targetContext);
-            if (targetData.Targets.Count == 0)
+            _projectileRemoveBuffer.Clear();
+
+            for (var i = 0; i < _projectiles.Count; i++)
             {
-                return;
+                var projectile = _projectiles[i];
+                projectile.RemainingTime -= deltaTime;
+                if (projectile.RemainingTime > 0f)
+                {
+                    continue;
+                }
+
+                if (projectile.ProjectileType == ProjectileType.Throw)
+                {
+                    ResolveThrowHit(tick, projectile, events);
+                }
+                else
+                {
+                    ResolveDirectHit(tick, projectile, events);
+                }
+
+                _projectileRemoveBuffer.Add(projectile);
             }
 
-            // 공격력과 공격 속도 가져오기
-            var attackDamage = tower.ASC.Get(AttributeId.AttackDamage);
-            var attackSpeed = tower.ASC.Get(AttributeId.AttackSpeed);
-
-            if (attackDamage <= 0 || attackSpeed <= 0)
+            for (var i = 0; i < _projectileRemoveBuffer.Count; i++)
             {
-                return;
+                _projectiles.Remove(_projectileRemoveBuffer[i]);
             }
+        }
 
-            // 쿨타임 리셋 (1.0 / 공격속도)
-            tower.AttackCooldownRemaining = 1f / attackSpeed;
-
-            // 각 대상에게 데미지 적용
+        private void ProcessHitScanAttack(
+            long tick,
+            MergeTower tower,
+            float attackDamage,
+            TargetData targetData,
+            List<MergeHostEvent> events)
+        {
             foreach (var targetAsc in targetData.Targets)
             {
                 var monster = FindMonsterByAsc(targetAsc);
@@ -84,23 +123,26 @@ namespace MyProject.MergeGame.Systems
                     continue;
                 }
 
-                // 데미지 적용
                 monster.TakeDamage(attackDamage);
 
-                // 공격 이벤트 발행
-                _eventBuffer.Add(new TowerAttackedEvent(
+                events.Add(new TowerAttackedEvent(
                     tick,
                     tower.Uid,
                     monster.Uid,
                     attackDamage,
                     tower.Position.X,
                     tower.Position.Y,
+                    tower.Position.Z,
                     monster.Position.X,
-                    monster.Position.Y
+                    monster.Position.Y,
+                    monster.Position.Z,
+                    TowerAttackType.HitScan,
+                    tower.ProjectileType,
+                    tower.ProjectileSpeed,
+                    tower.ThrowRadius
                 ));
 
-                // 몬스터 데미지 이벤트 발행
-                _eventBuffer.Add(new MonsterDamagedEvent(
+                events.Add(new MonsterDamagedEvent(
                     tick,
                     monster.Uid,
                     attackDamage,
@@ -110,9 +152,217 @@ namespace MyProject.MergeGame.Systems
             }
         }
 
-        /// <summary>
-        /// 캐릭터 기준으로 적(몬스터) 목록을 반환합니다.
-        /// </summary>
+        private void ProcessProjectileAttack(
+            long tick,
+            MergeTower tower,
+            GameplayAbility ability,
+            float attackDamage,
+            TargetData targetData,
+            List<MergeHostEvent> events)
+        {
+            if (tower.ProjectileType == ProjectileType.Throw)
+            {
+                var throwPoint = ResolveThrowPoint(tower, targetData);
+
+                EnqueueProjectile(
+                    tower,
+                    ability,
+                    targetUid: 0,
+                    impact: throwPoint,
+                    damage: attackDamage,
+                    projectileType: ProjectileType.Throw,
+                    throwRadius: tower.ThrowRadius);
+
+                events.Add(new TowerAttackedEvent(
+                    tick,
+                    tower.Uid,
+                    0,
+                    attackDamage,
+                    tower.Position.X,
+                    tower.Position.Y,
+                    tower.Position.Z,
+                    throwPoint.X,
+                    throwPoint.Y,
+                    throwPoint.Z,
+                    TowerAttackType.Projectile,
+                    ProjectileType.Throw,
+                    tower.ProjectileSpeed,
+                    tower.ThrowRadius
+                ));
+
+                return;
+            }
+
+            foreach (var targetAsc in targetData.Targets)
+            {
+                var monster = FindMonsterByAsc(targetAsc);
+                if (monster == null || !monster.IsAlive)
+                {
+                    continue;
+                }
+
+                var impact = monster.Position;
+
+                EnqueueProjectile(
+                    tower,
+                    ability,
+                    monster.Uid,
+                    impact,
+                    attackDamage,
+                    ProjectileType.Direct,
+                    0f);
+
+                events.Add(new TowerAttackedEvent(
+                    tick,
+                    tower.Uid,
+                    monster.Uid,
+                    attackDamage,
+                    tower.Position.X,
+                    tower.Position.Y,
+                    tower.Position.Z,
+                    impact.X,
+                    impact.Y,
+                    impact.Z,
+                    TowerAttackType.Projectile,
+                    ProjectileType.Direct,
+                    tower.ProjectileSpeed,
+                    tower.ThrowRadius
+                ));
+            }
+        }
+
+        private void EnqueueProjectile(
+            MergeTower tower,
+            GameplayAbility ability,
+            long targetUid,
+            Point3D impact,
+            float damage,
+            ProjectileType projectileType,
+            float throwRadius)
+        {
+            var speed = tower.ProjectileSpeed > 0f ? tower.ProjectileSpeed : 1f;
+            var distance = MathF.Sqrt(Point3D.DistanceSquared(tower.Position, impact));
+            var travelTime = speed <= 0f ? 0f : distance / speed;
+
+            _projectiles.Add(new PendingProjectile
+            {
+                AttackerUid = tower.Uid,
+                TargetUid = targetUid,
+                OwnerAsc = tower.ASC,
+                TargetingStrategy = ability?.TargetingStrategy,
+                Start = tower.Position,
+                Impact = impact,
+                RemainingTime = travelTime,
+                Damage = damage,
+                ProjectileType = projectileType,
+                ThrowRadius = throwRadius
+            });
+        }
+
+        private void ResolveDirectHit(long tick, PendingProjectile projectile, List<MergeHostEvent> events)
+        {
+            var monster = _state.GetMonster(projectile.TargetUid);
+            if (monster == null || !monster.IsAlive)
+            {
+                return;
+            }
+
+            monster.TakeDamage(projectile.Damage);
+
+            events.Add(new MonsterDamagedEvent(
+                tick,
+                monster.Uid,
+                projectile.Damage,
+                monster.ASC.Get(AttributeId.Health),
+                projectile.AttackerUid
+            ));
+        }
+
+        private void ResolveThrowHit(long tick, PendingProjectile projectile, List<MergeHostEvent> events)
+        {
+            var targets = ResolveThrowTargets(projectile);
+            if (targets.Count == 0)
+            {
+                return;
+            }
+
+            for (var i = 0; i < targets.Count; i++)
+            {
+                var targetAsc = targets[i];
+                var monster = FindMonsterByAsc(targetAsc);
+                if (monster == null || !monster.IsAlive)
+                {
+                    continue;
+                }
+
+                monster.TakeDamage(projectile.Damage);
+
+                events.Add(new MonsterDamagedEvent(
+                    tick,
+                    monster.Uid,
+                    projectile.Damage,
+                    monster.ASC.Get(AttributeId.Health),
+                    projectile.AttackerUid
+                ));
+            }
+        }
+
+        private IReadOnlyList<AbilitySystemComponent> ResolveThrowTargets(PendingProjectile projectile)
+        {
+            if (projectile.OwnerAsc != null && projectile.TargetingStrategy != null)
+            {
+                var impactContext = CreateImpactContext(projectile.OwnerAsc, projectile.Impact);
+                var targetData = projectile.TargetingStrategy.FindTargets(projectile.OwnerAsc, impactContext);
+                if (targetData != null && targetData.Targets.Count > 0)
+                {
+                    return targetData.Targets;
+                }
+            }
+
+            // 기본 fallback: Throw 반경 내 모든 몬스터
+            _monsterAscList.Clear();
+            var radiusSq = projectile.ThrowRadius * projectile.ThrowRadius;
+            foreach (var monster in _state.Monsters.Values)
+            {
+                if (!monster.IsAlive)
+                {
+                    continue;
+                }
+
+                var distSq = Point3D.DistanceSquared(projectile.Impact, monster.Position);
+                if (distSq <= radiusSq)
+                {
+                    _monsterAscList.Add(monster.ASC);
+                }
+            }
+
+            return _monsterAscList;
+        }
+
+        private TargetContext CreateImpactContext(AbilitySystemComponent owner, Point3D impact)
+        {
+            return new TargetContext(
+                getEnemies: GetEnemiesForTower,
+                getAllies: GetAlliesForTower,
+                getPosition: asc => asc == owner ? impact : GetPositionForAsc(asc),
+                random: _targetContext.Random);
+        }
+
+        private Point3D ResolveThrowPoint(MergeTower tower, TargetData targetData)
+        {
+            if (targetData != null && targetData.Targets.Count > 0)
+            {
+                var first = targetData.Targets[0];
+                var monster = FindMonsterByAsc(first);
+                if (monster != null)
+                {
+                    return monster.Position;
+                }
+            }
+
+            return tower.Position;
+        }
+
         private IReadOnlyList<AbilitySystemComponent> GetEnemiesForTower(AbilitySystemComponent owner)
         {
             _monsterAscList.Clear();
@@ -128,65 +378,39 @@ namespace MyProject.MergeGame.Systems
             return _monsterAscList;
         }
 
-        /// <summary>
-        /// 캐릭터 기준으로 아군(다른 캐릭터) 목록을 반환합니다.
-        /// </summary>
         private IReadOnlyList<AbilitySystemComponent> GetAlliesForTower(AbilitySystemComponent owner)
         {
-            var allies = new List<AbilitySystemComponent>();
-
-            foreach (var tower in _state.Towers.Values)
-            {
-                if (tower.ASC != owner)
-                {
-                    allies.Add(tower.ASC);
-                }
-            }
-
-            return allies;
+            return Array.Empty<AbilitySystemComponent>();
         }
 
-        /// <summary>
-        /// ASC의 위치를 반환합니다.
-        /// </summary>
-        private Point2D GetPositionForAsc(AbilitySystemComponent asc)
+        private Point3D GetPositionForAsc(AbilitySystemComponent asc)
         {
-            // 캐릭터에서 찾기
-            foreach (var tower in _state.Towers.Values)
+            if (asc == null)
             {
-                if (tower.ASC == asc)
-                {
-                    return tower.Position;
-                }
+                return Point3D.zero;
             }
 
-            // 몬스터에서 찾기
-            foreach (var monster in _state.Monsters.Values)
+            if (asc.Owner is MergeTower tower)
             {
-                if (monster.ASC == asc)
-                {
-                    return monster.Position;
-                }
+                return tower.Position;
             }
 
-            return Point2D.zero;
+            if (asc.Owner is MergeMonster monster)
+            {
+                return monster.Position;
+            }
+
+            return Point3D.zero;
         }
 
-        /// <summary>
-        /// ASC로 몬스터를 찾습니다.
-        /// </summary>
         private MergeMonster FindMonsterByAsc(AbilitySystemComponent asc)
         {
-            foreach (var monster in _state.Monsters.Values)
+            if (asc?.Owner is MergeMonster monster)
             {
-                if (monster.ASC == asc)
-                {
-                    return monster;
-                }
+                return monster;
             }
 
             return null;
         }
     }
 }
-

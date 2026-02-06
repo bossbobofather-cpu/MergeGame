@@ -110,6 +110,7 @@ namespace MyProject.MergeGame.Systems
                     source.OnMergeSourceEffectId,
                     source.Position.X,
                     source.Position.Y,
+                    source.Position.Z,
                     true,
                     source.Uid,
                     target.Uid,
@@ -128,6 +129,7 @@ namespace MyProject.MergeGame.Systems
                     target.OnMergeTargetEffectId,
                     target.Position.X,
                     target.Position.Y,
+                    target.Position.Z,
                     false,
                     source.Uid,
                     target.Uid,
@@ -186,7 +188,7 @@ namespace MyProject.MergeGame.Systems
                     continue;
                 }
 
-                var distSq = Point2D.DistanceSquared(center, monster.Position);
+                var distSq = Point3D.DistanceSquared(center, monster.Position);
                 if (distSq <= radiusSq)
                 {
                     monster.TakeDamage(damage);
@@ -302,4 +304,6 @@ namespace MyProject.MergeGame.Systems
 
     #endregion
 }
+
+
 

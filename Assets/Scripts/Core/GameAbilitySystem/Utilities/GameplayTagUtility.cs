@@ -5,8 +5,8 @@ using System.Runtime.CompilerServices;
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// ê²Œì„?Œë ˆ???œê·¸ ë¬¸ì??? í‹¸ë¦¬í‹°?…ë‹ˆ??(?œìˆ˜ C#).
-    /// Unity???˜ì¡´?˜ì? ?Šìœ¼ë©?Host ?˜ê²½?ì„œ ?¬ìš© ê°€?¥í•©?ˆë‹¤.
+    /// ì£¼ì„ ì •ë¦¬
+    /// ì£¼ì„ ì •ë¦¬
     /// </summary>
     public static class GameplayTagUtility
     {
@@ -58,7 +58,7 @@ namespace Noname.GameAbilitySystem
             return child.StartsWith(parent, StringComparison.Ordinal) && child[parent.Length] == '.';
         }
 
-        //TagUtilityê°€ ?„ë‹ˆ?´ë„ ? ë“¯. ?´ë°?œë„ ?¸ì¼ ?ê¸°ë©???¸°??
+        // ì£¼ì„ ì •ë¦¬
         public static int Fnv1a32(string value)
         {
             if (string.IsNullOrEmpty(value))

@@ -1,18 +1,17 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// ?�겟팅???�요???�드 조회 ?�수�??�공?�는 컨텍?�트?�니??
-    /// Host/?�버 ?�경?�서 주입?�여 ?�용?�니??
+    /// 타겟팅에 필요한 월드 조회 함수를 제공하는 컨텍스트입니다.
     /// </summary>
     public sealed class TargetContext
     {
         public TargetContext(
             Func<AbilitySystemComponent, IReadOnlyList<AbilitySystemComponent>> getEnemies,
             Func<AbilitySystemComponent, IReadOnlyList<AbilitySystemComponent>> getAllies,
-            Func<AbilitySystemComponent, Point2D> getPosition,
+            Func<AbilitySystemComponent, Point3D> getPosition,
             Random random = null)
         {
             GetEnemies = getEnemies;
@@ -22,22 +21,22 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?�정 주체 기�??�로 ??목록??반환?�니??
+        /// 적 목록 조회 함수입니다.
         /// </summary>
         public Func<AbilitySystemComponent, IReadOnlyList<AbilitySystemComponent>> GetEnemies { get; }
 
         /// <summary>
-        /// ?�정 주체 기�??�로 ?�군 목록??반환?�니??
+        /// 아군 목록 조회 함수입니다.
         /// </summary>
         public Func<AbilitySystemComponent, IReadOnlyList<AbilitySystemComponent>> GetAllies { get; }
 
         /// <summary>
-        /// 주체???�치 ?�보�?반환?�니??
+        /// 대상 위치 조회 함수입니다.
         /// </summary>
-        public Func<AbilitySystemComponent, Point2D> GetPosition { get; }
+        public Func<AbilitySystemComponent, Point3D> GetPosition { get; }
 
         /// <summary>
-        /// ?�덤 ?�택???�한 RNG?�니??
+        /// 랜덤 소스입니다.
         /// </summary>
         public Random Random { get; }
 
@@ -51,10 +50,9 @@ namespace Noname.GameAbilitySystem
             return GetAllies != null ? GetAllies(owner) : Array.Empty<AbilitySystemComponent>();
         }
 
-        public Point2D ResolvePosition(AbilitySystemComponent owner)
+        public Point3D ResolvePosition(AbilitySystemComponent owner)
         {
             return GetPosition != null ? GetPosition(owner) : default;
         }
     }
 }
-

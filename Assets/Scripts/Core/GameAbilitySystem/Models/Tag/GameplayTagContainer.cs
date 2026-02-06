@@ -4,8 +4,8 @@ using System.Linq;
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// ê²Œì„?Œë ˆ???œê·¸ë¥?ê´€ë¦¬í•˜??ì»¨í…Œ?´ë„ˆ?…ë‹ˆ??(?œìˆ˜ C# ëª¨ë¸).
-    /// Unity???˜ì¡´?˜ì? ?Šìœ¼ë©?Host ?˜ê²½?ì„œ ?¬ìš© ê°€?¥í•©?ˆë‹¤.
+    /// ì£¼ì„ ì •ë¦¬
+    /// ì£¼ì„ ì •ë¦¬
     /// </summary>
     public sealed class GameplayTagContainer
     {
@@ -14,7 +14,7 @@ namespace Noname.GameAbilitySystem
         private readonly HashSet<int> _expandedTags = new();
 
         /// <summary>
-        /// ë³´ê? ì¤‘ì¸ ?œê·¸ ëª©ë¡?…ë‹ˆ??
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public IReadOnlyList<FGameplayTag> Tags => _tags;
 
@@ -24,7 +24,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ë¶€ëª??œê·¸ê¹Œì? ?¬í•¨?˜ì—¬ ë³´ìœ  ?¬ë?ë¥??•ì¸?©ë‹ˆ??
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public bool HasTag(FGameplayTag tag)
         {
@@ -32,7 +32,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?•í™•???¼ì¹˜?˜ëŠ” ?œê·¸ë§??•ì¸?©ë‹ˆ??
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public bool HasTagExact(FGameplayTag tag)
         {
@@ -40,7 +40,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?¤ë¥¸ ì»¨í…Œ?´ë„ˆ???œê·¸ ì¤??˜ë‚˜?¼ë„ ?¬í•¨?˜ëŠ”ì§€ ?•ì¸?©ë‹ˆ??
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public bool HasAny(GameplayTagContainer other)
         {
@@ -61,7 +61,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?¤ë¥¸ ì»¨í…Œ?´ë„ˆ???œê·¸ë¥?ëª¨ë‘ ?¬í•¨?˜ëŠ”ì§€ ?•ì¸?©ë‹ˆ??
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public bool HasAll(GameplayTagContainer other)
         {
@@ -82,7 +82,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?œê·¸ë¥?ì¶”ê??©ë‹ˆ??
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public bool AddTag(FGameplayTag tag)
         {
@@ -102,7 +102,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?œê·¸ë¥??œê±°?©ë‹ˆ??
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public void RemoveTag(FGameplayTag tag)
         {
@@ -118,7 +118,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// ?œê·¸ë¥?ëª¨ë‘ ?œê±°?©ë‹ˆ??
+        /// ì£¼ì„ ì •ë¦¬
         /// </summary>
         public void Clear()
         {
@@ -169,7 +169,7 @@ namespace Noname.GameAbilitySystem
         {
             _expandedTags.Add(tag.Hash);
 
-            // ë¶€ëª??œê·¸ ì¶”ê? (?? "Ability.Attack.Fire" -> "Ability.Attack", "Ability")
+            // ì£¼ì„ ì •ë¦¬
             var lastDotIndex = tag.Value.LastIndexOf('.');
             while (lastDotIndex > 0)
             {

@@ -1,17 +1,17 @@
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// ?�성 ?�정?�의 ?�산 ?�?�입?�다.
+    /// 주석 정리
     /// </summary>
     public enum AttributeModifierOperationType
     {
-        /// <summary>?�하�?/summary>
+        /// 주석 정리
         Add,
-        /// <summary>?�센???�하�?(100 = +100%)</summary>
+        /// 주석 정리
         AddPercent,
-        /// <summary>곱하�?/summary>
+        /// 주석 정리
         Multiply,
-        /// <summary>??��?�기</summary>
+        /// 주석 정리
         Override
     }
 }

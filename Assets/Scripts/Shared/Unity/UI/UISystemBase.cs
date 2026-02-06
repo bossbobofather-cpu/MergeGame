@@ -1,11 +1,9 @@
 ﻿namespace MyProject.Common.UI
 {
     /// <summary>
-    /// ?쒖뒪???덉씠?댁슜 UI 踰좎씠?ㅼ엯?덈떎.
+    /// 시스템 레이어용 UI 베이스입니다.
     /// </summary>
     public abstract class UISystemBase : UIBase
     {
     }
 }
-
-

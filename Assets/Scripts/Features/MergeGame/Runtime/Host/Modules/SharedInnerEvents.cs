@@ -1,4 +1,4 @@
-using MyProject.MergeGame;
+﻿using MyProject.MergeGame;
 using Noname.GameAbilitySystem;
 using Noname.GameHost.Module;
 
@@ -18,7 +18,7 @@ namespace MyProject.MergeGame.Modules
     public sealed class GetSlotPositionRequest : InnerEventBase
     {
         public int SlotIndex { get; }
-        public Point2D Position { get; set; }
+        public Point3D Position { get; set; }
         public bool Found { get; set; }
 
         public GetSlotPositionRequest(long tick, int slotIndex) : base(tick)
@@ -110,7 +110,7 @@ namespace MyProject.MergeGame.Modules
     {
         public int PathIndex { get; }
         public float Progress { get; }
-        public Point2D Position { get; set; }
+        public Point3D Position { get; set; }
         public bool Found { get; set; }
 
         public GetPathPositionRequest(long tick, int pathIndex, float progress) : base(tick)
@@ -205,3 +205,4 @@ namespace MyProject.MergeGame.Modules
 
     #endregion
 }
+

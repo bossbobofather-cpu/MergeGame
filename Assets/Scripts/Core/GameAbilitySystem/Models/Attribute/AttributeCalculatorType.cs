@@ -1,28 +1,28 @@
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// ?�성 계산�??�?�입?�다.
-    /// Calculated ValueMode?�서 ?�용??계산기�? 지?�합?�다.
+    /// 주석 정리
+    /// 주석 정리
     /// </summary>
     public enum AttributeCalculatorType
     {
         /// <summary>
-        /// ?�음 (Static 모드?�서 ?�용)
+        /// 주석 정리
         /// </summary>
         None = 0,
 
         /// <summary>
-        /// ?�?�의 최�? 체력 비율만큼 ?�복?�니??
+        /// 주석 정리
         /// </summary>
         HealByTargetMaxHealthPercent,
 
         /// <summary>
-        /// ?�전?�의 최�? 체력 비율만큼 ?�복?�니??
+        /// 주석 정리
         /// </summary>
         HealBySourceMaxHealthPercent,
 
         /// <summary>
-        /// ?�?�의 ?�재 체력??최�? 체력?�로 ?�정?�니?? (?�전 ?�복)
+        /// 주석 정리
         /// </summary>
         FullHeal,
     }
