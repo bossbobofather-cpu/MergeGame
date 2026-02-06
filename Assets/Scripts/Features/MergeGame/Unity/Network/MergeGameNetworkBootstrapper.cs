@@ -29,6 +29,7 @@ namespace MyProject.MergeGame.Unity.Network
         [SerializeField] private RunMode _cloneRunMode = RunMode.Client;
         [SerializeField] private string _address = "localhost";
         [SerializeField] private ushort _port = 7777;
+        [Tooltip("Host 모드: local(호스트) 1명 + remote(maxConnections)")]
         [SerializeField] private int _maxConnections = 1;
         [SerializeField] private bool _autoStart = true;
 
@@ -152,7 +153,7 @@ namespace MyProject.MergeGame.Unity.Network
         private void StartAsHost()
         {
             // 1) Server 시작
-            NetworkServer.Listen(_maxConnections);
+            NetworkServer.Listen(_maxConnections + 1);
 
             // 2) ServerAdapter 준비 (연결 이벤트 핸들러 등록)
             EnsureServerAdapter();
@@ -258,3 +259,5 @@ namespace MyProject.MergeGame.Unity.Network
         }
     }
 }
+
+
