@@ -55,7 +55,37 @@ namespace MyProject.MergeGame.Unity
             }
 
             _gameViewInstance = instance;
+
+            // 프리팹/씬 설정이 아직 없더라도, 프로토타입이 최소 동작하도록 기본 모듈을 자동 추가합니다.
+            EnsureViewModules(_gameViewInstance);
+
             _gameViewInstance.Initialize(host);
+        }
+
+        private static void EnsureViewModules(MergeGameView view)
+        {
+            if (view == null)
+            {
+                return;
+            }
+
+            EnsureModule<MapViewModule>(view, "MapViewModule");
+            EnsureModule<UnitViewModule>(view, "UnitViewModule");
+            EnsureModule<HudViewModule>(view, "HudViewModule");
+            EnsureModule<InputViewModule>(view, "InputViewModule");
+        }
+
+        private static T EnsureModule<T>(MergeGameView view, string name) where T : Component
+        {
+            var existing = view.GetComponentInChildren<T>(true);
+            if (existing != null)
+            {
+                return existing;
+            }
+
+            var obj = new GameObject(name);
+            obj.transform.SetParent(view.transform, false);
+            return obj.AddComponent<T>();
         }
 
         private static MapModuleConfig BuildMapConfig()

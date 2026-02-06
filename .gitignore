@@ -38,3 +38,7 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 Icon?
+
+# Claude
+.claude/
+

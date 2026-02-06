@@ -1,4 +1,4 @@
-using MyProject.Common.GameMode;
+﻿using MyProject.Common.GameMode;
 using MyProject.Common.UI;
 using MyProject.MergeGame.Commands;
 using UnityEngine;
@@ -28,6 +28,23 @@ namespace MyProject.MergeGame.Unity
         /// 최신 스냅샷입니다.
         /// </summary>
         public MergeHostSnapshot LatestSnapshot => _latestSnapshot;
+        /// <summary>
+        /// 로컬 유저 UID입니다.
+        /// </summary>
+        public long LocalUserId => _localUserId;
+
+        /// <summary>
+        /// 호스트에 커맨드를 전송합니다.
+        /// </summary>
+        public void SendCommand(MergeCommand command)
+        {
+            if (command == null)
+            {
+                return;
+            }
+
+            Host?.SendCommand(command);
+        }
 
         protected override void OnInitialize()
         {
@@ -63,10 +80,10 @@ namespace MyProject.MergeGame.Unity
             // 모듈에 스냅샷 전파
             RouteSnapshotToModules(snapshot);
         }
-
         private void CheckInput()
         {
-            // 인풋 모듈에서 처리 예정
+            var input = GetModule<InputViewModule>();
+            input?.TickInput();
         }
 
         protected override void OnHostResult(MergeCommandResult result)
@@ -169,3 +186,4 @@ namespace MyProject.MergeGame.Unity
         }
     }
 }
+
