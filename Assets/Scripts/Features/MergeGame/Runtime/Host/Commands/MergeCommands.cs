@@ -492,4 +492,60 @@ namespace MyProject.MergeGame.Commands
     }
 
     #endregion
+
+    #region 멀티플레이(상대 공격)
+
+    /// <summary>
+    /// 상대(다른 세션/플레이어)로부터 몬스터를 주입(추가 스폰)하는 Command입니다.
+    /// 서버/MatchHost가 상대 공격(garbage) 처리를 위해 사용합니다.
+    /// </summary>
+    public sealed class InjectMonstersCommand : MergeCommand
+    {
+        /// <summary>
+        /// 주입할 몬스터 정의 ID입니다. null/빈 값이면 기본 몬스터를 사용합니다.
+        /// </summary>
+        public string MonsterId { get; }
+
+        /// <summary>
+        /// 주입할 몬스터 수입니다.
+        /// </summary>
+        public int Count { get; }
+
+        /// <summary>
+        /// 스폰할 경로 인덱스입니다.
+        /// </summary>
+        public int PathIndex { get; }
+
+        public InjectMonstersCommand(long senderUid, string monsterId, int count, int pathIndex = 0) : base(senderUid)
+        {
+            MonsterId = monsterId;
+            Count = count;
+            PathIndex = pathIndex;
+        }
+    }
+
+    /// <summary>
+    /// 몬스터 주입 Result입니다.
+    /// </summary>
+    public sealed class InjectMonstersResult : MergeCommandResult
+    {
+        /// <summary>
+        /// 실제로 스폰된 몬스터 수입니다.
+        /// </summary>
+        public int SpawnedCount { get; }
+
+        private InjectMonstersResult(long tick, long senderUid, bool success, string reason, int spawnedCount)
+            : base(tick, senderUid, success, reason)
+        {
+            SpawnedCount = spawnedCount;
+        }
+
+        public static InjectMonstersResult Ok(long tick, long senderUid, int spawnedCount)
+            => new InjectMonstersResult(tick, senderUid, true, null, spawnedCount);
+
+        public static InjectMonstersResult Fail(long tick, long senderUid, string reason)
+            => new InjectMonstersResult(tick, senderUid, false, reason, 0);
+    }
+
+    #endregion
 }

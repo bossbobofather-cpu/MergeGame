@@ -164,6 +164,10 @@ namespace MyProject.MergeGame
                 case StartWaveCommand startWaveCmd:
                     return HandleStartWave(startWaveCmd);
 
+                
+                case InjectMonstersCommand injectCmd:
+                    return HandleInjectMonsters(injectCmd);
+
                 default:
                     return default;
             }
@@ -198,19 +202,13 @@ namespace MyProject.MergeGame
             {
                 _tickEventBuffer.Add(evt);
             }
-
-            // 3. 목적지 도달 몬스터 처리
-            ProcessMonstersReachedGoal();
-
-            // 4. 사망한 몬스터 처리
+            // 3. 사망한 몬스터 처리
             ProcessDeadMonsters();
-
-            // 7. 게임 오버 체크
-            if (_state.PlayerHp <= 0)
+            // 게임 오버 체크: 몬스터가 너무 많이 쌓이면 패배합니다.
+            if (_config.MaxMonsterStack > 0 && _state.Monsters.Count >= _config.MaxMonsterStack)
             {
                 HandleGameOver(false);
             }
-
             // 이벤트 발행
             foreach (var evt in _tickEventBuffer)
             {
@@ -814,37 +812,68 @@ namespace MyProject.MergeGame
                 StartWaveResult.Ok(Tick, command.SenderUid, status.CurrentWaveNumber, status.TotalMonsters));
         }
 
+
+        private GameCommandOutcome<MergeCommandResult, MergeHostEvent> HandleInjectMonsters(InjectMonstersCommand command)
+        {
+            if (_state.SessionPhase != MergeSessionPhase.Playing)
+            {
+                return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
+                    InjectMonstersResult.Fail(Tick, command.SenderUid, "게임이 진행 중이 아닙니다."));
+            }
+
+            if (command.Count <= 0)
+            {
+                return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
+                    InjectMonstersResult.Ok(Tick, command.SenderUid, 0));
+            }
+
+            var path = _state.GetMonsterPath(command.PathIndex);
+            if (path == null)
+            {
+                return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
+                    InjectMonstersResult.Fail(Tick, command.SenderUid, "유효하지 않은 경로입니다."));
+            }
+
+            var monsterId = string.IsNullOrWhiteSpace(command.MonsterId) ? "monster_default" : command.MonsterId;
+
+            var events = new List<MergeHostEvent>(command.Count);
+            var spawned = 0;
+
+            // 상대 공격(garbage) 몬스터는 우선 보상/플레이어 데미지를 주지 않는 형태로 주입합니다.
+            for (var i = 0; i < command.Count; i++)
+            {
+                var monster = _state.CreateMonster(
+                    monsterId,
+                    command.PathIndex,
+                    path.GetStartPosition(),
+                    damageToPlayer: 0,
+                    goldReward: 0);
+
+                // 최소 동작용 ASC 세팅 (추후 몬스터 정의/스케일링 정책으로 교체)
+                monster.ASC.Set(AttributeId.MaxHealth, 100f);
+                monster.ASC.Set(AttributeId.Health, 100f);
+                monster.ASC.Set(AttributeId.MoveSpeed, 2f);
+
+                events.Add(new MonsterSpawnedEvent(
+                    Tick,
+                    monster.Uid,
+                    monster.MonsterId,
+                    monster.PathIndex,
+                    monster.Position.X,
+                    monster.Position.Y,
+                    monster.ASC.Get(AttributeId.MaxHealth)
+                ));
+
+                spawned++;
+            }
+
+            return new GameCommandOutcome<MergeCommandResult, MergeHostEvent>(
+                InjectMonstersResult.Ok(Tick, command.SenderUid, spawned),
+                events);
+        }
         #endregion
 
         #region Tick Processing
-
-        private void ProcessMonstersReachedGoal()
-        {
-            foreach (var monsterUid in _movementSystem.MonstersReachedGoal)
-            {
-                var monster = _state.GetMonster(monsterUid);
-                if (monster == null)
-                {
-                    continue;
-                }
-
-                // 플레이어에게 데미지
-                var hpBefore = _state.PlayerHp;
-                _state.DamagePlayer(monster.DamageToPlayer);
-
-                _tickEventBuffer.Add(new PlayerHpChangedEvent(
-                    Tick,
-                    _state.PlayerHp,
-                    _state.PlayerMaxHp,
-                    _state.PlayerHp - hpBefore,
-                    "MonsterReachedGoal"
-                ));
-
-                // 몬스터 제거
-                _state.RemoveMonster(monsterUid);
-            }
-        }
-
         private void ProcessDeadMonsters()
         {
             var deadMonsterUids = new List<long>();
@@ -1199,5 +1228,10 @@ namespace MyProject.MergeGame
     }
 
 }
+
+
+
+
+
 
 

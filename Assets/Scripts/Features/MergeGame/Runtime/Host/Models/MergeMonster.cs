@@ -21,7 +21,7 @@ namespace MyProject.MergeGame.Models
         /// <summary>
         /// 이동 경로 인덱스입니다 (복수 경로 지원).
         /// </summary>
-        public int PathIndex { get; }
+        public int PathIndex { get; set; }
 
         /// <summary>
         /// 경로 진행도입니다 (0.0 = 시작, 1.0 = 도착).
