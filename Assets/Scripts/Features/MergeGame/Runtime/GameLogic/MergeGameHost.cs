@@ -134,7 +134,7 @@ namespace MyProject.MergeGame
             _towerDatabase = towerDatabase ?? throw new ArgumentNullException(nameof(towerDatabase));
             _state = new MergeHostState();
 
-            _combatSystem = new MergeCombatSystem(_state, _config.DefaultAttackRange);
+            _combatSystem = new MergeCombatSystem(_state);
             _effectSystem = new MergeEffectSystem();
             _defaultTowerAI = new TowerBaseAttackAI();
             _defaultMonsterAI = new MonsterPathMoveAI();
@@ -240,10 +240,6 @@ namespace MyProject.MergeGame
                 // 게임 오버 체크: 몬스터가 너무 많이 쌓이면 패배합니다.
                 bool isGameOver = false;
                 if (_config.MaxMonsterStack > 0 && _state.GetAliveMonsterCount(i) >= _config.MaxMonsterStack)
-                {
-                    isGameOver = true;
-                }
-                else if (!_state.IsPlayerAlive(i))
                 {
                     isGameOver = true;
                 }
@@ -363,13 +359,12 @@ namespace MyProject.MergeGame
                 usedSlots: _state.GetUsedSlotCount(playerIndex),
                 elapsedTime: _state.ElapsedTime,
                 slots: _tempSlotSnapshots.ToArray(),
-                playerHp: _state.GetPlayerHp(playerIndex),
-                playerMaxHp: _state.GetPlayerMaxHp(playerIndex),
                 playerGold: _state.GetPlayerGold(playerIndex),
                 difficultyStep: difficulty == null ? 0 : difficulty.CurrentStep,
                 spawnCount: difficulty == null ? 0 : difficulty.SpawnCount,
                 healthMultiplier: difficulty == null ? 1f : difficulty.HealthMultiplier,
                 spawnInterval: difficulty == null ? 1f : difficulty.SpawnInterval,
+                maxMonsterStack: _config.MaxMonsterStack,
                 towers: _tempTowerSnapshots.ToArray(),
                 monsters: _tempMonsterSnapshots.ToArray(),
                 projectiles: _tempProjectileSnapshots.ToArray()
@@ -409,7 +404,6 @@ namespace MyProject.MergeGame
             if (needsPlayerInit)
             {
                 _state.InitializeSlots(playerIndex, mapModule.Slots);
-                _state.SetPlayerHp(playerIndex, _config.PlayerMaxHp, _config.PlayerMaxHp);
                 _state.SetPlayerGold(playerIndex, _config.PlayerStartGold);
 
                 // MapModule에서 경로를 State에 등록
@@ -511,7 +505,7 @@ namespace MyProject.MergeGame
             }
 
             // 캐릭터 정의 조회 (3종 중 랜덤)
-            var towerId = _towerDatabase.GetRandomIdForGrade(_config.InitialUnitGrade);
+            var towerId = _towerDatabase.GetRandomIdForGrade(_config.InitialTowerGrade);
             var definition = _towerDatabase.GetDefinition(towerId);
             if (definition == null)
             {
@@ -606,7 +600,7 @@ namespace MyProject.MergeGame
             if (!sourceChar.CanMergeWith(targetChar))
             {
                 return new GameCommandOutcome<MergeCommandResult, MergeGameEvent>(
-                    MergeTowerResult.Fail(Tick, command.SenderUid, "같은 타입과 등급의 캐릭터만 머지할 수 있습니다."));
+                    MergeTowerResult.Fail(Tick, command.SenderUid, "같은 타입과 등급의 캐릭터만 머지할 수 있습니다. 최대 등급 타워는 머지할 수 없습니다."));
             }
 
             // 새 등급 계산
@@ -1213,14 +1207,4 @@ namespace MyProject.MergeGame
     }
 
 }
-
-
-
-
-
-
-
-
-
-
 

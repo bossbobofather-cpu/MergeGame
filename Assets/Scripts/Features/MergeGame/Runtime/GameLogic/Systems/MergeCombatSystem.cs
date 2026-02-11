@@ -86,7 +86,7 @@ namespace MyProject.MergeGame.Systems
             return _activeProjectileBuffer;
         }
 
-        public MergeCombatSystem(MergeHostState state, float defaultAttackRange = 10f)
+        public MergeCombatSystem(MergeHostState state)
         {
             _state = state ?? throw new ArgumentNullException(nameof(state));
             _targetContext = new TargetContext(GetEnemiesForTower, GetAlliesForTower, GetPositionForAsc);

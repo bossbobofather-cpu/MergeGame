@@ -310,21 +310,6 @@ namespace MyProject.MergeGame.Snapshots
         public IReadOnlyList<SlotSnapshot> Slots { get; }
 
         /// <summary>
-        /// 플레이어 현재 HP입니다.
-        /// </summary>
-        public int PlayerHp { get; }
-
-        /// <summary>
-        /// 플레이어 최대 HP입니다.
-        /// </summary>
-        public int PlayerMaxHp { get; }
-
-        /// <summary>
-        /// 플레이어 HP 비율입니다 (0.0 ~ 1.0).
-        /// </summary>
-        public float PlayerHpRatio => PlayerMaxHp > 0 ? (float)PlayerHp / PlayerMaxHp : 0f;
-
-        /// <summary>
         /// 플레이어 골드입니다.
         /// </summary>
         public int PlayerGold { get; }
@@ -348,6 +333,12 @@ namespace MyProject.MergeGame.Snapshots
         /// 현재 스폰 간격입니다.
         /// </summary>
         public float SpawnInterval { get; }
+
+        /// <summary>
+        /// 몬스터 누적 패배 기준 수량입니다.
+        /// </summary>
+        public int MaxMonsterStack { get; }
+
 
         /// <summary>
         /// 캐릭터 목록입니다.
@@ -377,13 +368,12 @@ namespace MyProject.MergeGame.Snapshots
             int usedSlots,
             float elapsedTime,
             IReadOnlyList<SlotSnapshot> slots,
-            int playerHp,
-            int playerMaxHp,
             int playerGold,
             int difficultyStep,
             int spawnCount,
             float healthMultiplier,
             float spawnInterval,
+            int maxMonsterStack,
             IReadOnlyList<TowerSnapshot> towers,
             IReadOnlyList<MonsterSnapshot> monsters,
             IReadOnlyList<ProjectileSnapshot> projectiles = null) : base(tick)
@@ -396,32 +386,91 @@ namespace MyProject.MergeGame.Snapshots
             UsedSlots = usedSlots;
             ElapsedTime = elapsedTime;
             Slots = slots;
-            PlayerHp = playerHp;
-            PlayerMaxHp = playerMaxHp;
             PlayerGold = playerGold;
             DifficultyStep = difficultyStep;
             SpawnCount = spawnCount;
             HealthMultiplier = healthMultiplier;
             SpawnInterval = spawnInterval;
+            MaxMonsterStack = maxMonsterStack;
             Towers = towers;
             Monsters = monsters;
             Projectiles = projectiles ?? Array.Empty<ProjectileSnapshot>();
         }
-
-        private const int SlotSize = sizeof(int) + sizeof(long) + sizeof(int); // 16
-        private const int TowerSize = sizeof(long) * 2 + sizeof(int) * 2 + sizeof(float) * 8 + sizeof(int) * 2; // 64
-        private const int MonsterSize = sizeof(long) * 2 + sizeof(int) + sizeof(float) * 6; // 44
-        // Uid(long) + Start XYZ(float*3) + Impact XYZ(float*3) + Progress(float) + ProjectileType(int) + IsLanded(byte)
-        private const int ProjectileSize = sizeof(long) + sizeof(float) * 7 + sizeof(int) + sizeof(byte); // 41
-
         protected override int GetPayloadSize()
         {
-            return sizeof(int) * 14   // PlayerIndex ~ SpawnInterval (14 int/float fields)
-                + sizeof(int) + Slots.Count * SlotSize
-                + sizeof(int) + Towers.Count * TowerSize
-                + sizeof(int) + Monsters.Count * MonsterSize
-                + sizeof(int) + Projectiles.Count * ProjectileSize;
+            return
+                // Fixed header fields
+                sizeof(int) // PlayerIndex
+                + sizeof(int) // SessionPhase
+                + sizeof(int) // Score
+                + sizeof(int) // MaxGrade
+                + sizeof(int) // TotalSlots
+                + sizeof(int) // UsedSlots
+                + sizeof(float) // ElapsedTime
+                + sizeof(int) // PlayerGold
+                + sizeof(int) // DifficultyStep
+                + sizeof(int) // SpawnCount
+                + sizeof(float) // HealthMultiplier
+                + sizeof(float) // SpawnInterval
+                + sizeof(int) // MaxMonsterStack
+
+                // Slots
+                + sizeof(int) // Slots.Count
+                + Slots.Count * (
+                    sizeof(int) // Slot.Index
+                    + sizeof(long) // Slot.TowerUid
+                    + sizeof(int) // Slot.TowerGrade
+                )
+
+                // Towers
+                + sizeof(int) // Towers.Count
+                + Towers.Count * (
+                    sizeof(long) // Tower.Uid
+                    + sizeof(long) // Tower.TowerId
+                    + sizeof(int) // Tower.Grade
+                    + sizeof(int) // Tower.SlotIndex
+                    + sizeof(float) // Tower.PositionX
+                    + sizeof(float) // Tower.PositionY
+                    + sizeof(float) // Tower.PositionZ
+                    + sizeof(float) // Tower.AttackDamage
+                    + sizeof(float) // Tower.AttackSpeed
+                    + sizeof(float) // Tower.AttackRange
+                    + sizeof(int) // Tower.AttackType
+                    + sizeof(int) // Tower.ProjectileType
+                    + sizeof(float) // Tower.ProjectileSpeed
+                    + sizeof(float) // Tower.ThrowRadius
+                )
+
+                // Monsters
+                + sizeof(int) // Monsters.Count
+                + Monsters.Count * (
+                    sizeof(long) // Monster.Uid
+                    + sizeof(long) // Monster.MonsterId
+                    + sizeof(int) // Monster.PathIndex
+                    + sizeof(float) // Monster.PathProgress
+                    + sizeof(float) // Monster.PositionX
+                    + sizeof(float) // Monster.PositionY
+                    + sizeof(float) // Monster.PositionZ
+                    + sizeof(float) // Monster.CurrentHealth
+                    + sizeof(float) // Monster.MaxHealth
+                )
+
+                // Projectiles
+                + sizeof(int) // Projectiles.Count
+                + Projectiles.Count * (
+                    sizeof(long) // Projectile.Uid
+                    + sizeof(float) // Projectile.StartX
+                    + sizeof(float) // Projectile.StartY
+                    + sizeof(float) // Projectile.StartZ
+                    + sizeof(float) // Projectile.ImpactX
+                    + sizeof(float) // Projectile.ImpactY
+                    + sizeof(float) // Projectile.ImpactZ
+                    + sizeof(float) // Projectile.Progress
+                    + sizeof(int) // Projectile.ProjectileType
+                    + sizeof(byte) // Projectile.IsLanded
+                );
         }
+
 
         protected override int WritePayload(Span<byte> dst)
         {
@@ -434,13 +483,12 @@ namespace MyProject.MergeGame.Snapshots
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), TotalSlots); offset += sizeof(int);
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), UsedSlots); offset += sizeof(int);
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), BitConverter.SingleToInt32Bits(ElapsedTime)); offset += sizeof(float);
-            BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), PlayerHp); offset += sizeof(int);
-            BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), PlayerMaxHp); offset += sizeof(int);
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), PlayerGold); offset += sizeof(int);
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), DifficultyStep); offset += sizeof(int);
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), SpawnCount); offset += sizeof(int);
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), BitConverter.SingleToInt32Bits(HealthMultiplier)); offset += sizeof(float);
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), BitConverter.SingleToInt32Bits(SpawnInterval)); offset += sizeof(float);
+            BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), MaxMonsterStack); offset += sizeof(int);
 
             // Slots
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), Slots.Count); offset += sizeof(int);
@@ -521,13 +569,12 @@ namespace MyProject.MergeGame.Snapshots
             int totalSlots = BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset)); offset += sizeof(int);
             int usedSlots = BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset)); offset += sizeof(int);
             float elapsedTime = BitConverter.Int32BitsToSingle(BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset))); offset += sizeof(float);
-            int playerHp = BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset)); offset += sizeof(int);
-            int playerMaxHp = BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset)); offset += sizeof(int);
             int playerGold = BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset)); offset += sizeof(int);
             int difficultyStep = BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset)); offset += sizeof(int);
             int spawnCount = BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset)); offset += sizeof(int);
             float healthMultiplier = BitConverter.Int32BitsToSingle(BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset))); offset += sizeof(float);
             float spawnInterval = BitConverter.Int32BitsToSingle(BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset))); offset += sizeof(float);
+            int maxMonsterStack = BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset)); offset += sizeof(int);
 
             // Slots
             int slotCount = BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset)); offset += sizeof(int);
@@ -598,8 +645,9 @@ namespace MyProject.MergeGame.Snapshots
             }
 
             return new MergeHostSnapshot(tick, playerIndex, sessionPhase, score, maxGrade,
-                totalSlots, usedSlots, elapsedTime, slots, playerHp, playerMaxHp, playerGold,
-                difficultyStep, spawnCount, healthMultiplier, spawnInterval, towers, monsters, projectiles);
+                totalSlots, usedSlots, elapsedTime, slots, playerGold,
+                difficultyStep, spawnCount, healthMultiplier, spawnInterval, maxMonsterStack, towers, monsters, projectiles);
         }
     }
 }
+

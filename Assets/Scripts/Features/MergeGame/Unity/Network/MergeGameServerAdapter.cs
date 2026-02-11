@@ -561,7 +561,7 @@ namespace MyProject.MergeGame.Unity.Network
         {
             return new MapModuleConfig
             {
-                MapId = DevIdHelper.DEV_DEFAULT_MAP_ID,
+                MapId = DevHelperSet.DevIdHelper.DEV_DEFAULT_MAP_ID,
 
                 SlotDefinitions = new List<SlotDefinition>
                 {
@@ -597,11 +597,10 @@ namespace MyProject.MergeGame.Unity.Network
         {
             return new RuleModuleConfig
             {
-                PlayerMaxHp = hostConfig.PlayerMaxHp,
                 PlayerStartGold = hostConfig.PlayerStartGold,
                 ScorePerGrade = hostConfig.ScorePerGrade,
-                InitialUnitGrade = hostConfig.InitialUnitGrade,
-                MaxUnitGrade = hostConfig.MaxUnitGrade,
+                InitialUnitGrade = hostConfig.InitialTowerGrade,
+                MaxUnitGrade = hostConfig.MaxTowerGrade,
             };
         }
 
@@ -622,9 +621,9 @@ namespace MyProject.MergeGame.Unity.Network
         {
             private static readonly long[] _towerIds =
             {
-                DevIdHelper.DEV_TOWER_ID_RED,
-                DevIdHelper.DEV_TOWER_ID_GREEN,
-                DevIdHelper.DEV_TOWER_ID_BLUE
+                DevHelperSet.DevIdHelper.DEV_TOWER_ID_RED,
+                DevHelperSet.DevIdHelper.DEV_TOWER_ID_GREEN,
+                DevHelperSet.DevIdHelper.DEV_TOWER_ID_BLUE
             };
 
             private readonly System.Random _random = new();
@@ -632,10 +631,10 @@ namespace MyProject.MergeGame.Unity.Network
             private readonly Dictionary<long, TowerDefinition> _definitions = new()
             {
                 {
-                    DevIdHelper.DEV_TOWER_ID_RED,
+                    DevHelperSet.DevIdHelper.DEV_TOWER_ID_RED,
                     new TowerDefinition
                     {
-                        TowerId = DevIdHelper.DEV_TOWER_ID_RED,
+                        TowerId = DevHelperSet.DevIdHelper.DEV_TOWER_ID_RED,
                         InitialGrade = 1,
                         BaseAttackDamage = 10f,
                         BaseAttackSpeed = 1f,
@@ -645,10 +644,10 @@ namespace MyProject.MergeGame.Unity.Network
                     }
                 },
                 {
-                    DevIdHelper.DEV_TOWER_ID_GREEN,
+                    DevHelperSet.DevIdHelper.DEV_TOWER_ID_GREEN,
                     new TowerDefinition
                     {
-                        TowerId = DevIdHelper.DEV_TOWER_ID_GREEN,
+                        TowerId = DevHelperSet.DevIdHelper.DEV_TOWER_ID_GREEN,
                         InitialGrade = 1,
                         BaseAttackDamage = 15f,
                         BaseAttackSpeed = 0.7f,
@@ -660,10 +659,10 @@ namespace MyProject.MergeGame.Unity.Network
                     }
                 },
                 {
-                    DevIdHelper.DEV_TOWER_ID_BLUE,
+                    DevHelperSet.DevIdHelper.DEV_TOWER_ID_BLUE,
                     new TowerDefinition
                     {
-                        TowerId = DevIdHelper.DEV_TOWER_ID_BLUE,
+                        TowerId = DevHelperSet.DevIdHelper.DEV_TOWER_ID_BLUE,
                         InitialGrade = 1,
                         BaseAttackDamage = 20f,
                         BaseAttackSpeed = 0.5f,

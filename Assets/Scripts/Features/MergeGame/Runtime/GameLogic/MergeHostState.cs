@@ -78,8 +78,6 @@ namespace MyProject.MergeGame
             public readonly List<MonsterPath> Paths = new();
 
             // 플레이어 상태
-            public int Hp;
-            public int MaxHp;
             public int Gold;
             public bool IsGameOver;
 
@@ -104,8 +102,6 @@ namespace MyProject.MergeGame
                 Monsters.Clear();
 
                 Paths.Clear();
-                Hp = 0;
-                MaxHp = 0;
                 Gold = 0;
                 IsGameOver = false;
                 Score = 0;
@@ -165,17 +161,6 @@ namespace MyProject.MergeGame
         /// 몬스터 목록입니다. (특정 플레이어)
         /// </summary>
         public IReadOnlyDictionary<long, MergeMonster> GetMonsters(int playerIndex) => GetPlayerState(playerIndex)?.Monsters;
-
-        /// <summary>
-        /// 플레이어 HP입니다.
-        /// </summary>
-        public int GetPlayerHp(int playerIndex) => GetPlayerState(playerIndex)?.Hp ?? 0;
-
-        /// <summary>
-        /// 플레이어 최대 HP입니다.
-        /// </summary>
-        public int GetPlayerMaxHp(int playerIndex) => GetPlayerState(playerIndex)?.MaxHp ?? 0;
-
         /// <summary>
         /// 플레이어 골드입니다.
         /// </summary>
@@ -257,30 +242,6 @@ namespace MyProject.MergeGame
                 var mapSlot = mapSlots[i];
                 player.Slots.Add(new SlotInfo(mapSlot.Index, mapSlot.Position));
             }
-        }
-
-        /// <summary>
-        /// 플레이어 상태를 초기화합니다.
-        /// </summary>
-        public void InitializePlayer(int playerIndex, int maxHp, int startGold)
-        {
-            var player = GetPlayerState(playerIndex);
-            if (player == null) return;
-
-            player.MaxHp = maxHp;
-            player.Hp = maxHp;
-            player.Gold = startGold;
-        }
-
-        /// <summary>
-        /// 경로를 추가합니다.
-        /// </summary>
-        public void AddPath(int playerIndex, MonsterPath path)
-        {
-            var player = GetPlayerState(playerIndex);
-            if (player == null) return;
-
-            player.Paths.Add(path);
         }
 
         #endregion
@@ -570,17 +531,6 @@ namespace MyProject.MergeGame
         #region Player State
 
         /// <summary>
-        /// 플레이어 HP를 설정합니다.
-        /// </summary>
-        public void SetPlayerHp(int playerIndex, int hp, int maxHp)
-        {
-            var player = GetPlayerState(playerIndex);
-            if (player == null) return;
-            player.Hp = hp;
-            player.MaxHp = maxHp;
-        }
-
-        /// <summary>
         /// 플레이어 골드를 설정합니다.
         /// </summary>
         public void SetPlayerGold(int playerIndex, int gold)
@@ -599,11 +549,6 @@ namespace MyProject.MergeGame
             if (player == null) return;
             player.Gold += amount;
         }
-
-        /// <summary>
-        /// 플레이어 생존 여부입니다.
-        /// </summary>
-        public bool IsPlayerAlive(int playerIndex) => GetPlayerHp(playerIndex) > 0;
 
         #endregion
 

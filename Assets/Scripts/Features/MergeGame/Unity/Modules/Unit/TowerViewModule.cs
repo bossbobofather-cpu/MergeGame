@@ -41,6 +41,18 @@ namespace MyProject.MergeGame.Unity
         private readonly List<long> _removeBuffer = new();
         private IReadOnlyList<SlotPositionData> _cachedSlotPositions;
         private MergeHostSnapshot _lastSnapshot;
+        // 등급 단계가 확실히 구분되도록 8단계 고정 팔레트를 사용합니다.
+        private static readonly Color[] GradePalette =
+        {
+            new(0.62f, 0.72f, 0.96f, 1f), // 1
+            new(0.42f, 0.82f, 0.95f, 1f), // 2
+            new(0.36f, 0.90f, 0.62f, 1f), // 3
+            new(0.58f, 0.94f, 0.40f, 1f), // 4
+            new(0.95f, 0.90f, 0.30f, 1f), // 5
+            new(1.00f, 0.72f, 0.26f, 1f), // 6
+            new(1.00f, 0.48f, 0.28f, 1f), // 7
+            new(0.96f, 0.28f, 0.42f, 1f)  // 8
+        };
 
         // 드래그 상태
         private Camera _mainCamera;
@@ -63,6 +75,7 @@ namespace MyProject.MergeGame.Unity
             {
                 return;
             }
+            
             switch (evt)
             {
                 case MapInitializedEvent mapEvt:
@@ -464,9 +477,10 @@ namespace MyProject.MergeGame.Unity
                 return;
             }
 
-            // 프로토타입용: 등급이 올라갈수록 밝고 따뜻한 색으로.
-            var t = Mathf.Clamp01((grade - 1) / 8f);
-            var color = Color.Lerp(new Color(0.8f, 0.8f, 0.9f, 1f), new Color(1f, 0.8f, 0.2f, 1f), t);
+            var maxGrade = Mathf.Max(1, DevHelperSet.DevRuleHelper.DEV_TOWER_MAX_GRADE);
+            var normalized = maxGrade > 1? Mathf.Clamp01((grade - 1f) / (maxGrade - 1f)): 0f;
+            var paletteIndex = Mathf.Clamp(Mathf.RoundToInt(normalized * (GradePalette.Length - 1)), 0, GradePalette.Length - 1);
+            var color = GradePalette[paletteIndex];
 
             try
             {
@@ -518,5 +532,4 @@ namespace MyProject.MergeGame.Unity
         }
     }
 }
-
 

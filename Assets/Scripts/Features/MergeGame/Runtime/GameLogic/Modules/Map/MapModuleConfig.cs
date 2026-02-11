@@ -47,7 +47,7 @@ namespace MyProject.MergeGame.Modules
         /// <summary>
         /// 맵 ID입니다.
         /// </summary>
-        public int MapId { get; set; } = DevIdHelper.DEV_DEFAULT_MAP_ID;
+        public int MapId { get; set; } = DevHelperSet.DevIdHelper.DEV_DEFAULT_MAP_ID;
 
         /// <summary>
         /// 슬롯 정의 목록입니다.

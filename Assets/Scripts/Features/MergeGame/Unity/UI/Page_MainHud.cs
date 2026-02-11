@@ -14,6 +14,11 @@ namespace MyProject.MergeGame.Unity
         [SerializeField] private Button _spawnTowerButton;
         [SerializeField] private Button _readyButton;
 
+        [SerializeField] private Text _resultText;
+        [SerializeField] private Text _monsterNumText;
+        [SerializeField] private Text _difficultyStepText;
+        [SerializeField] private Text _goldText;
+
         /// <summary>
         /// 타워 스폰 버튼입니다.
         /// </summary>
@@ -32,6 +37,46 @@ namespace MyProject.MergeGame.Unity
         public void SetActiveReadyButton(bool active)
         {
             ReadyButton?.gameObject.SetActive(active);
+        }
+
+        public void SetActiveResultText(bool active)
+        {
+            _resultText?.gameObject.SetActive(active);
+        }
+
+        public void SetActiveMonsterNumText(bool active)
+        {
+            _monsterNumText?.gameObject.SetActive(active);
+        }
+
+        public void SetActiveDifficultyStepText(bool active)
+        {
+            _difficultyStepText?.gameObject.SetActive(active);
+        }
+
+        public void SetActiveGoldText(bool active)
+        {
+            _goldText?.gameObject.SetActive(active);
+        }
+
+        public void SetResultText(string text)
+        {
+            if(_resultText != null) _resultText.text = text;
+        }
+
+        public void SetMonsterNumText(string text)
+        {
+            if (_monsterNumText != null) _monsterNumText.text = text;
+        }
+
+        public void SetDifficultyText(string text)
+        {
+            if(_difficultyStepText != null) _difficultyStepText.text = text;
+        }
+
+        public void SetGoldText(string text)
+        {
+            if (_goldText != null) _goldText.text = text;
         }
     }
 }

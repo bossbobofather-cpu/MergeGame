@@ -38,7 +38,7 @@ namespace MyProject.MergeGame.Modules
         /// <summary>
         /// 기본 몬스터 ID입니다.
         /// </summary>
-        public long DefaultMonsterId { get; set; } = DevIdHelper.DEV_DEFAULT_MONSTER_ID;
+        public long DefaultMonsterId { get; set; } = DevHelperSet.DevIdHelper.DEV_DEFAULT_MONSTER_ID;
 
         /// <summary>
         /// 기본 경로 인덱스입니다.

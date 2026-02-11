@@ -141,6 +141,9 @@ namespace MyProject.MergeGame.Models
         {
             if (other == null) return false;
             if (Uid == other.Uid) return false;
+            if (Grade == DevHelperSet.DevRuleHelper.DEV_TOWER_MAX_GRADE
+            || other.Grade == DevHelperSet.DevRuleHelper.DEV_TOWER_MAX_GRADE) return false;
+
             return TowerId == other.TowerId && Grade == other.Grade;
         }
 

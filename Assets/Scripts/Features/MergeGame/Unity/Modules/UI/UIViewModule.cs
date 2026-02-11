@@ -19,6 +19,10 @@ namespace MyProject.MergeGame.Unity
         [SerializeField] private Page_MainHud _mainHudPrefab;
 
         private Page_MainHud _mainHudInstance;
+        private int _currentMonsterCount = 0;
+        private int _maxMonsterStack = 0;
+        private int _difficultyStep = 0;
+        private int _gold = 0;
 
         protected override void OnInit()
         {
@@ -29,40 +33,67 @@ namespace MyProject.MergeGame.Unity
 
         public override void OnConnectedEvent()
         {
-            if(_mainHudInstance == null) return;
-            
-            //연결 성공 시 HUD UI Active 킨다.
+            if (_mainHudInstance == null) return;
+
+            // 연결 성공 시 HUD UI Active 킨다.
             _mainHudInstance.gameObject.SetActive(true);
-            _mainHudInstance.SetActiveReadyButton(true);
+            _mainHudInstance?.SetActiveReadyButton(true);
         }
 
         public override void OnCommandResultMsg(MergeCommandResult result)
         {
-            if(result == null) return;
+            if (result == null) return;
 
-            if(result is ReadyMergeGameResult readyCmdResult)
+            if (result is ReadyMergeGameResult readyCmdResult)
             {
-                if(readyCmdResult.Success)
+                if (readyCmdResult.Success)
                 {
-                    //Ready 성공했으면 Ready 버튼 숨긴다.
+                    // Ready 성공했으면 Ready 버튼 숨긴다.
                     _mainHudInstance?.SetActiveReadyButton(false);
+
+                    _mainHudInstance?.SetActiveMonsterNumText(true);
+                    _mainHudInstance?.SetActiveDifficultyStepText(true);
+                    _mainHudInstance?.SetActiveGoldText(true);
+
+                    RefreshMonsterNumText();
+                    RefreshDifficultyText();
+                    RefreshGoldNumText();
                 }
             }
         }
 
         public override void OnEventMsg(MergeGameEvent evt)
         {
-            if(evt == null) return;
+            if (!IsMyEvent(evt)) return;
 
-            if (evt is GameStartedEvent gameStartedEvent)
+            if (evt is GameStartedEvent)
             {
-                if (!IsMyPlayer(gameStartedEvent.PlayerIndex))
-                {
-                    return;
-                }
-
                 // GameStartedEvent 이벤트가 오면 스폰 버튼 활성화
                 _mainHudInstance?.SetActiveSpawnButton(true);
+            }
+            else if (evt is MonsterSpawnedEvent)
+            {
+                // 스냅샷 반영 전까지 HUD 즉시성 확보를 위해 이벤트에서도 증가시킵니다.
+                _currentMonsterCount++;
+                RefreshMonsterNumText();
+            }
+            else if (evt is PlayerGoldChangedEvent goldChangedEvent)
+            {
+                _gold = goldChangedEvent.CurrentGold;
+                RefreshGoldNumText();
+            }
+            else if (evt is DifficultyStepChangedEvent difficultyStepChangedEvent)
+            {
+                _difficultyStep = difficultyStepChangedEvent.Step;
+                RefreshDifficultyText();
+            }
+            else if (evt is GameOverEvent gameOverEvent)
+            {
+                var result = gameOverEvent.IsVictory ? "Win" : "Lose";
+                _mainHudInstance?.SetResultText(result);
+                _mainHudInstance?.SetActiveResultText(true);
+
+                _mainHudInstance?.SetActiveSpawnButton(false);
             }
         }
 
@@ -72,6 +103,15 @@ namespace MyProject.MergeGame.Unity
             {
                 return;
             }
+
+            _currentMonsterCount = snapshot.Monsters?.Count ?? 0;
+            _maxMonsterStack = snapshot.MaxMonsterStack;
+            _gold = snapshot.PlayerGold;
+            _difficultyStep = snapshot.DifficultyStep;
+
+            RefreshMonsterNumText();
+            RefreshDifficultyText();
+            RefreshGoldNumText();
         }
 
         private void EnsureMainHudPage()
@@ -109,13 +149,15 @@ namespace MyProject.MergeGame.Unity
                 _mainHudInstance.ReadyButton.onClick.AddListener(HandleReadyClicked);
             }
 
-            //만들어두고 액티브 꺼둔다.
-            //서버 연결 성공 시 켠다.
+            // 만들어두고 액티브 꺼둔다.
+            // 서버 연결 성공 시 켠다.
             _mainHudInstance.gameObject.SetActive(false);
 
-            //두 버튼 다 꺼두고 필요할 때 켜는 걸로
             _mainHudInstance.SetActiveSpawnButton(false);
             _mainHudInstance.SetActiveReadyButton(false);
+            _mainHudInstance.SetActiveResultText(false);
+            _mainHudInstance.SetActiveMonsterNumText(true);
+            RefreshMonsterNumText();
         }
 
         private void HandleSpawnTowerClicked()
@@ -140,6 +182,37 @@ namespace MyProject.MergeGame.Unity
             GameView.SendReady();
         }
 
+        private void RefreshMonsterNumText()
+        {
+            if (_mainHudInstance == null)
+            {
+                return;
+            }
+
+            var maxText = _maxMonsterStack > 0 ? _maxMonsterStack.ToString() : "?";
+            _mainHudInstance.SetMonsterNumText($"몬스터 : {_currentMonsterCount} / {maxText}");
+        }
+
+        private void RefreshGoldNumText()
+        {
+            if (_mainHudInstance == null)
+            {
+                return;
+            }
+
+            _mainHudInstance.SetGoldText($"Gold : {_gold}");
+        }
+
+        private void RefreshDifficultyText()
+        {
+            if (_mainHudInstance == null)
+            {
+                return;
+            }
+
+            _mainHudInstance.SetDifficultyText($"Difficulty Step : {_difficultyStep}");
+        }
+
         protected override void OnShutdown()
         {
             if (_mainHudInstance != null)
@@ -161,5 +234,4 @@ namespace MyProject.MergeGame.Unity
         }
     }
 }
-
 

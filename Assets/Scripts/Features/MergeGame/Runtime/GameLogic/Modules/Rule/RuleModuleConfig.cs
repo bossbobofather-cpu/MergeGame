@@ -114,11 +114,6 @@ namespace MyProject.MergeGame.Modules
         public int PlayerStartGold { get; set; } = 100;
 
         /// <summary>
-        /// 플레이어 최대 HP입니다.
-        /// </summary>
-        public int PlayerMaxHp { get; set; } = 100;
-
-        /// <summary>
         /// 몬스터당 보상 골드입니다.
         /// </summary>
         public int GoldPerMonsterKill { get; set; } = 5;
