@@ -45,5 +45,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MyProject.Common.UI.UIManager
   _rootPrefab: {fileID: 186396015441958642, guid: 43f99b362a2ef3a41b63018e054c323e, type: 3}
-  _registry: {fileID: 11400000, guid: b86b8b960a29cb84c90b28744b12fa18, type: 2}
+  _registry: {fileID: 11400000, guid: c5bad4d257bd4c9469f577b3d475f655, type: 2}
   _dontDestroyOnLoad: 1

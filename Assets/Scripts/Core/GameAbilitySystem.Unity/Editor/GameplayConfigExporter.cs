@@ -141,7 +141,7 @@ namespace Noname.GameCore.Helper.Editor
 
             return new GameplayEffectDto
             {
-                EffectId = config.name,
+                EffectTag = config.name,
                 DisplayName = config.DisplayName ?? config.name,
                 Description = config.Description ?? "",
                 DurationType = config.DurationType.ToString(),
@@ -268,3 +268,4 @@ namespace Noname.GameCore.Helper.Editor
         #endregion
     }
 }
+

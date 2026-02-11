@@ -3,7 +3,6 @@
     "rootNamespace":  "MyProject.MergeGame.Unity.Network",
     "references":  [
                        "Noname.MergeGame",
-                       "Noname.MergeGame.Shared",
                        "Noname.GameAbilitySystem",
                        "Noname.GameHost",
                        "Noname.Shared.Unity",

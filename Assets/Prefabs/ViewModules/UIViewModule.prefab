@@ -1,0 +1,61 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1027499773739349250
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7939543339296741783}
+  - component: {fileID: 4206240526483746809}
+  m_Layer: 0
+  m_Name: UIViewModule
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7939543339296741783
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1027499773739349250}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3054.0159, y: 0.00013, z: 1599.2322}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4206240526483746809
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1027499773739349250}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dad62c91066267f41baae683b5f53925, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Noname.MergeGame.Unity::MyProject.MergeGame.Unity.HudViewModule
+  _mainHudPrefab: {fileID: 0}
+  _spawnTowerId: 1
+  _hpText: {fileID: 0}
+  _goldText: {fileID: 0}
+  _difficultyText: {fileID: 0}
+  _scoreText: {fileID: 0}
+  _miscText: {fileID: 0}
+  _canvas: {fileID: 0}
+  _container: {fileID: 0}
+  _autoCreateCanvas: 1
+  _font: {fileID: 0}
+  _fontSize: 18
+  _textColor: {r: 1, g: 1, b: 1, a: 1}
+  _panelColor: {r: 0, g: 0, b: 0, a: 0.6}
+  _panelPadding: {x: 10, y: 10}

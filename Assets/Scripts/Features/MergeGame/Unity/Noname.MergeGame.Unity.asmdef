@@ -2,8 +2,9 @@
   "name": "Noname.MergeGame.Unity",
   "rootNamespace": "MyProject.MergeGame.Unity",
   "references": [
+    "Mirror",
     "Noname.MergeGame",
-    "Noname.MergeGame.Shared",
+    "Noname.MergeGame.Unity.Network",
     "Noname.GameAbilitySystem",
     "Noname.GameAbilitySystem.Unity",
     "Noname.GameHost",

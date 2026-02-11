@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Noname.GameAbilitySystem.Json
@@ -9,14 +9,17 @@ namespace Noname.GameAbilitySystem.Json
     [Serializable]
     public class GameplayEffectDto
     {
+        public string EffectTag;
+
+        // Legacy field for backward compatibility with old exported json.
         public string EffectId;
+
         public string DisplayName;
         public string Description;
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
-        
         public string DurationType;
 
         public float Duration;
@@ -31,4 +34,3 @@ namespace Noname.GameAbilitySystem.Json
         public DurationPolicyDto DurationPolicy;
     }
 }
-

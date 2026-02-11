@@ -143,11 +143,13 @@ namespace MyProject.Common.UI
 
             // 비활성화만 하고 인스턴스는 보관합니다.
             instance.gameObject.SetActive(false);
-
+            
             if (_activePopup == instance)
             {
                 _activePopup = null;
             }
+
+            instance.OnClosed();
         }
 
         /// <summary>
@@ -162,6 +164,9 @@ namespace MyProject.Common.UI
 
             // 활성 팝업만 비활성화합니다.
             _activePopup.gameObject.SetActive(false);
+
+            _activePopup.OnClosed();
+            
             _activePopup = null;
         }
 
@@ -227,6 +232,7 @@ namespace MyProject.Common.UI
                 _activePopup = instance as UIPopupBase;
             }
 
+            instance.OnOpened();
             return instance;
         }
 

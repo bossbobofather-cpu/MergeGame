@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3495545804137399046
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4174495049501957456}
+  - component: {fileID: 7742955776202277018}
+  m_Layer: 0
+  m_Name: TowerViewModule
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4174495049501957456
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3495545804137399046}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3054.0159, y: 0.00013, z: 1599.2322}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7742955776202277018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3495545804137399046}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61aad63942a74471a9abc18525347882, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Noname.MergeGame.Unity::MyProject.MergeGame.Unity.TowerViewModule
+  _defaultTowerPrefab: {fileID: 4511685049516256600, guid: 8b375be4823530c4d9b94815af05ea0e, type: 3}
+  _towerPrefabs:
+  - Id: 1
+    Prefab: {fileID: 4511685049516256600, guid: 8b375be4823530c4d9b94815af05ea0e, type: 3}
+  - Id: 2
+    Prefab: {fileID: 261712505557603768, guid: 97c218e26e882dd43be0ab661f848cc5, type: 3}
+  - Id: 3
+    Prefab: {fileID: 3548786653379959874, guid: 00bcb4702b9b6b149b022aaa1cfc4c6a, type: 3}
+  _enableHitScanLine: 1
+  _hitScanLinePrefab: {fileID: 1891726025392590965, guid: a36f7c474c38f324b9b238a239ef8db6, type: 3}
+  _hitScanLineDuration: 0.08
+  _hitScanLineWidth: 0.05
+  _hitScanLineColor: {r: 1, g: 0.8, b: 0.2, a: 1}

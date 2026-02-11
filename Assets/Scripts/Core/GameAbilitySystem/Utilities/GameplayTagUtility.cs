@@ -58,7 +58,6 @@ namespace Noname.GameAbilitySystem
             return child.StartsWith(parent, StringComparison.Ordinal) && child[parent.Length] == '.';
         }
 
-        // 주석 정리
         public static int Fnv1a32(string value)
         {
             if (string.IsNullOrEmpty(value))

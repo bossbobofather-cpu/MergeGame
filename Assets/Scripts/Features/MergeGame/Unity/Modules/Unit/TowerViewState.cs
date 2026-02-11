@@ -21,18 +21,6 @@ namespace MyProject.MergeGame.Unity
         public TowerVisualState State => _state;
 
         /// <summary>
-        /// 기본 스케일을 설정합니다.
-        /// </summary>
-        public void SetBaseScale(Vector3 baseScale)
-        {
-            _baseScale = baseScale;
-            if (_state == TowerVisualState.Idle)
-            {
-                transform.localScale = _baseScale;
-            }
-        }
-
-        /// <summary>
         /// 공격 상태로 전환합니다.
         /// </summary>
         public void TriggerAttack(float? duration = null)

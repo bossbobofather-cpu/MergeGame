@@ -7,30 +7,14 @@ namespace MyProject.Common.UI
 {    
     public class UIBase : MonoBehaviour
     {
-        private bool _collecteButtons = false;
-        private List<Button> _buttons = new();
-
-        public List<Button> Buttons => _buttons;
-
-
-        private void Awake()
+        public virtual void OnOpened()
         {
-            CollecteButtons();
-        }
-
-        private void OnEnable()
-        {
-            CollecteButtons();
-        }
-
-        public void CollecteButtons()
-        {
-            if(_collecteButtons) return;
-
-            _buttons.Clear();
-            _collecteButtons = true;
             
-            GetComponentsInChildren(true, _buttons);
+        }
+
+        public virtual void OnClosed()
+        {
+            
         }
     }
 }

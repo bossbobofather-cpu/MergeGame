@@ -105,7 +105,7 @@ namespace Noname.GameCore.Helper
 
             var effect = new GameplayEffect
             {
-                EffectId = config.name,
+                EffectTag = new FGameplayTag(config.name),
                 DisplayName = config.name,
                 Description = config.Description,
                 DurationType = config.DurationType,
@@ -164,3 +164,4 @@ namespace Noname.GameCore.Helper
         }
     }
 }
+

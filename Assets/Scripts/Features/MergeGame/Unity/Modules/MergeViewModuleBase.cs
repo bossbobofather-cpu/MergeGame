@@ -1,40 +1,76 @@
-﻿using MyProject.Common.GameMode;
+﻿using MyProject.Common.GameView;
+using MyProject.MergeGame.Commands;
+using MyProject.MergeGame.Events;
+using MyProject.MergeGame.Snapshots;
 
 namespace MyProject.MergeGame.Unity
 {
     /// <summary>
     /// MergeGame View 모듈의 공통 베이스 클래스입니다.
-    /// Mode와 Host 사이의 이벤트/스냅샷 연결 지점을 제공합니다.
     /// </summary>
-    public abstract class MergeViewModuleBase : ModuleBase, IMergeViewModule
+    public abstract class MergeViewModuleBase : ViewModuleBase, IMergeViewModule
     {
         /// <summary>
-        /// 현재 모듈이 연결된 MergeGameMode 인스턴스입니다.
+        /// 현재 모듈이 연결된 MergeGameView 인스턴스입니다.
         /// </summary>
-        protected MergeGameMode GameView { get; private set; }
+        protected MergeGameViewManager GameView { get; private set; }
 
         /// <summary>
-        /// 모듈 초기화 시 Mode를 MergeGameMode로 캐스팅해 보관합니다.
+        /// 모듈 초기화 시 View를 MergeGameView로 캐스팅해 보관합니다.
         /// </summary>
         protected override void OnInit()
         {
-            GameView = Mode as MergeGameMode;
+            GameView = View as MergeGameViewManager;
         }
 
-        /// <summary>
-        /// Host 이벤트 수신 콜백입니다.
-        /// 필요한 모듈만 override하여 사용합니다.
-        /// </summary>
-        public virtual void OnHostEvent(MergeHostEvent evt)
+        public virtual void OnEventMsg(MergeGameEvent evt)
+        {
+        }
+
+        public virtual void OnSnapshotMsg(MergeHostSnapshot snapshot)
+        {
+        }
+
+        public virtual void OnCommandResultMsg(MergeCommandResult result)
+        {
+        }
+
+        public virtual void OnConnectedEvent()
+        {
+        }
+
+        public virtual void OnDisconnectedEvent()
         {
         }
 
         /// <summary>
-        /// 스냅샷 갱신 콜백입니다.
-        /// 필요한 모듈만 override하여 사용합니다.
+        /// 로컬 플레이어가 할당되었는지 여부입니다.
         /// </summary>
-        public virtual void OnSnapshotUpdated(MergeHostSnapshot snapshot)
+        protected bool HasAssignedPlayer =>
+            GameView != null && GameView.AssignedPlayerIndex >= 0;
+
+        /// <summary>
+        /// 입력된 플레이어 인덱스가 로컬 플레이어와 같은지 검사합니다.
+        /// </summary>
+        protected bool IsMyPlayer(int playerIndex)
         {
+            return HasAssignedPlayer && GameView.AssignedPlayerIndex == playerIndex;
+        }
+
+        /// <summary>
+        /// 이벤트가 로컬 플레이어용인지 검사합니다.
+        /// </summary>
+        protected bool IsMyEvent(MergeGameEvent evt)
+        {
+            return evt != null && IsMyPlayer(evt.PlayerIndex);
+        }
+
+        /// <summary>
+        /// 스냅샷이 로컬 플레이어용인지 검사합니다.
+        /// </summary>
+        protected bool IsMySnapshot(MergeHostSnapshot snapshot)
+        {
+            return snapshot != null && IsMyPlayer(snapshot.PlayerIndex);
         }
     }
 }

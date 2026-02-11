@@ -1,4 +1,5 @@
-﻿using Mirror;
+﻿using System;
+using Mirror;
 
 namespace MyProject.MergeGame.Unity.Network
 {
@@ -8,51 +9,58 @@ namespace MyProject.MergeGame.Unity.Network
     public enum MergeNetCommandType : ushort
     {
         None = 0,
+        ReadyGame = 2,
+        ExitGame = 3,           //게임의 종료는 Host가 판단한다. Client는 게임 도중 나가기에 대한 커맨드만
+        SpawnTower = 10,
+        MergeTower = 11,
+        InjectMonsters = 20,
+    }
 
-        // NOTE:
-        // StartGame(1)은 초기 프로토타입에서 "즉시 시작" 용도로 사용했었습니다.
-        // 현재는 Ready 게이트를 두고 시작시키므로, StartGame도 Ready와 동일하게 취급할 수 있습니다.
-        StartGame = 1,
-        SpawnTower = 2,
-        MergeTower = 3,
+    public struct NetAuthenticateMessage : NetworkMessage
+    {
+        public long UserId;
+    }
 
-        /// <summary>
-        /// 게임 준비(Ready) 커맨드입니다.
-        /// 서버는 두 플레이어의 Ready를 모두 받으면 게임을 시작합니다.
-        /// </summary>
-        Ready = 4,
+    /// <summary>
+    /// 서버 -> 클라이언트 인증 응답 메시지
+    /// </summary>
+    public struct NetAuthResponseMessage : NetworkMessage
+    {
+        public bool Success;
+        public string Message;
     }
 
     /// <summary>
     /// 클라이언트 -> 서버 커맨드 메시지입니다.
-    /// 복잡한 직렬화 대신, 최소한의 공용 필드(Int/Str)를 사용합니다.
     /// </summary>
-    public struct CommandMsg : NetworkMessage
+    public struct NetCommandMessage : NetworkMessage
     {
-        public int PlayerIndex;
         public long SenderUid;
         public MergeNetCommandType CommandType;
-        public int Int0;
-        public int Int1;
-        public string Str0;
+
+        public ArraySegment<byte> Payload;
+    }
+
+    /// <summary>
+    /// 서버 -> 클라이언트 커맨드 결과 메시지입니다.
+    /// </summary>
+    public struct NetCommandResultMessage : NetworkMessage
+    {
+        public long SenderUid;
+        public MergeNetCommandType CommandType;
+
+        public ArraySegment<byte> Payload;
     }
 
     /// <summary>
     /// 서버 -> 클라이언트 스냅샷 메시지입니다.
     /// View는 스냅샷을 source of truth로 삼아 동기화합니다.
     /// </summary>
-    public struct SnapshotMsg : NetworkMessage
+    public struct NetSnapshotMessage : NetworkMessage
     {
         public int PlayerIndex;
-        public long Tick;
-        public int SessionPhase;
-        public int WaveNumber;
-        public int WavePhase;
-        public int MonsterCount;
-        public int TowerCount;
-        public int UsedSlotCount;
-        public float SampleMonsterProgress0;
-        public float SampleMonsterProgress1;
+
+        public ArraySegment<byte> Payload;
     }
 
     /// <summary>
@@ -62,18 +70,37 @@ namespace MyProject.MergeGame.Unity.Network
     public enum MergeNetEventType : ushort
     {
         None = 0,
-        Log = 1,
+        PlayerAssigned = 1,
+        ConnectedInfo = 2,
+        GameStarted = 10,
+        GameOver = 11,
+        MapInitialized = 12,
+        TowerSpawned = 20,
+        TowerMerged = 21,
+        TowerRemoved = 22,
+        TowerAttacked = 23,
+        EffectTriggered = 24,
+        MonsterSpawned = 30,
+        MonsterDamaged = 31,
+        MonsterDied = 32,
+        MonsterMoved = 33,
+
+        DifficultyStepChangedEvent = 40,
+
+        ScoreChanged = 50,
+        PlayerGoldChanged = 51,
     }
 
     /// <summary>
     /// 서버 -> 클라이언트 이벤트 메시지입니다.
     /// </summary>
-    public struct EventMsg : NetworkMessage
+    public struct NetEventMessage : NetworkMessage
     {
         public int PlayerIndex;
         public long Tick;
         public MergeNetEventType EventType;
-        public string Text;
+
+        public ArraySegment<byte> Payload;
     }
 }
 

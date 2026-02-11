@@ -1,10 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Mirror;
 using MyProject.MergeGame;
 using MyProject.MergeGame.Commands;
+using MyProject.MergeGame.Events;
 using MyProject.MergeGame.Modules;
+using MyProject.MergeGame.Snapshots;
 using Noname.GameAbilitySystem;
+using Noname.GameHost;
 using UnityEngine;
+using Time = UnityEngine.Time;
 
 namespace MyProject.MergeGame.Unity.Network
 {
@@ -22,8 +27,6 @@ namespace MyProject.MergeGame.Unity.Network
         [SerializeField] private bool _reserveSlot0ForLocalHost = true;
         [SerializeField] private int _maxPlayers = 1;
         [SerializeField] private float _snapshotSendInterval = 0.1f;
-        [SerializeField] private float _dummySpawnInterval = 1f;
-        [SerializeField] private string _dummyTowerId = "unit_basic";
 
         /// <summary>
         /// Host(Server+LocalClient) 모드와 Dedicated Server 모드에 맞춰
@@ -43,17 +46,10 @@ namespace MyProject.MergeGame.Unity.Network
             _maxPlayers = Mathf.Clamp(maxPlayers, 1, MaxSupportedPlayers);
         }
 
-        private readonly Dictionary<int, int> _playerIndexByConnectionId = new();
-        private NetworkConnectionToClient[] _connections;
-        private long[] _playerUids;
-        private MergeGameHost[] _playerHosts;
-        private bool[] _playerReady;
-        private bool[] _playerStarted;
-        private bool[] _playerGameOver;
+        private readonly Dictionary<int, (NetworkConnectionToClient, MergeGamePlayer)> _playerAndConnectionByConnId = new();
+        private MergeGameHost _host;
 
         private bool _matchStarted;
-
-        private float[] _dummySpawnTimers;
         private float _snapshotTimer;
 
         private bool _initialized;
@@ -72,36 +68,31 @@ namespace MyProject.MergeGame.Unity.Network
             }
 
             var playerCount = Mathf.Clamp(_maxPlayers, 1, MaxSupportedPlayers);
-            _connections = new NetworkConnectionToClient[playerCount];
-            _playerUids = new long[playerCount];
-            _playerHosts = new MergeGameHost[playerCount];
-            _playerReady = new bool[playerCount];
-            _playerStarted = new bool[playerCount];
-            _playerGameOver = new bool[playerCount];
-            _dummySpawnTimers = new float[playerCount];
-
-            for (var i = 0; i < playerCount; i++)
-            {
-                _playerUids[i] = i + 1;
-            }
 
             _initialized = true;
 
-            NetworkServer.OnConnectedEvent += HandleConnected;
-            NetworkServer.OnDisconnectedEvent += HandleDisconnected;
-            NetworkServer.UnregisterHandler<CommandMsg>();
-            NetworkServer.RegisterHandler<CommandMsg>(HandleCommandMsg, requireAuthentication: false);
-
-            // 플레이어 보드별 Host를 생성하고 초기화합니다.
-            for (var i = 0; i < _playerHosts.Length; i++)
+            // NetworkServer.OnConnectedEvent는 연결 직후 호출되므로 인증 데이터가 아직 없을 수 있습니다.
+            // Authenticator가 있다면 인증 완료 이벤트를 구독해야 합니다.
+            if (NetworkManager.singleton.authenticator != null)
             {
-                var playerIndex = i;
-                var host = BuildHost();
-                host.ResultProduced += result => OnHostResult(playerIndex, result);
-                host.EventRaised += evt => OnHostEvent(playerIndex, evt);
-                host.StartSimulation();
-                _playerHosts[playerIndex] = host;
+                NetworkManager.singleton.authenticator.OnServerAuthenticated.AddListener(HandleConnected);
             }
+            else
+            {
+                NetworkServer.OnConnectedEvent += HandleConnected;
+            }
+            
+            NetworkServer.OnDisconnectedEvent += HandleDisconnected;
+            NetworkServer.UnregisterHandler<NetCommandMessage>();
+            NetworkServer.RegisterHandler<NetCommandMessage>(HandleCommandMsg);
+
+            // 단일 Host를 생성하고 초기화합니다.
+            _host = BuildHost();
+            _host.InitializePlayers(playerCount);
+
+            _host.ResultProduced += OnHostResult;
+            _host.EventRaised += OnHostEvent;
+            _host.StartSimulation();
 
             Debug.Log("[MergeGameServerAdapter] ServerAdapter initialized.");
         }
@@ -113,24 +104,22 @@ namespace MyProject.MergeGame.Unity.Network
                 return;
             }
 
+            if (NetworkManager.singleton != null && NetworkManager.singleton.authenticator != null)
+            {
+                NetworkManager.singleton.authenticator.OnServerAuthenticated.RemoveListener(HandleConnected);
+            }
+
             NetworkServer.OnConnectedEvent -= HandleConnected;
             NetworkServer.OnDisconnectedEvent -= HandleDisconnected;
-            NetworkServer.UnregisterHandler<CommandMsg>();
+            NetworkServer.UnregisterHandler<NetCommandMessage>();
 
-            if (_playerHosts != null)
+            if (_host != null)
             {
-                for (var i = 0; i < _playerHosts.Length; i++)
-                {
-                    var host = _playerHosts[i];
-                    if (host == null)
-                    {
-                        continue;
-                    }
-
-                    host.StopSimulation();
-                    host.Dispose();
-                    _playerHosts[i] = null;
-                }
+                _host.ResultProduced -= OnHostResult;
+                _host.EventRaised -= OnHostEvent;
+                _host.StopSimulation();
+                _host.Dispose();
+                _host = null;
             }
 
             _initialized = false;
@@ -138,22 +127,13 @@ namespace MyProject.MergeGame.Unity.Network
 
         private void Update()
         {
-            if (!_initialized || !NetworkServer.active || _playerHosts == null)
+            if (!_initialized || !NetworkServer.active || _host == null)
             {
                 return;
             }
 
-            // 서버 프레임에서 각 Host의 Result/Event를 메인 스레드로 디스패치합니다.
-            for (var i = 0; i < _playerHosts.Length; i++)
-            {
-                _playerHosts[i]?.FlushEvents();
-            }
-
-            // 더미 테스트: 일정 주기로 기본 타워를 자동 생성합니다.
-            for (var i = 0; i < _playerHosts.Length; i++)
-            {
-                TickDummySpawn(i, Time.deltaTime);
-            }
+            // 서버 프레임에서 Host의 Result/Event를 메인 스레드로 디스패치합니다.
+            _host.FlushEvents();
 
             // 스냅샷 주기 전송
             _snapshotTimer += Time.deltaTime;
@@ -161,93 +141,69 @@ namespace MyProject.MergeGame.Unity.Network
             {
                 _snapshotTimer -= _snapshotSendInterval;
 
-                for (var i = 0; i < _playerHosts.Length; i++)
+                foreach (var playerAndConnection in _playerAndConnectionByConnId)
                 {
-                    SendSnapshotToPlayer(i);
+                    var conn = playerAndConnection.Value.Item1;
+                    if (conn == null) continue;
+
+                    var player = playerAndConnection.Value.Item2;
+                    if (player == null) continue;
+
+                    SendSnapshotToPlayer(player.Index, playerAndConnection.Value.Item1);
                 }
             }
         }
 
-        private void TickDummySpawn(int playerIndex, float deltaSeconds)
+        private void SendSnapshotToPlayer(int playerIndex, NetworkConnectionToClient conn)
         {
-            if (!_playerStarted[playerIndex] || _playerGameOver[playerIndex])
-            {
-                return;
-            }
+            if (conn == null) return;
 
-            _dummySpawnTimers[playerIndex] += deltaSeconds;
-            if (_dummySpawnTimers[playerIndex] < _dummySpawnInterval)
-            {
-                return;
-            }
-
-            _dummySpawnTimers[playerIndex] -= _dummySpawnInterval;
-
-            var host = GetHost(playerIndex);
-            if (host == null)
-            {
-                return;
-            }
-
-            host.SendCommand(new SpawnTowerCommand(
-                senderUid: _playerUids[playerIndex],
-                towerId: _dummyTowerId,
-                slotIndex: -1
-            ));
-        }
-
-        private void SendSnapshotToPlayer(int playerIndex)
-        {
-            var conn = _connections[playerIndex];
-            if (conn == null)
-            {
-                return;
-            }
-
-            var host = GetHost(playerIndex);
-            if (host == null)
-            {
-                return;
-            }
-
-            var snapshot = host.GetLatestSnapshot();
+            var snapshot = _host.GetPlayerSnapshot(playerIndex);
             if (snapshot == null)
             {
                 return;
             }
 
-            var monsters = snapshot.Monsters;
-            var towers = snapshot.Towers;
-            var usedSlots = snapshot.UsedSlots;
 
-            var p0 = 0f;
-            var p1 = 0f;
-
-            if (monsters != null)
-            {
-                if (monsters.Count > 0) p0 = monsters[0].PathProgress;
-                if (monsters.Count > 1) p1 = monsters[1].PathProgress;
-            }
-
-            var msg = new SnapshotMsg
+            var pooled = ByteSerializer.SerializePooled(snapshot);
+            var msg = new NetSnapshotMessage
             {
                 PlayerIndex = playerIndex,
-                Tick = snapshot.Tick,
-                SessionPhase = (int)snapshot.SessionPhase,
-                WaveNumber = snapshot.CurrentWaveNumber,
-                WavePhase = (int)snapshot.WavePhase,
-                MonsterCount = monsters?.Count ?? 0,
-                TowerCount = towers?.Count ?? 0,
-                UsedSlotCount = usedSlots,
-                SampleMonsterProgress0 = p0,
-                SampleMonsterProgress1 = p1,
+                Payload = pooled.Segment,
             };
 
             conn.Send(msg);
+
+            pooled.Dispose();
         }
 
         private void HandleConnected(NetworkConnectionToClient conn)
         {
+            if (conn == null)
+            {
+                return;
+            }
+
+            if (_playerAndConnectionByConnId.ContainsKey(conn.connectionId))
+            {
+                Debug.LogWarning($"[MergeGameServerAdapter] 이미 등록된 연결입니다. connId={conn.connectionId}");
+                return;
+            }
+
+            if (!TryResolveUserId(conn.authenticationData, out var uid))
+            {
+                Debug.LogWarning($"[MergeGameServerAdapter] 유효하지 않은 인증 정보(UserId) 입니다. connId={conn.connectionId}");
+                conn.Disconnect();
+                return;
+            }
+
+            if (uid < 0)
+            {
+                Debug.LogWarning($"[MergeGameServerAdapter] 유효하지 않은 인증 정보(UserId) 입니다. connId={conn.connectionId}, uid={uid}");
+                conn.Disconnect();
+                return;
+            }
+
             var playerIndex = ResolvePlayerIndexForConnection(conn);
             if (playerIndex < 0)
             {
@@ -256,134 +212,194 @@ namespace MyProject.MergeGame.Unity.Network
                 return;
             }
 
-            _playerIndexByConnectionId[conn.connectionId] = playerIndex;
-            _connections[playerIndex] = conn;
+            var player = new MergeGamePlayer(uid, playerIndex);
+            _playerAndConnectionByConnId.Add(conn.connectionId, (conn, player));
 
             Debug.Log($"[MergeGameServerAdapter] 클라이언트 연결 성공. connId={conn.connectionId}, playerIndex={playerIndex}");
 
-            _playerReady[playerIndex] = false;
-            _playerStarted[playerIndex] = false;
-            _playerGameOver[playerIndex] = false;
+            //클라이언트 연결되면 호스트에 등록
+            _host?.RegisterPlayer(uid, playerIndex);
 
-            SendLog(playerIndex, 0, "[서버] 준비(Ready) 커맨드를 보내주세요.");
+            // 클라이언트에게 자신에게 할당된 플레이어 인덱스를 알려줍니다.
+            ConnectedInfoEvent connectedEvent = new(0, playerIndex);
+            var pooled = ByteSerializer.SerializePooled(connectedEvent);
+            conn.Send(new NetEventMessage
+            {
+                PlayerIndex = playerIndex,
+                Tick = 0,
+                EventType = MergeNetEventType.ConnectedInfo,
+                Payload = pooled.Segment,
+            });
+
+            pooled.Dispose();
+        }
+
+        private static bool TryResolveUserId(object authenticationData, out long uid)
+        {
+            uid = 0;
+            if (authenticationData == null)
+            {
+                return false;
+            }
+
+            switch (authenticationData)
+            {
+                case long longValue:
+                    uid = longValue;
+                    return true;
+                case int intValue:
+                    uid = intValue;
+                    return true;
+                case string strValue:
+                    return long.TryParse(strValue, out uid);
+                default:
+                    return false;
+            }
         }
 
         private void HandleDisconnected(NetworkConnectionToClient conn)
         {
-            if (_playerIndexByConnectionId.TryGetValue(conn.connectionId, out var playerIndex))
+            var connId = conn.connectionId;
+
+            _playerAndConnectionByConnId.TryGetValue(connId, out var playerAndConnection);
+            var player = playerAndConnection.Item2;
+            player?.Dispose();
+
+            _playerAndConnectionByConnId.Remove(conn.connectionId);
+
+            // 모든 플레이어가 나간 경우에만 매치 상태를 초기화합니다.
+            if (_playerAndConnectionByConnId.Count == 0)
             {
-                _playerIndexByConnectionId.Remove(conn.connectionId);
-
-                if (playerIndex >= 0 && playerIndex < _connections.Length && _connections[playerIndex] == conn)
-                {
-                    _connections[playerIndex] = null;
-                }
-
-                _playerReady[playerIndex] = false;
-                _playerStarted[playerIndex] = false;
-                _playerGameOver[playerIndex] = false;
-                _dummySpawnTimers[playerIndex] = 0f;
-
-                // 연결이 끊기면 Ready 게이트를 다시 열어둡니다.
                 _matchStarted = false;
-
-                Debug.Log($"[MergeGameServerAdapter] 클라이언트 연결 해제. connId={conn.connectionId}, playerIndex={playerIndex}");
             }
         }
 
         private int ResolvePlayerIndexForConnection(NetworkConnectionToClient conn)
         {
+            var maxPlayers = Mathf.Clamp(_maxPlayers, 1, MaxSupportedPlayers);
+
             // Host 모드에서는 localConnection(connectionId=0)을 playerIndex=0으로 예약합니다.
             if (_reserveSlot0ForLocalHost && conn.connectionId == 0)
             {
-                return 0;
+                return maxPlayers > 0 ? 0 : -1;
             }
 
-            // 비어 있는 첫 슬롯을 배정합니다.
-            for (var i = 0; i < _connections.Length; i++)
+            for (var index = 0; index < maxPlayers; index++)
             {
-                if (_connections[i] == null)
+                if (_reserveSlot0ForLocalHost && index == 0)
                 {
-                    return i;
+                    continue;
+                }
+
+                var inUse = false;
+                foreach (var kv in _playerAndConnectionByConnId)
+                {
+                    var existingPlayer = kv.Value.Item2;
+                    if (existingPlayer != null && existingPlayer.Index == index)
+                    {
+                        inUse = true;
+                        break;
+                    }
+                }
+
+                if (!inUse)
+                {
+                    return index;
                 }
             }
 
             return -1;
         }
 
-        private void HandleCommandMsg(NetworkConnectionToClient conn, CommandMsg msg)
+        /// <summary>
+        /// 클라이언트로 부터 받은 커맨드를 호스트에 전달 한다.
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="payload"></param>
+        private void HandleCommandMsg(NetworkConnectionToClient conn, NetCommandMessage msg)
         {
-            if (!_playerIndexByConnectionId.TryGetValue(conn.connectionId, out var playerIndex))
-            {
-                return;
-            }
+            if (_host == null) return;
 
-            var host = GetHost(playerIndex);
-            if (host == null)
-            {
-                return;
-            }
+            _playerAndConnectionByConnId.TryGetValue(conn.connectionId, out var playerAndConnection);
+            var player = playerAndConnection.Item2;
+            if (player == null) return;
 
-            // MVP에서는 준비/타워 생성/머지 커맨드만 처리합니다.
             switch (msg.CommandType)
             {
-                case MergeNetCommandType.StartGame:
-                case MergeNetCommandType.Ready:
-                    HandleReady(playerIndex);
+                case MergeNetCommandType.ReadyGame:
+                    HandleCommandMsg_ReadyGame(player, msg.Payload);
                     break;
-
+                case MergeNetCommandType.ExitGame:
+                {
+                    var cmd = ExitMergeGameCommand.ReadFrom(msg.Payload);
+                    _host.SendCommand(cmd);
+                    break;
+                }
                 case MergeNetCommandType.SpawnTower:
-                    host.SendCommand(new SpawnTowerCommand(
-                        senderUid: _playerUids[playerIndex],
-                        towerId: string.IsNullOrEmpty(msg.Str0) ? _dummyTowerId : msg.Str0,
-                        slotIndex: msg.Int0
-                    ));
+                {
+                    var cmd = SpawnTowerCommand.ReadFrom(msg.Payload);
+                    _host.SendCommand(cmd);
                     break;
-
+                }
                 case MergeNetCommandType.MergeTower:
-                    host.SendCommand(new MergeTowerCommand(
-                        senderUid: _playerUids[playerIndex],
-                        fromSlotIndex: msg.Int0,
-                        toSlotIndex: msg.Int1
-                    ));
+                {
+                    var cmd = MergeTowerCommand.ReadFrom(msg.Payload);
+                    _host.SendCommand(cmd);
                     break;
+                }
+                case MergeNetCommandType.InjectMonsters:
+                {
+                    var cmd = InjectMonstersCommand.ReadFrom(msg.Payload);
+                    _host.SendCommand(cmd);
+                    break;
+                }
             }
         }
 
-        private void HandleReady(int playerIndex)
+
+        private void HandleCommandMsg_ReadyGame(MergeGamePlayer player, ArraySegment<byte> payload)
         {
-            if (playerIndex < 0 || playerIndex >= _playerReady.Length)
+            if (player == null) return;
+
+            if (player.State == MergeGamePlayerState.Ready || player.State == MergeGamePlayerState.Started)
             {
                 return;
             }
 
-            if (_matchStarted)
-            {
-                SendLog(playerIndex, 0, "[준비] 이미 게임이 시작되었습니다.");
-                return;
-            }
-
-            if (_playerReady[playerIndex])
-            {
-                return;
-            }
-
-            _playerReady[playerIndex] = true;
-            SendLog(playerIndex, 0, "[준비] Ready 수신.");
-
+            player.SetState(MergeGamePlayerState.Ready);
             TryStartMatchIfReady();
         }
 
         private void TryStartMatchIfReady()
         {
-            if (_matchStarted)
+            if (_matchStarted || _host == null)
             {
                 return;
             }
 
-            for (var i = 0; i < _connections.Length; i++)
+            var requiredPlayers = Mathf.Clamp(_maxPlayers, 1, MaxSupportedPlayers);
+            var connectedPlayers = new List<MergeGamePlayer>();
+
+            foreach (var pair in _playerAndConnectionByConnId)
             {
-                if (_connections[i] == null || !_playerReady[i])
+                var conn = pair.Value.Item1;
+                var player = pair.Value.Item2;
+                if (conn == null || player == null)
+                {
+                    continue;
+                }
+
+                connectedPlayers.Add(player);
+            }
+
+            if (connectedPlayers.Count < requiredPlayers)
+            {
+                return;
+            }
+
+            for (var i = 0; i < connectedPlayers.Count; i++)
+            {
+                if (connectedPlayers[i].State != MergeGamePlayerState.Ready)
                 {
                     return;
                 }
@@ -391,176 +407,186 @@ namespace MyProject.MergeGame.Unity.Network
 
             _matchStarted = true;
 
-            // 매치 시작 직후 타이머를 초기화하고 게임 시작 커맨드를 보냅니다.
-            for (var i = 0; i < _dummySpawnTimers.Length; i++)
+            for (var i = 0; i < connectedPlayers.Count; i++)
             {
-                _dummySpawnTimers[i] = 0f;
-                SendLog(i, 0, "[매치] 준비 완료. 게임을 시작합니다.");
-                GetHost(i)?.SendCommand(new StartMergeGameCommand(_playerUids[i]));
+                var player = connectedPlayers[i];
+                var cmd = new ReadyMergeGameCommand(player.Uid);
+                _host.SendCommand(cmd);
+                player.SetState(MergeGamePlayerState.Started);
             }
         }
 
-        private void OnHostResult(int playerIndex, MergeCommandResult result)
+        /// <summary>
+        /// 호스트로부터 받은 결과를 클라이언트에 전송한다.
+        /// </summary>
+        /// <param name="result"></param>
+        private void OnHostResult(MergeCommandResult result)
         {
             if (result == null)
             {
                 return;
             }
 
-            if (result.Success)
+            switch (result)
             {
-                return;
+                case ReadyMergeGameResult readyResult:
+                    SendResultToPlayer(readyResult, MergeNetCommandType.ReadyGame);
+                    break;
+                case SpawnTowerResult spawnResult:
+                    SendResultToPlayer(spawnResult, MergeNetCommandType.SpawnTower);
+                    break;
+                case MergeTowerResult mergeResult:
+                    SendResultToPlayer(mergeResult, MergeNetCommandType.MergeTower);
+                    break;
+                case ExitMergeGameResult endResult:
+                    SendResultToPlayer(endResult, MergeNetCommandType.ExitGame);
+                    break;
+                case InjectMonstersResult injectResult:
+                    SendResultToPlayer(injectResult, MergeNetCommandType.InjectMonsters);
+                    break;
             }
-
-            SendLog(playerIndex, result.Tick, $"[커맨드 실패] {result.GetType().Name}: {result.ErrorMessage}");
         }
 
-        private void OnHostEvent(int playerIndex, MergeHostEvent evt)
+        private void OnHostEvent(MergeGameEvent mergeGameEvent)
         {
-            if (evt == null)
+            if (mergeGameEvent == null)
             {
                 return;
             }
 
-            // 시작/종료 상태를 서버 내부 플래그에 반영합니다.
-            if (evt is MergeGameStartedEvent)
+            MergeNetEventType eventType = mergeGameEvent switch
             {
-                _playerStarted[playerIndex] = true;
-            }
-            else if (evt is MergeGameOverEvent)
-            {
-                _playerGameOver[playerIndex] = true;
-            }
+                GameStartedEvent => MergeNetEventType.GameStarted,
+                GameOverEvent => MergeNetEventType.GameOver,
+                MapInitializedEvent => MergeNetEventType.MapInitialized,
+                TowerSpawnedEvent => MergeNetEventType.TowerSpawned,
+                TowerMergedEvent => MergeNetEventType.TowerMerged,
+                TowerRemovedEvent => MergeNetEventType.TowerRemoved,
+                TowerAttackedEvent => MergeNetEventType.TowerAttacked,
+                EffectTriggeredEvent => MergeNetEventType.EffectTriggered,
+                MonsterSpawnedEvent => MergeNetEventType.MonsterSpawned,
+                MonsterDamagedEvent => MergeNetEventType.MonsterDamaged,
+                MonsterDiedEvent => MergeNetEventType.MonsterDied,
+                MonsterMovedEvent => MergeNetEventType.MonsterMoved,
+                DifficultyStepChangedEvent => MergeNetEventType.DifficultyStepChangedEvent,
+                ScoreChangedEvent => MergeNetEventType.ScoreChanged,
+                PlayerGoldChangedEvent => MergeNetEventType.PlayerGoldChanged,
+                _ => MergeNetEventType.None,
+            };
 
-            // 이동 이벤트는 빈도가 높아 로그에서 제외합니다.
-            if (evt is MonsterMovedEvent)
-            {
-                return;
-            }
+            if (eventType == MergeNetEventType.None) return;
 
-            if (!TryFormatEvent(evt, out var line))
-            {
-                return;
-            }
-
-            SendLog(playerIndex, evt.Tick, line);
+            BroadcastEvent(mergeGameEvent, eventType);
         }
 
-        private void SendLog(int playerIndex, long tick, string text)
+        private void BroadcastEvent(MergeGameEvent evt, MergeNetEventType eventType)
         {
-            if (playerIndex < 0 || playerIndex >= _connections.Length)
+            var pooled = ByteSerializer.SerializePooled(evt);
+            var msg = new NetEventMessage
+            {
+                PlayerIndex = evt.PlayerIndex,
+                Tick = evt.Tick,
+                EventType = eventType,
+                Payload = pooled.Segment,
+            };
+
+            foreach (var kv in _playerAndConnectionByConnId)
+            {
+                var conn = kv.Value.Item1;
+                if (conn == null) continue;
+
+                conn.Send(msg);
+            }
+
+            pooled.Dispose();
+        }
+
+        private void SendResultToPlayer(MergeCommandResult result, MergeNetCommandType commandType)
+        {
+            if (false == TryGetFindPlayerAndConnectionByUid(result.SenderUid, out var playerAndConnection))
             {
                 return;
             }
 
-            var conn = _connections[playerIndex];
-            if (conn == null)
+            var pooled = ByteSerializer.SerializePooled(result);
+            playerAndConnection.conn.Send(new NetCommandResultMessage
             {
-                return;
-            }
-
-            conn.Send(new EventMsg
-            {
-                PlayerIndex = playerIndex,
-                Tick = tick,
-                EventType = MergeNetEventType.Log,
-                Text = text
+                SenderUid = result.SenderUid,
+                CommandType = commandType,
+                Payload = pooled.Segment,
             });
+
+            pooled.Dispose();
         }
 
-        private static bool TryFormatEvent(MergeHostEvent evt, out string line)
+        private bool TryGetFindPlayerAndConnectionByUid(long uid, out (NetworkConnectionToClient conn, MergeGamePlayer player) out_PlayerAndConnection)
         {
-            line = null;
-
-            switch (evt)
+            foreach (var playerAndConnection in _playerAndConnectionByConnId)
             {
-                case MapInitializedEvent e:
-                    line = $"[맵 초기화] map={e.MapId} slots={e.SlotPositions.Count} paths={e.Paths.Count}";
-                    return true;
+                var player = playerAndConnection.Value.Item2;
+                if (player == null) continue;
 
-                case MergeGameStartedEvent e:
-                    line = $"[게임 시작] slots={e.SlotCount}";
-                    return true;
+                if (player.Uid != uid) continue;
 
-                case WaveStartedEvent e:
-                    line = $"[웨이브 시작] wave={e.WaveNumber} total={e.TotalMonsterCount}";
-                    return true;
-
-                case MonsterSpawnedEvent e:
-                    line = $"[몬스터 생성] uid={e.MonsterUid} id={e.MonsterId} path={e.PathIndex} hp={e.MaxHealth:0}";
-                    return true;
-
-                case TowerSpawnedEvent e:
-                    line = $"[타워 생성] uid={e.TowerUid} id={e.TowerId} grade={e.Grade} slot={e.SlotIndex}";
-                    return true;
-
-                case TowerAttackedEvent e:
-                    line = $"[공격] attacker={e.AttackerUid} -> monster={e.TargetUid} dmg={e.Damage:0}";
-                    return true;
-
-                case MonsterDamagedEvent e:
-                    line = $"[피해] monster={e.MonsterUid} dmg={e.Damage:0} hp={e.CurrentHealth:0}";
-                    return true;
-
-                case MonsterDiedEvent e:
-                    line = $"[처치] monster={e.MonsterUid} gold=+{e.GoldReward}";
-                    return true;
-
-                case PlayerGoldChangedEvent e:
-                    line = $"[골드] reason={e.Reason} delta={e.GoldDelta} current={e.CurrentGold}";
-                    return true;
-
-                case MergeGameOverEvent e:
-                    line = $"[게임 종료] victory={e.IsVictory} score={e.FinalScore} maxGrade={e.MaxGradeReached}";
-                    return true;
+                out_PlayerAndConnection = playerAndConnection.Value;
+                return true;
             }
 
+            out_PlayerAndConnection = default;
             return false;
-        }
-
-        private MergeGameHost GetHost(int playerIndex)
-        {
-            if (_playerHosts == null || playerIndex < 0 || playerIndex >= _playerHosts.Length)
-            {
-                return null;
-            }
-
-            return _playerHosts[playerIndex];
         }
 
         private static MergeGameHost BuildHost()
         {
             var hostConfig = new MergeHostConfig()
-                .WithMaxMonsterStack(100)
-                .WithWaveSettings(spawnInterval: 0.2f, completionBonus: 0);
+                .WithMaxMonsterStack(100);
 
             var host = new MergeGameHost(hostConfig, new DevTowerDatabase());
 
             host.AddModule(new MapModule(), BuildMapConfig());
             host.AddModule(new RuleModule(), BuildRuleConfig(hostConfig));
-            host.AddModule(new WaveModule(), BuildWaveConfig(hostConfig));
+            host.AddModule(new DifficultyModule(), BuildDifficultyConfig());
 
             host.InitializeModules();
 
             return host;
         }
 
+        /// <summary>
+        /// 맵 정보. 슬롯 개수,위치, 몬스터 경로 개수 위치 등
+        /// 지금은 하드코딩으로. (이후에 맵 데이타를 추출해서 가져다 쓰도록 해야 함)
+        /// </summary>
+        /// <returns></returns>
         private static MapModuleConfig BuildMapConfig()
         {
             return new MapModuleConfig
             {
-                MapId = 1,
-                SlotDefinitions = MapModuleConfig.CreateGridSlotDefinitions(rows: 4, columns: 4, slotWidth: 1.5f, slotHeight: 1.5f),
+                MapId = DevIdHelper.DEV_DEFAULT_MAP_ID,
+
+                SlotDefinitions = new List<SlotDefinition>
+                {
+                    new SlotDefinition(0, -5, 0, -5),
+                    new SlotDefinition(1, 0, 0, -5),
+                    new SlotDefinition(2, 5, 0, -5),
+                    new SlotDefinition(3, -5, 0, 0),
+                    new SlotDefinition(4, 0, 0, 0),
+                    new SlotDefinition(5, 5, 0, 0),
+                    new SlotDefinition(6, -5, 0, 5),
+                    new SlotDefinition(7, 0, 0, 5),
+                    new SlotDefinition(8, 5, 0, 5),
+                },
+
                 PathDefinitions = new List<PathDefinition>
                 {
                     new PathDefinition(
                         pathIndex: 0,
                         waypoints: new List<Point3D>
                         {
-                            new Point3D(-6f, 3f, 0f),
-                            new Point3D(-2f, 3f, 0f),
-                            new Point3D( 2f, 3f, 0f),
-                            new Point3D( 6f, 3f, 0f)
+                            new Point3D(-9f, 0f, -9f),
+                            new Point3D(-9f, 0f, 9f),
+                            new Point3D( 9f, 0f, 9f),
+                            new Point3D( 9f, 0f, -9f),
+                            new Point3D( -9f, 0f, -9f)
                         }
                     )
                 }
@@ -576,22 +602,15 @@ namespace MyProject.MergeGame.Unity.Network
                 ScorePerGrade = hostConfig.ScorePerGrade,
                 InitialUnitGrade = hostConfig.InitialUnitGrade,
                 MaxUnitGrade = hostConfig.MaxUnitGrade,
-                WaveCompletionBonusGold = hostConfig.WaveCompletionBonusGold,
             };
         }
 
-        private static WaveModuleConfig BuildWaveConfig(MergeHostConfig hostConfig)
+        private static DifficultyModuleConfig BuildDifficultyConfig()
         {
             // 자동 진행용 단순 웨이브 설정입니다.
-            return new WaveModuleConfig
+            return new DifficultyModuleConfig
             {
-                AutoStartWaves = true,
-                WaveStartDelay = 0f,
-                WaveIntervalDelay = 0f,
-                DefaultSpawnInterval = hostConfig.WaveSpawnInterval,
-                MaxWaveCount = 1,
-                BaseMonsterCount = 1000,
-                MonstersPerWaveIncrease = 0,
+
             };
         }
 
@@ -601,40 +620,76 @@ namespace MyProject.MergeGame.Unity.Network
         /// </summary>
         private sealed class DevTowerDatabase : ITowerDatabase
         {
-            private readonly Dictionary<string, TowerDefinition> _definitions = new()
+            private static readonly long[] _towerIds =
+            {
+                DevIdHelper.DEV_TOWER_ID_RED,
+                DevIdHelper.DEV_TOWER_ID_GREEN,
+                DevIdHelper.DEV_TOWER_ID_BLUE
+            };
+
+            private readonly System.Random _random = new();
+
+            private readonly Dictionary<long, TowerDefinition> _definitions = new()
             {
                 {
-                    "unit_basic",
+                    DevIdHelper.DEV_TOWER_ID_RED,
                     new TowerDefinition
                     {
-                        TowerId = "unit_basic",
-                        TowerType = "basic",
+                        TowerId = DevIdHelper.DEV_TOWER_ID_RED,
                         InitialGrade = 1,
                         BaseAttackDamage = 10f,
                         BaseAttackSpeed = 1f,
                         BaseAttackRange = 10f,
                         AttackType = TowerAttackType.HitScan,
+                        TargetingType = TowerTargetingType.Nearest,
+                    }
+                },
+                {
+                    DevIdHelper.DEV_TOWER_ID_GREEN,
+                    new TowerDefinition
+                    {
+                        TowerId = DevIdHelper.DEV_TOWER_ID_GREEN,
+                        InitialGrade = 1,
+                        BaseAttackDamage = 15f,
+                        BaseAttackSpeed = 0.7f,
+                        BaseAttackRange = 12f,
+                        AttackType = TowerAttackType.Projectile,
                         ProjectileType = ProjectileType.Direct,
-                        ProjectileSpeed = 8f,
-                        ThrowRadius = 1.5f,
+                        ProjectileSpeed = 15f,
+                        TargetingType = TowerTargetingType.Nearest,
+                    }
+                },
+                {
+                    DevIdHelper.DEV_TOWER_ID_BLUE,
+                    new TowerDefinition
+                    {
+                        TowerId = DevIdHelper.DEV_TOWER_ID_BLUE,
+                        InitialGrade = 1,
+                        BaseAttackDamage = 20f,
+                        BaseAttackSpeed = 0.5f,
+                        BaseAttackRange = 8f,
+                        AttackType = TowerAttackType.Projectile,
+                        ProjectileType = ProjectileType.Throw,
+                        ProjectileSpeed = 20f,
+                        ThrowRadius = 2.5f,
+                        TrapDelay = 0.5f,
+                        TargetingType = TowerTargetingType.None,
                     }
                 },
             };
 
-            public TowerDefinition GetDefinition(string towerId)
+            public TowerDefinition GetDefinition(long towerId)
             {
-                if (string.IsNullOrEmpty(towerId))
-                {
-                    return null;
-                }
-
                 return _definitions.TryGetValue(towerId, out var definition) ? definition : null;
             }
 
-            public string GetRandomIdForGrade(int grade)
+            public long GetRandomIdForGrade(int grade)
             {
-                return "unit_basic";
+                return _towerIds[_random.Next(_towerIds.Length)];
             }
         }
     }
 }
+
+
+

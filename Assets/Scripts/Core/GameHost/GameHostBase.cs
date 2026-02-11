@@ -329,10 +329,6 @@ namespace Noname.GameHost
             _dispatchQueue.Enqueue(DispatchItem.ForResult(result));
         }
 
-        protected virtual void HandleInternalEvent(TEvent eventData)
-        {
-        }
-
         protected void PublishEvent(TEvent eventData)
         {
             if (eventData == null)
@@ -340,8 +336,6 @@ namespace Noname.GameHost
                 return;
             }
 
-            // 내부에 쓸 일 있을 수 있으니 먼저 호출합니다.
-            HandleInternalEvent(eventData);
             _dispatchQueue.Enqueue(DispatchItem.ForEvent(eventData));
         }
 

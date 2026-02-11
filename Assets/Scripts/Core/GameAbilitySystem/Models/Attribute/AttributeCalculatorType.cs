@@ -1,30 +1,36 @@
-namespace Noname.GameAbilitySystem
+﻿namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// 주석 정리
-    /// 주석 정리
+    /// 二쇱꽍 ?뺣━
+    /// 二쇱꽍 ?뺣━
     /// </summary>
     public enum AttributeCalculatorType
     {
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         None = 0,
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         HealByTargetMaxHealthPercent,
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         HealBySourceMaxHealthPercent,
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         FullHeal,
+
+        /// <summary>
+        /// 二쇱꽍 ?뺣━
+        /// </summary>
+        DamageBySourceAttackDamage,
     }
 }
+
 

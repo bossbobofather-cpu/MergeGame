@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6941044001716030078
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7829679170252867615}
+  - component: {fileID: 3227091769164964096}
+  m_Layer: 0
+  m_Name: MapViewModule
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7829679170252867615
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6941044001716030078}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3054.0159, y: 0.00013, z: 1599.2322}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3227091769164964096
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6941044001716030078}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2130f7d4f326404ea9e6fb35b2f5ef9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Noname.MergeGame.Unity::MyProject.MergeGame.Unity.MapViewModule
+  _defaultBackgroundPrefab: {fileID: 2192172029623998541, guid: b08312ef910210c4fab34c782bdce48c, type: 3}
+  _backgroundPrefabs: []
+  _slotPrefab: {fileID: 8682254135275872838, guid: 7f24f1e7709258d418a2048b79a93fdc, type: 3}
+  _pathPointPrefab: {fileID: 4033982210415859564, guid: 13904db48ea422e49895586ef92088b2, type: 3}
+  _pathLinePrefab: {fileID: 4287178083797069928, guid: 432d09fc3768fbb4c962d6dde2539398, type: 3}
+  _autoAddSlotCollider: 1
+  _slotColliderSize: {x: 1, y: 1, z: 1}
+  _slotColliderCenter: {x: 0, y: 0, z: 0}

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using MyProject.MergeGame.Events;
 using UnityEngine;
 
 namespace MyProject.MergeGame.Unity
@@ -28,11 +29,6 @@ namespace MyProject.MergeGame.Unity
         [SerializeField] private GameObject _pathPointPrefab;
         [SerializeField] private LineRenderer _pathLinePrefab;
 
-        [Header("Slot Interaction")]
-        [SerializeField] private bool _autoAddSlotCollider = true;
-        [SerializeField] private Vector3 _slotColliderSize = new Vector3(1f, 1f, 1f);
-        [SerializeField] private Vector3 _slotColliderCenter = Vector3.zero;
-
         private GameObject _backgroundInstance;
 
         private readonly Dictionary<int, GameObject> _slotObjects = new();
@@ -51,12 +47,19 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         public IReadOnlyDictionary<int, GameObject> SlotObjects => _slotObjects;
 
-        public override void OnHostEvent(MergeHostEvent evt)
+        public override void OnEventMsg(MergeGameEvent evt)
         {
-            if (evt is MapInitializedEvent mapEvt)
+            if (evt is not MapInitializedEvent mapEvt)
             {
-                BuildMap(mapEvt);
+                return;
             }
+
+            if (!IsMyPlayer(mapEvt.PlayerIndex))
+            {
+                return;
+            }
+
+            BuildMap(mapEvt);
         }
 
         private void BuildMap(MapInitializedEvent evt)
@@ -64,6 +67,12 @@ namespace MyProject.MergeGame.Unity
             ClearMap();
 
             BuildBackground(evt.MapId);
+
+            if(_backgroundInstance == null)
+            {
+                Debug.LogError("Failed to build map. Background instance is null.");
+                return;
+            }
 
             // 슬롯 배치
             if (_slotPrefab != null)
@@ -73,11 +82,6 @@ namespace MyProject.MergeGame.Unity
                     var slotObj = Instantiate(_slotPrefab, transform);
                     slotObj.transform.localPosition = new Vector3(slotPos.X, slotPos.Y, slotPos.Z);
                     slotObj.name = $"Slot_{slotPos.Index}";
-
-                    if (_autoAddSlotCollider)
-                    {
-                        EnsureSlotCollider(slotObj);
-                    }
 
                     // 슬롯 오브젝트에 슬롯 인덱스를 주입합니다.
                     (slotObj.GetComponent<MergeSlotView>() ?? slotObj.AddComponent<MergeSlotView>()).SetSlotIndex(slotPos.Index);
@@ -103,7 +107,7 @@ namespace MyProject.MergeGame.Unity
             // LineRenderer로 경로 선을 그립니다.
             if (_pathLinePrefab != null)
             {
-                var lineObj = Instantiate(_pathLinePrefab, transform);
+                var lineObj = Instantiate(_pathLinePrefab, _backgroundInstance.transform);
                 lineObj.name = $"Path_{pathData.PathIndex}";
                 lineObj.positionCount = pathData.Waypoints.Count;
 
@@ -123,7 +127,7 @@ namespace MyProject.MergeGame.Unity
                 {
                     var wp = pathData.Waypoints[i];
 
-                    var pointObj = Instantiate(_pathPointPrefab, transform);
+                    var pointObj = Instantiate(_pathPointPrefab, _backgroundInstance.transform);
                     pointObj.transform.localPosition = new Vector3(wp.X, wp.Y, wp.Z);
                     pointObj.name = $"PathPoint_{pathData.PathIndex}_{i}";
 
@@ -147,7 +151,7 @@ namespace MyProject.MergeGame.Unity
             _backgroundInstance.name = $"MapBackground_{mapId}";
             _backgroundInstance.transform.localPosition = Vector3.zero;
             _backgroundInstance.transform.localRotation = Quaternion.identity;
-            _backgroundInstance.transform.localScale = Vector3.one;
+            //_backgroundInstance.transform.localScale = Vector3.one;
         }
 
         private GameObject ResolveBackgroundPrefab(int mapId)
@@ -166,12 +170,6 @@ namespace MyProject.MergeGame.Unity
 
         private void ClearMap()
         {
-            if (_backgroundInstance != null)
-            {
-                Destroy(_backgroundInstance);
-                _backgroundInstance = null;
-            }
-
             foreach (var slotObj in _slotObjects.Values)
             {
                 if (slotObj != null)
@@ -189,28 +187,18 @@ namespace MyProject.MergeGame.Unity
                 }
             }
             _pathObjects.Clear();
+
+            if (_backgroundInstance != null)
+            {
+                Destroy(_backgroundInstance);
+                _backgroundInstance = null;
+            }
         }
 
         protected override void OnShutdown()
         {
             ClearMap();
         }
-
-        private void EnsureSlotCollider(GameObject slotObj)
-        {
-            if (slotObj == null)
-            {
-                return;
-            }
-
-            if (slotObj.GetComponent<Collider>() != null)
-            {
-                return;
-            }
-
-            var box = slotObj.AddComponent<BoxCollider>();
-            box.size = _slotColliderSize;
-            box.center = _slotColliderCenter;
-        }
     }
 }
+

@@ -3,8 +3,7 @@
   "rootNamespace": "MyProject.MergeGame",
   "references": [
     "Noname.GameAbilitySystem",
-    "Noname.GameHost",
-    "Noname.MergeGame.Shared"
+    "Noname.GameHost"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

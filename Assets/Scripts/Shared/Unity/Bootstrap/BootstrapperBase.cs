@@ -72,7 +72,11 @@ namespace MyProject.Common.Bootstrap
             for (var i = 0; i < _managerPrefabs.Count; i++)
             {
                 // 등록된 매니저 프리팹을 순차적으로 생성합니다.
-                CreateManager(_managerPrefabs[i]);
+                var manager = CreateManager(_managerPrefabs[i]);
+                if(manager != null)
+                {
+                    manager.Initialize();
+                }
             }
         }
 

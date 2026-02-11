@@ -325,6 +325,26 @@ namespace Noname.GameAbilitySystem
         /// <returns>활성화 성공 여부</returns>
         public bool TryActivateAbility(GameplayAbilitySpec spec, TargetContext targetContext, out TargetData targetData)
         {
+            return TryActivateAbility(spec, targetContext, out targetData, applyAppliedEffectsOnActivate: true);
+        }
+
+        /// <summary>
+        /// 능력 스펙으로 능력 활성화를 시도합니다.
+        /// </summary>
+        /// <param name="spec">능력 스펙</param>
+        /// <param name="targetContext">타겟팅 컨텍스트</param>
+        /// <param name="targetData">타겟팅 결과 (out)</param>
+        /// <param name="applyAppliedEffectsOnActivate">
+        /// true면 발동 시점에 AppliedEffects를 즉시 적용합니다.
+        /// false면 AppliedEffects 적용을 호출 측(예: 투사체 히트 시점)으로 위임합니다.
+        /// </param>
+        /// <returns>활성화 성공 여부</returns>
+        public bool TryActivateAbility(
+            GameplayAbilitySpec spec,
+            TargetContext targetContext,
+            out TargetData targetData,
+            bool applyAppliedEffectsOnActivate)
+        {
             targetData = null;
 
             if (spec == null)
@@ -363,7 +383,7 @@ namespace Noname.GameAbilitySystem
             }
 
             // 효과 적용
-            if (ability.AppliedEffects != null && targetData != null)
+            if (applyAppliedEffectsOnActivate && ability.AppliedEffects != null && targetData != null)
             {
                 foreach (var effect in ability.AppliedEffects)
                 {
@@ -404,6 +424,29 @@ namespace Noname.GameAbilitySystem
             {
                 if (target == null) continue;
                 ApplyEffectToTarget(effect, target);
+            }
+        }
+
+        /// <summary>
+        /// 여러 이펙트를 타겟들에게 적용합니다.
+        /// (투사체 히트 시점 적용 등 외부 호출용)
+        /// </summary>
+        public void ApplyEffectsToTargets(IReadOnlyList<GameplayEffect> effects, TargetData targetData)
+        {
+            if (effects == null || targetData == null)
+            {
+                return;
+            }
+
+            for (var i = 0; i < effects.Count; i++)
+            {
+                var effect = effects[i];
+                if (effect == null)
+                {
+                    continue;
+                }
+
+                ApplyEffectToTargets(effect, targetData);
             }
         }
 
@@ -742,13 +785,13 @@ namespace Noname.GameAbilitySystem
                 return false;
             }
         }
-
+
         /// <summary>
-        /// EffectId로 활성 효과를 제거합니다. (같은 EffectId의 첫 번째 효과를 제거)
+        /// EffectTag로 활성 효과를 제거합니다. (같은 EffectTag의 첫 번째 효과를 제거)
         /// </summary>
-        public bool RemoveActiveEffect(string effectId)
+        public bool RemoveActiveEffect(FGameplayTag effectTag)
         {
-            if (string.IsNullOrEmpty(effectId))
+            if (!effectTag.IsValid)
             {
                 return false;
             }
@@ -757,7 +800,8 @@ namespace Noname.GameAbilitySystem
             {
                 for (var i = _activeEffects.Count - 1; i >= 0; i--)
                 {
-                    if (_activeEffects[i].Effect?.EffectId != effectId)
+                    var activeTag = _activeEffects[i].Effect?.EffectTag;
+                    if (!activeTag.HasValue || !activeTag.Value.Equals(effectTag))
                     {
                         continue;
                     }
@@ -774,6 +818,19 @@ namespace Noname.GameAbilitySystem
 
                 return false;
             }
+        }
+
+        /// <summary>
+        /// 문자열 태그로 활성 효과 제거를 시도합니다.
+        /// </summary>
+        public bool RemoveActiveEffect(string effectTag)
+        {
+            if (string.IsNullOrEmpty(effectTag))
+            {
+                return false;
+            }
+
+            return RemoveActiveEffect(new FGameplayTag(effectTag));
         }
 
         /// <summary>
@@ -1011,6 +1068,9 @@ namespace Noname.GameAbilitySystem
         }
     }
 }
+
+
+
 
 
 

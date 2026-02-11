@@ -174,7 +174,7 @@ namespace Noname.GameAbilitySystem
             while (lastDotIndex > 0)
             {
                 var parent = tag.Value.Substring(0, lastDotIndex);
-                _expandedTags.Add(parent.GetHashCode());
+                _expandedTags.Add(GameplayTagUtility.Fnv1a32(parent));
                 lastDotIndex = parent.LastIndexOf('.');
             }
         }

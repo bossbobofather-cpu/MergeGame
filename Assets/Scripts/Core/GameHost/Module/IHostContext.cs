@@ -11,6 +11,11 @@ namespace Noname.GameHost.Module
         long CurrentTick { get; }
 
         /// <summary>
+        /// 플레이어 수입니다.
+        /// </summary>
+        int PlayerCount { get; }
+
+        /// <summary>
         /// 내부 이벤트 버스입니다.
         /// </summary>
         IInnerEventBus InnerEventBus { get; }

@@ -12,7 +12,7 @@ namespace MyProject.MergeGame.Unity
     {
         [Header("Buttons")]
         [SerializeField] private Button _spawnTowerButton;
-        [SerializeField] private Button _startWaveButton;
+        [SerializeField] private Button _readyButton;
 
         /// <summary>
         /// 타워 스폰 버튼입니다.
@@ -20,8 +20,18 @@ namespace MyProject.MergeGame.Unity
         public Button SpawnTowerButton => _spawnTowerButton;
 
         /// <summary>
-        /// 웨이브 시작 버튼입니다. (옵션)
+        /// 웨이브 시작 버튼입니다.
         /// </summary>
-        public Button StartWaveButton => _startWaveButton;
+        public Button ReadyButton => _readyButton;
+
+        public void SetActiveSpawnButton(bool active)
+        {
+            SpawnTowerButton?.gameObject.SetActive(active);
+        }
+
+        public void SetActiveReadyButton(bool active)
+        {
+            ReadyButton?.gameObject.SetActive(active);
+        }
     }
 }

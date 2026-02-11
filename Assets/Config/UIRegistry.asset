@@ -11,5 +11,6 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3d2a1a5142138614baff4b0aa2839cd1, type: 3}
   m_Name: UIRegistry
-  m_EditorClassIdentifier: Assembly-CSharp::MyProject.Common.UI.UIRegistry
-  _entries: []
+  m_EditorClassIdentifier: Noname.Shared.Unity::MyProject.Common.UI.UIRegistry
+  _entries:
+  - _prefab: {fileID: 2863339324938201262, guid: 2066ab01493910d4ba6cd625acc7bee1, type: 3}

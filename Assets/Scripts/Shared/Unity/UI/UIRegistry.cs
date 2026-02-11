@@ -61,39 +61,18 @@ namespace MyProject.Common.UI
         private sealed class Entry
         {
             [SerializeField] private UIBase _prefab;
-            [SerializeField] private string _typeName;
 
             public UIBase Prefab => _prefab;
 
             public bool Matches(Type type)
             {
-                if (type == null)
+                if (type == null || _prefab == null)
                 {
                     return false;
                 }
 
-                var target = _prefab != null ? _prefab.GetType() : ResolveType();
+                var target = _prefab.GetType();
                 return target == type;
-            }
-
-            public void SyncTypeName()
-            {
-                if (_prefab == null)
-                {
-                    return;
-                }
-
-                _typeName = _prefab.GetType().AssemblyQualifiedName;
-            }
-
-            private Type ResolveType()
-            {
-                if (string.IsNullOrEmpty(_typeName))
-                {
-                    return null;
-                }
-
-                return Type.GetType(_typeName);
             }
         }
 
@@ -101,18 +80,13 @@ namespace MyProject.Common.UI
         {
             RemoveNullEntries();
             RemoveDuplicateTypes();
-
-            for (var i = 0; i < _entries.Count; i++)
-            {
-                _entries[i]?.SyncTypeName();
-            }
         }
 
         private void RemoveNullEntries()
         {
             for (var i = _entries.Count - 1; i >= 0; i--)
             {
-                if (_entries[i] == null || _entries[i].Prefab == null)
+                if (_entries[i] == null)
                 {
                     _entries.RemoveAt(i);
                 }

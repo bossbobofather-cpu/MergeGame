@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using MyProject.MergeGame.Events;
+using MyProject.MergeGame.Snapshots;
 using UnityEngine;
 
 namespace MyProject.MergeGame.Unity
@@ -21,8 +23,12 @@ namespace MyProject.MergeGame.Unity
         private readonly HashSet<long> _seen = new();
         private readonly List<long> _removeBuffer = new();
 
-        public override void OnHostEvent(MergeHostEvent evt)
+        public override void OnEventMsg(MergeGameEvent evt)
         {
+            if (!IsMyEvent(evt))
+            {
+                return;
+            }
             switch (evt)
             {
                 case MonsterSpawnedEvent spawned:
@@ -39,9 +45,9 @@ namespace MyProject.MergeGame.Unity
             }
         }
 
-        public override void OnSnapshotUpdated(MergeHostSnapshot snapshot)
+        public override void OnSnapshotMsg(MergeHostSnapshot snapshot)
         {
-            if (snapshot == null)
+            if (snapshot == null || !IsMySnapshot(snapshot))
             {
                 return;
             }
@@ -213,3 +219,5 @@ namespace MyProject.MergeGame.Unity
         }
     }
 }
+
+
