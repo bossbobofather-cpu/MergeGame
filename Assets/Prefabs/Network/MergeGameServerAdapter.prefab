@@ -45,7 +45,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Noname.MergeGame.Unity.Network::MyProject.MergeGame.Unity.Network.MergeGameServerAdapter
   _reserveSlot0ForLocalHost: 1
-  _maxPlayers: 1
+  _maxPlayers: 2
   _snapshotSendInterval: 0.01
-  _dummySpawnInterval: 1
-  _dummyTowerId: 0

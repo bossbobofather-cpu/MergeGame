@@ -1,29 +1,29 @@
-namespace Noname.GameAbilitySystem
+﻿namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// 주석 정리
+    /// 二쇱꽍 ?뺣━
     /// </summary>
     public enum TargetingStrategyType
     {
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         None,
 
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         Self,
 
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         Random,
 
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         NearestEnemy,
 
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         NearestN,
 
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         LowestHp,
 
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         Area,
     }
 }

@@ -74,21 +74,33 @@ namespace MyProject.Common.UI
             public Image Background;
             public CanvasGroup Group;
         }
+        /// <summary>
+        /// Awake 함수를 처리합니다.
+        /// </summary>
 
         private void Awake()
         {
+            // 핵심 로직을 처리합니다.
             EnsureCanvas();
             EnsureContainer();
             EnsureFont();
         }
+        /// <summary>
+        /// OnEnable 함수를 처리합니다.
+        /// </summary>
 
         private void OnEnable()
         {
+            // 핵심 로직을 처리합니다.
             SystemMessageBus.MessagePublished += HandleMessage;
         }
+        /// <summary>
+        /// OnDisable 함수를 처리합니다.
+        /// </summary>
 
         private void OnDisable()
         {
+            // 핵심 로직을 처리합니다.
             SystemMessageBus.MessagePublished -= HandleMessage;
         }
 
@@ -100,11 +112,16 @@ namespace MyProject.Common.UI
         /// <param name="message">표시할 메시지 내용</param>
         public static void Post(string message)
         {
+            // 핵심 로직을 처리합니다.
             SystemMessageBus.Publish(message);
         }
+        /// <summary>
+        /// HandleMessage 함수를 처리합니다.
+        /// </summary>
 
         private void HandleMessage(SystemMessage message)
         {
+            // 핵심 로직을 처리합니다.
             if (string.IsNullOrWhiteSpace(message.Text))
             {
                 return;
@@ -129,9 +146,13 @@ namespace MyProject.Common.UI
             _activeRows.Add(row);
             TrimOverflow();
         }
+        /// <summary>
+        /// GetOrCreateRow 함수를 처리합니다.
+        /// </summary>
 
         private MessageRow GetOrCreateRow()
         {
+            // 핵심 로직을 처리합니다.
             if (_pool.Count > 0)
             {
                 var pooled = _pool.Dequeue();
@@ -141,6 +162,9 @@ namespace MyProject.Common.UI
 
             return CreateRow();
         }
+        /// <summary>
+        /// CreateRow 함수를 처리합니다.
+        /// </summary>
 
         private MessageRow CreateRow()
         {
@@ -197,6 +221,9 @@ namespace MyProject.Common.UI
                 Group = group
             };
         }
+        /// <summary>
+        /// TrimOverflow 함수를 처리합니다.
+        /// </summary>
 
         private void TrimOverflow()
         {
@@ -209,9 +236,13 @@ namespace MyProject.Common.UI
                 RecycleRow(row);
             }
         }
+        /// <summary>
+        /// RecycleRow 함수를 처리합니다.
+        /// </summary>
 
         private void RecycleRow(MessageRow row)
         {
+            // 핵심 로직을 처리합니다.
             if (row == null || row.Root == null)
             {
                 return;
@@ -220,9 +251,13 @@ namespace MyProject.Common.UI
             row.Root.SetActive(false);
             _pool.Enqueue(row);
         }
+        /// <summary>
+        /// EnsureCanvas 함수를 처리합니다.
+        /// </summary>
 
         private void EnsureCanvas()
         {
+            // 핵심 로직을 처리합니다.
             if (_container != null)
             {
                 return;
@@ -243,9 +278,13 @@ namespace MyProject.Common.UI
                 }
             }
         }
+        /// <summary>
+        /// EnsureContainer 함수를 처리합니다.
+        /// </summary>
 
         private void EnsureContainer()
         {
+            // 핵심 로직을 처리합니다.
             if (_container != null)
             {
                 return;
@@ -278,9 +317,13 @@ namespace MyProject.Common.UI
             fitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
             fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
         }
+        /// <summary>
+        /// EnsureFont 함수를 처리합니다.
+        /// </summary>
 
         private void EnsureFont()
         {
+            // 핵심 로직을 처리합니다.
             if (_font != null)
             {
                 return;

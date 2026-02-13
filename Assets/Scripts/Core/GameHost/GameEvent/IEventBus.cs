@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 
 namespace Noname.GameHost.GameEvent
 {
     /// <summary>
-    /// 이벤트 버스 공용 인터페이스입니다.
+    /// ?대깽??踰꾩뒪 怨듭슜 ?명꽣?섏씠?ㅼ엯?덈떎.
     /// </summary>
     public interface IEventBus<TEventBase>
         where TEventBase : class

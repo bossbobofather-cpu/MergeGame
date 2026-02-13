@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using MyProject.Common.Bootstrap;
 using UnityEngine;
 
@@ -27,6 +28,7 @@ namespace MyProject.Common.UI
         [SerializeField] private bool _dontDestroyOnLoad = true;
 
         private readonly Dictionary<UIBase, UIBase> _instances = new();
+        private readonly Dictionary<Type, List<UIBase>> _cachedByType = new();
         private UIRoot _rootInstance;
         private UIPopupBase _activePopup;
         private int _pageOrder;
@@ -44,6 +46,7 @@ namespace MyProject.Common.UI
         /// </summary>
         public void Initialize()
         {
+            // 핵심 로직을 처리합니다.
             if (_initialized)
             {
                 return;
@@ -67,6 +70,9 @@ namespace MyProject.Common.UI
             // 루트가 없으면 생성합니다.
             EnsureRoot();
         }
+        /// <summary>
+        /// OnDestroy 함수를 처리합니다.
+        /// </summary>
 
         private void OnDestroy()
         {
@@ -130,12 +136,45 @@ namespace MyProject.Common.UI
             // 등록된 프리팹을 찾아 시스템으로 엽니다.
             return OpenByType<T>(UILayer.System);
         }
+        /// <summary>
+        /// 캐시된 UI 인스턴스를 타입으로 조회합니다.
+        /// 활성/비활성 상태와 무관하게 조회합니다.
+        /// </summary>
+        public bool TryGetCached<T>(out T instance) where T : UIBase
+        {
+            return TryGetCachedInternal(out instance);
+        }
+
+        /// <summary>
+        /// 캐시된 Page 인스턴스를 조회합니다.
+        /// </summary>
+        public bool TryGetCachedPage<T>(out T page) where T : UIPageBase
+        {
+            return TryGetCachedInternal(out page);
+        }
+
+        /// <summary>
+        /// 캐시된 Popup 인스턴스를 조회합니다.
+        /// </summary>
+        public bool TryGetCachedPopup<T>(out T popup) where T : UIPopupBase
+        {
+            return TryGetCachedInternal(out popup);
+        }
+
+        /// <summary>
+        /// 캐시된 System 인스턴스를 조회합니다.
+        /// </summary>
+        public bool TryGetCachedSystem<T>(out T system) where T : UISystemBase
+        {
+            return TryGetCachedInternal(out system);
+        }
 
         /// <summary>
         /// UI 인스턴스를 닫습니다.
         /// </summary>
         public void Close(UIBase instance)
         {
+            // 핵심 로직을 처리합니다.
             if (instance == null)
             {
                 return;
@@ -157,6 +196,7 @@ namespace MyProject.Common.UI
         /// </summary>
         public void ClosePopup()
         {
+            // 핵심 로직을 처리합니다.
             if (_activePopup == null)
             {
                 return;
@@ -186,9 +226,13 @@ namespace MyProject.Common.UI
 
             return Open(prefab, layer) as T;
         }
+        /// <summary>
+        /// Open 함수를 처리합니다.
+        /// </summary>
 
         private UIBase Open(UIBase prefab, UILayer layer)
         {
+            // 핵심 로직을 처리합니다.
             if (prefab == null)
             {
                 return null;
@@ -226,6 +270,7 @@ namespace MyProject.Common.UI
             instance.gameObject.SetActive(true);
             instance.transform.SetAsLastSibling();
             ApplySorting(instance, layer);
+            RegisterCachedType(instance);
 
             if (layer == UILayer.Popup)
             {
@@ -235,9 +280,13 @@ namespace MyProject.Common.UI
             instance.OnOpened();
             return instance;
         }
+        /// <summary>
+        /// EnsureRoot 함수를 처리합니다.
+        /// </summary>
 
         private void EnsureRoot()
         {
+            // 핵심 로직을 처리합니다.
             if (_rootInstance != null)
             {
                 return;
@@ -256,9 +305,13 @@ namespace MyProject.Common.UI
                 DontDestroyOnLoad(_rootInstance.gameObject);
             }
         }
+        /// <summary>
+        /// ResolveRoot 함수를 처리합니다.
+        /// </summary>
 
         private RectTransform ResolveRoot(UILayer layer)
         {
+            // 핵심 로직을 처리합니다.
             if (_rootInstance == null)
             {
                 return null;
@@ -272,9 +325,13 @@ namespace MyProject.Common.UI
                 _ => null
             };
         }
+        /// <summary>
+        /// ResolveCanvas 함수를 처리합니다.
+        /// </summary>
 
         private Canvas ResolveCanvas(UILayer layer)
         {
+            // 핵심 로직을 처리합니다.
             if (_rootInstance == null)
             {
                 return null;
@@ -288,9 +345,13 @@ namespace MyProject.Common.UI
                 _ => null
             };
         }
+        /// <summary>
+        /// ApplySorting 함수를 처리합니다.
+        /// </summary>
 
         private void ApplySorting(UIBase instance, UILayer layer)
         {
+            // 핵심 로직을 처리합니다.
             var canvas = instance.GetComponent<Canvas>();
             if (canvas == null)
             {
@@ -305,9 +366,13 @@ namespace MyProject.Common.UI
             canvas.overrideSorting = true;
             canvas.sortingOrder = baseOrder + order;
         }
+        /// <summary>
+        /// NextOrder 함수를 처리합니다.
+        /// </summary>
 
         private int NextOrder(UILayer layer)
         {
+            // 핵심 로직을 처리합니다.
             return layer switch
             {
                 UILayer.Page => ++_pageOrder,
@@ -316,9 +381,13 @@ namespace MyProject.Common.UI
                 _ => 0
             };
         }
+        /// <summary>
+        /// ValidateLayer 함수를 처리합니다.
+        /// </summary>
 
         private bool ValidateLayer(UIBase prefab, UILayer layer)
         {
+            // 핵심 로직을 처리합니다.
             var isPage = prefab is UIPageBase;
             var isPopup = prefab is UIPopupBase;
             var isSystem = prefab is UISystemBase;
@@ -339,7 +408,78 @@ namespace MyProject.Common.UI
             Debug.LogWarning($"{prefab.name} UI는 {layer} 레이어에 맞지 않습니다.");
             return false;
         }
+        private bool TryGetCachedInternal<T>(out T instance) where T : UIBase
+        {
+            instance = null;
+            var targetType = typeof(T);
+
+            foreach (var pair in _cachedByType)
+            {
+                var runtimeType = pair.Key;
+                if (!targetType.IsAssignableFrom(runtimeType))
+                {
+                    continue;
+                }
+
+                var list = pair.Value;
+                if (list == null || list.Count == 0)
+                {
+                    continue;
+                }
+
+                for (var i = list.Count - 1; i >= 0; i--)
+                {
+                    var cached = list[i];
+                    if (cached == null)
+                    {
+                        list.RemoveAt(i);
+                        continue;
+                    }
+
+                    if (cached is T typed)
+                    {
+                        instance = typed;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+        /// <summary>
+        /// RegisterCachedType 함수를 처리합니다.
+        /// </summary>
+
+        private void RegisterCachedType(UIBase instance)
+        {
+            // 핵심 로직을 처리합니다.
+            if (instance == null)
+            {
+                return;
+            }
+
+            var type = instance.GetType();
+            if (!_cachedByType.TryGetValue(type, out var list))
+            {
+                list = new List<UIBase>();
+                _cachedByType[type] = list;
+            }
+
+            for (var i = list.Count - 1; i >= 0; i--)
+            {
+                if (list[i] == null)
+                {
+                    list.RemoveAt(i);
+                }
+            }
+
+            if (!list.Contains(instance))
+            {
+                list.Add(instance);
+            }
+        }
     }
 }
+
 
 

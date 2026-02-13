@@ -13,9 +13,13 @@ namespace MyProject.MergeGame.AI
     public sealed class TowerBaseAttackAI : IMergeTowerAI
     {
         private readonly FGameplayTag _baseAttackTag;
+        /// <summary>
+        /// TowerBaseAttackAI 함수를 처리합니다.
+        /// </summary>
 
         public TowerBaseAttackAI(string baseAttackTag = "Ability.BaseAttack")
         {
+            // 핵심 로직을 처리합니다.
             _baseAttackTag = new FGameplayTag(baseAttackTag);
         }
 

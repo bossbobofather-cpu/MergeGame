@@ -1,24 +1,24 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Noname.GameHost
 {
     /// <summary>
-    /// 커맨드 처리 결과와 전/후 이벤트를 함께 포함하는 구조체입니다.
+    /// 而ㅻ㎤??泥섎━ 寃곌낵? ?????대깽?몃? ?④퍡 ?ы븿?섎뒗 援ъ“泥댁엯?덈떎.
     /// </summary>
     public readonly struct GameCommandOutcome<TResult, TEvent>
     {
         /// <summary>
-        /// 결과 발행 전에 발행할 이벤트 목록입니다.
+        /// 寃곌낵 諛쒗뻾 ?꾩뿉 諛쒗뻾???대깽??紐⑸줉?낅땲??
         /// </summary>
         public IReadOnlyList<TEvent> PreEvents { get; }
 
         /// <summary>
-        /// 커맨드 처리 결과입니다.
+        /// 而ㅻ㎤??泥섎━ 寃곌낵?낅땲??
         /// </summary>
         public TResult Result { get; }
 
         /// <summary>
-        /// 결과 발행 후에 발행할 이벤트 목록입니다.
+        /// 寃곌낵 諛쒗뻾 ?꾩뿉 諛쒗뻾???대깽??紐⑸줉?낅땲??
         /// </summary>
         public IReadOnlyList<TEvent> PostEvents { get; }
 

@@ -1,11 +1,11 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 
 namespace Noname.GameHost
 {
     /// <summary>
-    /// GameHost 공용 로그 라우터입니다.
-    /// Unity/Server 환경에 맞게 델리게이트를 교체할 수 있습니다.
+    /// GameHost 怨듭슜 濡쒓렇 ?쇱슦?곗엯?덈떎.
+    /// Unity/Server ?섍꼍??留욊쾶 ?몃━寃뚯씠?몃? 援먯껜?????덉뒿?덈떎.
     /// </summary>
     public static class GameHostLog
     {

@@ -9,8 +9,12 @@ namespace MyProject.MergeGame.Commands
     /// </summary>
     public abstract class MergeGameCommand : GameCommandBase
     {
+        /// <summary>
+        /// base 함수를 처리합니다.
+        /// </summary>
         protected MergeGameCommand(long senderUid) : base(senderUid)
         {
+            // 핵심 로직을 처리합니다.
         }
 
         /// <summary>
@@ -18,6 +22,7 @@ namespace MyProject.MergeGame.Commands
         /// </summary>
         protected MergeGameCommand(Guid commandId, long senderUid) : base(commandId, senderUid)
         {
+            // 핵심 로직을 처리합니다.
         }
     }
 
@@ -39,26 +44,46 @@ namespace MyProject.MergeGame.Commands
     /// </summary>
     public sealed class ReadyMergeGameCommand : MergeGameCommand
     {
+        /// <summary>
+        /// base 함수를 처리합니다.
+        /// </summary>
         public ReadyMergeGameCommand(long senderUid) : base(senderUid)
         {
+            // 핵심 로직을 처리합니다.
         }
+        /// <summary>
+        /// base 함수를 처리합니다.
+        /// </summary>
 
         private ReadyMergeGameCommand(Guid commandId, long senderUid) : base(commandId, senderUid)
         {
+            // 핵심 로직을 처리합니다.
         }
+        /// <summary>
+        /// GetPayloadSize 함수를 처리합니다.
+        /// </summary>
 
         protected override int GetPayloadSize()
         {
+            // 핵심 로직을 처리합니다.
             return 0;
         }
+        /// <summary>
+        /// WritePayload 함수를 처리합니다.
+        /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
+            // 핵심 로직을 처리합니다.
             return GetPayloadSize();
         }
+        /// <summary>
+        /// ReadFrom 함수를 처리합니다.
+        /// </summary>
 
         public static ReadyMergeGameCommand ReadFrom(ReadOnlySpan<byte> src)
         {
+            // 핵심 로직을 처리합니다.
             var (commandId, senderUid, _) = GameCommandBase.ReadHeader(src);
             return new ReadyMergeGameCommand(commandId, senderUid);
         }
@@ -74,25 +99,43 @@ namespace MyProject.MergeGame.Commands
             : base(tick, senderUid, success, reason)
         {
         }
+        /// <summary>
+        /// Ok 함수를 처리합니다.
+        /// </summary>
 
         public static ReadyMergeGameResult Ok(long tick, long senderUid)
             => new(tick, senderUid, true, null);
+        /// <summary>
+        /// Fail 함수를 처리합니다.
+        /// </summary>
 
         public static ReadyMergeGameResult Fail(long tick, long senderUid, string reason)
             => new(tick, senderUid, false, reason);
+        /// <summary>
+        /// GetPayloadSize 함수를 처리합니다.
+        /// </summary>
 
         protected override int GetPayloadSize()
         {
+            // 핵심 로직을 처리합니다.
             return 0;
         }
+        /// <summary>
+        /// WritePayload 함수를 처리합니다.
+        /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
+            // 핵심 로직을 처리합니다.
             return GetPayloadSize();
         }
+        /// <summary>
+        /// ReadFrom 함수를 처리합니다.
+        /// </summary>
 
         public static ReadyMergeGameResult ReadFrom(ReadOnlySpan<byte> src)
         {
+            // 핵심 로직을 처리합니다.
             var (tick, senderUid, success, errorMessage, _) = GameCommandResultBase.ReadHeader(src);
             return new ReadyMergeGameResult(tick, senderUid, success, errorMessage);
         }
@@ -103,26 +146,46 @@ namespace MyProject.MergeGame.Commands
     /// </summary>
     public sealed class ExitMergeGameCommand : MergeGameCommand
     {
+        /// <summary>
+        /// base 함수를 처리합니다.
+        /// </summary>
         public ExitMergeGameCommand(long senderUid) : base(senderUid)
         {
+            // 핵심 로직을 처리합니다.
         }
+        /// <summary>
+        /// base 함수를 처리합니다.
+        /// </summary>
 
         private ExitMergeGameCommand(Guid commandId, long senderUid) : base(commandId, senderUid)
         {
+            // 핵심 로직을 처리합니다.
         }
+        /// <summary>
+        /// GetPayloadSize 함수를 처리합니다.
+        /// </summary>
 
         protected override int GetPayloadSize()
         {
+            // 핵심 로직을 처리합니다.
             return 0;
         }
+        /// <summary>
+        /// WritePayload 함수를 처리합니다.
+        /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
+            // 핵심 로직을 처리합니다.
             return GetPayloadSize();
         }
+        /// <summary>
+        /// ReadFrom 함수를 처리합니다.
+        /// </summary>
 
         public static ExitMergeGameCommand ReadFrom(ReadOnlySpan<byte> src)
         {
+            // 핵심 로직을 처리합니다.
             var (commandId, senderUid, _) = GameCommandBase.ReadHeader(src);
             return new ExitMergeGameCommand(commandId, senderUid);
         }
@@ -137,25 +200,43 @@ namespace MyProject.MergeGame.Commands
             : base(tick, senderUid, success, reason)
         {
         }
+        /// <summary>
+        /// Ok 함수를 처리합니다.
+        /// </summary>
 
         public static ExitMergeGameResult Ok(long tick, long senderUid)
             => new(tick, senderUid, true, null);
+        /// <summary>
+        /// Fail 함수를 처리합니다.
+        /// </summary>
 
         public static ExitMergeGameResult Fail(long tick, long senderUid, string reason)
             => new(tick, senderUid, false, reason);
+        /// <summary>
+        /// GetPayloadSize 함수를 처리합니다.
+        /// </summary>
 
         protected override int GetPayloadSize()
         {
+            // 핵심 로직을 처리합니다.
             return 0;
         }
+        /// <summary>
+        /// WritePayload 함수를 처리합니다.
+        /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
+            // 핵심 로직을 처리합니다.
             return GetPayloadSize();
         }
+        /// <summary>
+        /// ReadFrom 함수를 처리합니다.
+        /// </summary>
 
         public static ExitMergeGameResult ReadFrom(ReadOnlySpan<byte> src)
         {
+            // 핵심 로직을 처리합니다.
             var (tick, senderUid, success, errorMessage, _) = GameCommandResultBase.ReadHeader(src);
             return new ExitMergeGameResult(tick, senderUid, success, errorMessage);
         }
@@ -170,8 +251,12 @@ namespace MyProject.MergeGame.Commands
     /// </summary>
     public sealed class SpawnTowerCommand : MergeGameCommand
     {
+        /// <summary>
+        /// base 함수를 처리합니다.
+        /// </summary>
         public SpawnTowerCommand(long senderUid) : base(senderUid)
         {
+            // 핵심 로직을 처리합니다.
 
         }
 
@@ -179,19 +264,31 @@ namespace MyProject.MergeGame.Commands
             : base(commandId, senderUid)
         {
         }
+        /// <summary>
+        /// GetPayloadSize 함수를 처리합니다.
+        /// </summary>
 
         protected override int GetPayloadSize()
         {
+            // 핵심 로직을 처리합니다.
             return 0;
         }
+        /// <summary>
+        /// WritePayload 함수를 처리합니다.
+        /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
+            // 핵심 로직을 처리합니다.
             return GetPayloadSize();
         }
+        /// <summary>
+        /// ReadFrom 함수를 처리합니다.
+        /// </summary>
 
         public static SpawnTowerCommand ReadFrom(ReadOnlySpan<byte> src)
         {
+            // 핵심 로직을 처리합니다.
             var (commandId, senderUid, offset) = GameCommandBase.ReadHeader(src);
 
             return new SpawnTowerCommand(commandId, senderUid);
@@ -262,12 +359,19 @@ namespace MyProject.MergeGame.Commands
             float positionY,
             float positionZ)
             => new(tick, senderUid, true, null, towerUid, towerId, grade, slotIndex, positionX, positionY, positionZ);
+        /// <summary>
+        /// Fail 함수를 처리합니다.
+        /// </summary>
 
         public static SpawnTowerResult Fail(long tick, long senderUid, string reason)
             => new(tick, senderUid, false, reason, 0, 0, 0, -1, 0, 0, 0);
+        /// <summary>
+        /// GetPayloadSize 함수를 처리합니다.
+        /// </summary>
 
         protected override int GetPayloadSize()
         {
+            // 핵심 로직을 처리합니다.
             return sizeof(long)     // TowerUid
                 + sizeof(long)      // TowerId
                 + sizeof(int)       // Grade
@@ -276,9 +380,13 @@ namespace MyProject.MergeGame.Commands
                 + sizeof(float)     // PositionY
                 + sizeof(float);    // PositionZ
         }
+        /// <summary>
+        /// WritePayload 함수를 처리합니다.
+        /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
+            // 핵심 로직을 처리합니다.
             var offset = 0;
 
             BinaryPrimitives.WriteInt64LittleEndian(dst.Slice(offset, sizeof(long)), TowerUid);
@@ -306,9 +414,13 @@ namespace MyProject.MergeGame.Commands
 
             return GetPayloadSize();
         }
+        /// <summary>
+        /// ReadFrom 함수를 처리합니다.
+        /// </summary>
 
         public static SpawnTowerResult ReadFrom(ReadOnlySpan<byte> src)
         {
+            // 핵심 로직을 처리합니다.
             var (tick, senderUid, success, errorMessage, offset) = GameCommandResultBase.ReadHeader(src);
 
             long towerUid = BinaryPrimitives.ReadInt64LittleEndian(src.Slice(offset, sizeof(long)));
@@ -352,9 +464,13 @@ namespace MyProject.MergeGame.Commands
         /// 드래그 종료 슬롯 인덱스 (타겟 캐릭터)입니다.
         /// </summary>
         public int ToSlotIndex { get; }
+        /// <summary>
+        /// base 함수를 처리합니다.
+        /// </summary>
 
         public MergeTowerCommand(long senderUid, int fromSlotIndex, int toSlotIndex) : base(senderUid)
         {
+            // 핵심 로직을 처리합니다.
             FromSlotIndex = fromSlotIndex;
             ToSlotIndex = toSlotIndex;
         }
@@ -365,15 +481,23 @@ namespace MyProject.MergeGame.Commands
             FromSlotIndex = fromSlotIndex;
             ToSlotIndex = toSlotIndex;
         }
+        /// <summary>
+        /// GetPayloadSize 함수를 처리합니다.
+        /// </summary>
 
         protected override int GetPayloadSize()
         {
+            // 핵심 로직을 처리합니다.
             return sizeof(int)      // FromSlotIndex
                 + sizeof(int);      // ToSlotIndex
         }
+        /// <summary>
+        /// WritePayload 함수를 처리합니다.
+        /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
+            // 핵심 로직을 처리합니다.
             var offset = 0;
 
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset, sizeof(int)), FromSlotIndex);
@@ -383,9 +507,13 @@ namespace MyProject.MergeGame.Commands
 
             return GetPayloadSize();
         }
+        /// <summary>
+        /// ReadFrom 함수를 처리합니다.
+        /// </summary>
 
         public static MergeTowerCommand ReadFrom(ReadOnlySpan<byte> src)
         {
+            // 핵심 로직을 처리합니다.
             var (commandId, senderUid, offset) = GameCommandBase.ReadHeader(src);
 
             int fromSlotIndex = BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(int)));
@@ -466,12 +594,19 @@ namespace MyProject.MergeGame.Commands
                 tick, senderUid, true, null,
                 sourceTowerUid, targetTowerUid, resultTowerUid,
                 resultTowerId, resultGrade, slotIndex);
+        /// <summary>
+        /// Fail 함수를 처리합니다.
+        /// </summary>
 
         public static MergeTowerResult Fail(long tick, long senderUid, string reason)
             => new(tick, senderUid, false, reason, 0, 0, 0, 0, 0, -1);
+        /// <summary>
+        /// GetPayloadSize 함수를 처리합니다.
+        /// </summary>
 
         protected override int GetPayloadSize()
         {
+            // 핵심 로직을 처리합니다.
             return sizeof(long)     // SourceTowerUid
                 + sizeof(long)      // TargetTowerUid
                 + sizeof(long)      // ResultTowerUid
@@ -479,9 +614,13 @@ namespace MyProject.MergeGame.Commands
                 + sizeof(int)       // ResultGrade
                 + sizeof(int);      // SlotIndex
         }
+        /// <summary>
+        /// WritePayload 함수를 처리합니다.
+        /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
+            // 핵심 로직을 처리합니다.
             var offset = 0;
 
             BinaryPrimitives.WriteInt64LittleEndian(dst.Slice(offset, sizeof(long)), SourceTowerUid);
@@ -503,9 +642,13 @@ namespace MyProject.MergeGame.Commands
 
             return GetPayloadSize();
         }
+        /// <summary>
+        /// ReadFrom 함수를 처리합니다.
+        /// </summary>
 
         public static MergeTowerResult ReadFrom(ReadOnlySpan<byte> src)
         {
+            // 핵심 로직을 처리합니다.
             var (tick, senderUid, success, errorMessage, offset) = GameCommandResultBase.ReadHeader(src);
 
             long sourceTowerUid = BinaryPrimitives.ReadInt64LittleEndian(src.Slice(offset, sizeof(long)));
@@ -576,17 +719,25 @@ namespace MyProject.MergeGame.Commands
             Count = count;
             PathIndex = pathIndex;
         }
+        /// <summary>
+        /// GetPayloadSize 함수를 처리합니다.
+        /// </summary>
 
         protected override int GetPayloadSize()
         {
+            // 핵심 로직을 처리합니다.
             return sizeof(int)      // TargetPlayerIndex
                 + sizeof(long)      // MonsterId
                 + sizeof(int)       // Count
                 + sizeof(int);      // PathIndex
         }
+        /// <summary>
+        /// WritePayload 함수를 처리합니다.
+        /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
+            // 핵심 로직을 처리합니다.
             var offset = 0;
 
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset, sizeof(int)), TargetPlayerIndex);
@@ -602,9 +753,13 @@ namespace MyProject.MergeGame.Commands
 
             return GetPayloadSize();
         }
+        /// <summary>
+        /// ReadFrom 함수를 처리합니다.
+        /// </summary>
 
         public static InjectMonstersCommand ReadFrom(ReadOnlySpan<byte> src)
         {
+            // 핵심 로직을 처리합니다.
             var (commandId, senderUid, offset) = GameCommandBase.ReadHeader(src);
 
             int targetPlayerIndex = BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(int)));
@@ -637,29 +792,47 @@ namespace MyProject.MergeGame.Commands
         {
             SpawnedCount = spawnedCount;
         }
+        /// <summary>
+        /// Ok 함수를 처리합니다.
+        /// </summary>
 
         public static InjectMonstersResult Ok(long tick, long senderUid, int spawnedCount)
             => new(tick, senderUid, true, null, spawnedCount);
+        /// <summary>
+        /// Fail 함수를 처리합니다.
+        /// </summary>
 
         public static InjectMonstersResult Fail(long tick, long senderUid, string reason)
             => new(tick, senderUid, false, reason, 0);
+        /// <summary>
+        /// GetPayloadSize 함수를 처리합니다.
+        /// </summary>
 
         protected override int GetPayloadSize()
         {
+            // 핵심 로직을 처리합니다.
             return sizeof(int);     // SpawnedCount
         }
+        /// <summary>
+        /// WritePayload 함수를 처리합니다.
+        /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
+            // 핵심 로직을 처리합니다.
             var offset = 0;
 
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset, sizeof(int)), SpawnedCount);
 
             return GetPayloadSize();
         }
+        /// <summary>
+        /// ReadFrom 함수를 처리합니다.
+        /// </summary>
 
         public static InjectMonstersResult ReadFrom(ReadOnlySpan<byte> src)
         {
+            // 핵심 로직을 처리합니다.
             var (tick, senderUid, success, errorMessage, offset) = GameCommandResultBase.ReadHeader(src);
 
             int spawnedCount = BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(int)));

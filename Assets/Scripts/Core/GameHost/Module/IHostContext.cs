@@ -1,44 +1,44 @@
-namespace Noname.GameHost.Module
+﻿namespace Noname.GameHost.Module
 {
     /// <summary>
-    /// 모듈이 Host에 접근하기 위한 컨텍스트 인터페이스입니다.
+    /// 紐⑤뱢??Host???묎렐?섍린 ?꾪븳 而⑦뀓?ㅽ듃 ?명꽣?섏씠?ㅼ엯?덈떎.
     /// </summary>
     public interface IHostContext
     {
         /// <summary>
-        /// 현재 틱입니다.
+        /// ?꾩옱 ?깆엯?덈떎.
         /// </summary>
         long CurrentTick { get; }
 
         /// <summary>
-        /// 플레이어 수입니다.
+        /// ?뚮젅?댁뼱 ?섏엯?덈떎.
         /// </summary>
         int PlayerCount { get; }
 
         /// <summary>
-        /// 내부 이벤트 버스입니다.
+        /// ?대? ?대깽??踰꾩뒪?낅땲??
         /// </summary>
         IInnerEventBus InnerEventBus { get; }
 
         /// <summary>
-        /// 외부 이벤트를 발행합니다.
+        /// ?몃? ?대깽?몃? 諛쒗뻾?⑸땲??
         /// </summary>
-        /// <typeparam name="TEvent">이벤트 타입</typeparam>
-        /// <param name="eventData">이벤트 데이터</param>
+        /// <typeparam name="TEvent">?대깽?????/typeparam>
+        /// <param name="eventData">?대깽???곗씠??/param>
         void PublishEvent<TEvent>(TEvent eventData) where TEvent : GameEventBase;
 
         /// <summary>
-        /// 다른 모듈을 조회합니다.
+        /// ?ㅻⅨ 紐⑤뱢??議고쉶?⑸땲??
         /// </summary>
-        /// <typeparam name="TModule">모듈 타입</typeparam>
-        /// <returns>모듈 인스턴스 또는 null</returns>
+        /// <typeparam name="TModule">紐⑤뱢 ???/typeparam>
+        /// <returns>紐⑤뱢 ?몄뒪?댁뒪 ?먮뒗 null</returns>
         TModule GetModule<TModule>() where TModule : class, IHostModule;
 
         /// <summary>
-        /// 모듈 ID로 다른 모듈을 조회합니다.
+        /// 紐⑤뱢 ID濡??ㅻⅨ 紐⑤뱢??議고쉶?⑸땲??
         /// </summary>
-        /// <param name="moduleId">모듈 ID</param>
-        /// <returns>모듈 인스턴스 또는 null</returns>
+        /// <param name="moduleId">紐⑤뱢 ID</param>
+        /// <returns>紐⑤뱢 ?몄뒪?댁뒪 ?먮뒗 null</returns>
         IHostModule GetModule(string moduleId);
     }
 }

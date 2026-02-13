@@ -50,3 +50,5 @@ MonoBehaviour:
   - {fileID: 7742955776202277018, guid: 84922c3c6b35be846a7509df724bc2c0, type: 3}
   - {fileID: 4206240526483746809, guid: 25bc9fc043bff624d92e0579659008a6, type: 3}
   - {fileID: 3130315659885742628, guid: be317cfcecdd55c4485d746c6dffa273, type: 3}
+  - {fileID: 2208587347222508257, guid: 0545eba30226d6d4192ea4c6f32c2407, type: 3}
+  _playerOffsetStepX: 300

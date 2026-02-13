@@ -1,11 +1,11 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using Noname.GameAbilitySystem;
 
 namespace MyProject.MergeGame
 {
     /// <summary>
-    /// Å¸¿ö Á¤ÀÇ µ¥ÀÌÅÍÀÔ´Ï´Ù.
-    /// Host´Â ÀÌ µ¥ÀÌÅÍ¸¦ ±â¹İÀ¸·Î Å¸¿ö »óÅÂ(ASC µî)¸¦ ÃÊ±âÈ­ÇÕ´Ï´Ù.
+    /// íƒ€ì›Œ ì •ì˜ ë°ì´í„°ì…ë‹ˆë‹¤.
+    /// HostëŠ” ì´ ë°ì´í„°ë¥¼ ê¸°ë°˜ìœ¼ë¡œ íƒ€ì›Œ ìƒíƒœ(ASC ë“±)ë¥¼ ì´ˆê¸°í™”í•©ë‹ˆë‹¤.
     /// </summary>
     public sealed class TowerDefinition
     {
@@ -24,12 +24,12 @@ namespace MyProject.MergeGame
         public TowerTargetingType TargetingType { get; set; } = TowerTargetingType.Nearest;
 
         /// <summary>
-        /// ¸ÓÁö ½Ã ¼Ò½º Å¸¿ö¿¡¼­ ¹ßµ¿ÇÒ ÀÌÆåÆ® ¸ñ·ÏÀÔ´Ï´Ù.
+        /// ë¨¸ì§€ ì‹œ ì†ŒìŠ¤ íƒ€ì›Œì—ì„œ ë°œë™í•  ì´í™íŠ¸ ëª©ë¡ì…ë‹ˆë‹¤.
         /// </summary>
         public List<GameplayEffect> OnMergeSourceEffects { get; set; } = new();
 
         /// <summary>
-        /// ¸ÓÁö ½Ã Å¸°Ù Å¸¿ö¿¡¼­ ¹ßµ¿ÇÒ ÀÌÆåÆ® ¸ñ·ÏÀÔ´Ï´Ù.
+        /// ë¨¸ì§€ ì‹œ íƒ€ê²Ÿ íƒ€ì›Œì—ì„œ ë°œë™í•  ì´í™íŠ¸ ëª©ë¡ì…ë‹ˆë‹¤.
         /// </summary>
         public List<GameplayEffect> OnMergeTargetEffects { get; set; } = new();
     }

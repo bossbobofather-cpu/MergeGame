@@ -1,4 +1,4 @@
-namespace Noname.GameAbilitySystem
+﻿namespace Noname.GameAbilitySystem
 {
     public interface IEffectDurationPolicy
     {

@@ -199,6 +199,11 @@ namespace MyProject.MergeGame.Snapshots
         public float MaxHealth { get; }
 
         /// <summary>
+        /// 상대 플레이어에게서 주입된 몬스터인지 여부입니다.
+        /// </summary>
+        public bool IsInjectedByOpponent { get; }
+
+        /// <summary>
         /// 체력 비율입니다 (0.0 ~ 1.0).
         /// </summary>
         public float HealthRatio => MaxHealth > 0 ? CurrentHealth / MaxHealth : 0f;
@@ -212,7 +217,8 @@ namespace MyProject.MergeGame.Snapshots
             float positionY,
             float positionZ,
             float currentHealth,
-            float maxHealth)
+            float maxHealth,
+            bool isInjectedByOpponent)
         {
             Uid = uid;
             MonsterId = monsterId;
@@ -223,6 +229,7 @@ namespace MyProject.MergeGame.Snapshots
             PositionZ = positionZ;
             CurrentHealth = currentHealth;
             MaxHealth = maxHealth;
+            IsInjectedByOpponent = isInjectedByOpponent;
         }
     }
 
@@ -396,8 +403,12 @@ namespace MyProject.MergeGame.Snapshots
             Monsters = monsters;
             Projectiles = projectiles ?? Array.Empty<ProjectileSnapshot>();
         }
+        /// <summary>
+        /// GetPayloadSize 함수를 처리합니다.
+        /// </summary>
         protected override int GetPayloadSize()
         {
+            // 핵심 로직을 처리합니다.
             return
                 // Fixed header fields
                 sizeof(int) // PlayerIndex
@@ -453,6 +464,7 @@ namespace MyProject.MergeGame.Snapshots
                     + sizeof(float) // Monster.PositionZ
                     + sizeof(float) // Monster.CurrentHealth
                     + sizeof(float) // Monster.MaxHealth
+                    + sizeof(byte) // Monster.IsInjectedByOpponent
                 )
 
                 // Projectiles
@@ -470,10 +482,14 @@ namespace MyProject.MergeGame.Snapshots
                     + sizeof(byte) // Projectile.IsLanded
                 );
         }
+        /// <summary>
+        /// WritePayload 함수를 처리합니다.
+        /// </summary>
 
 
         protected override int WritePayload(Span<byte> dst)
         {
+            // 핵심 로직을 처리합니다.
             var offset = 0;
 
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), PlayerIndex); offset += sizeof(int);
@@ -535,6 +551,7 @@ namespace MyProject.MergeGame.Snapshots
                 BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), BitConverter.SingleToInt32Bits(m.PositionZ)); offset += sizeof(float);
                 BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), BitConverter.SingleToInt32Bits(m.CurrentHealth)); offset += sizeof(float);
                 BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), BitConverter.SingleToInt32Bits(m.MaxHealth)); offset += sizeof(float);
+                dst[offset] = m.IsInjectedByOpponent ? (byte)1 : (byte)0; offset += sizeof(byte);
             }
 
             // Projectiles
@@ -556,9 +573,13 @@ namespace MyProject.MergeGame.Snapshots
 
             return GetPayloadSize();
         }
+        /// <summary>
+        /// ReadFrom 함수를 처리합니다.
+        /// </summary>
 
         public static MergeHostSnapshot ReadFrom(ReadOnlySpan<byte> src)
         {
+            // 핵심 로직을 처리합니다.
             var (tick, headerOffset) = ReadHeader(src);
             var offset = headerOffset;
 
@@ -623,7 +644,8 @@ namespace MyProject.MergeGame.Snapshots
                 float pz = BitConverter.Int32BitsToSingle(BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset))); offset += sizeof(float);
                 float hp = BitConverter.Int32BitsToSingle(BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset))); offset += sizeof(float);
                 float maxHp = BitConverter.Int32BitsToSingle(BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset))); offset += sizeof(float);
-                monsters[i] = new MonsterSnapshot(uid, mId, pathIdx, progress, px, py, pz, hp, maxHp);
+                bool isInjectedByOpponent = src[offset] != 0; offset += sizeof(byte);
+                monsters[i] = new MonsterSnapshot(uid, mId, pathIdx, progress, px, py, pz, hp, maxHp, isInjectedByOpponent);
             }
 
             // Projectiles

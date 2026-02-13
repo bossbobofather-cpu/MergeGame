@@ -39,19 +39,31 @@ namespace Noname.GameAbilitySystem
         /// 랜덤 소스입니다.
         /// </summary>
         public Random Random { get; }
+        /// <summary>
+        /// ResolveEnemies 함수를 처리합니다.
+        /// </summary>
 
         public IReadOnlyList<AbilitySystemComponent> ResolveEnemies(AbilitySystemComponent owner)
         {
+            // 핵심 로직을 처리합니다.
             return GetEnemies != null ? GetEnemies(owner) : Array.Empty<AbilitySystemComponent>();
         }
+        /// <summary>
+        /// ResolveAllies 함수를 처리합니다.
+        /// </summary>
 
         public IReadOnlyList<AbilitySystemComponent> ResolveAllies(AbilitySystemComponent owner)
         {
+            // 핵심 로직을 처리합니다.
             return GetAllies != null ? GetAllies(owner) : Array.Empty<AbilitySystemComponent>();
         }
+        /// <summary>
+        /// ResolvePosition 함수를 처리합니다.
+        /// </summary>
 
         public Point3D ResolvePosition(AbilitySystemComponent owner)
         {
+            // 핵심 로직을 처리합니다.
             return GetPosition != null ? GetPosition(owner) : default;
         }
     }

@@ -1,10 +1,10 @@
-using Noname.GameHost.Module;
+﻿using Noname.GameHost.Module;
 
 namespace MyProject.MergeGame.Modules
 {
     /// <summary>
-    /// 규칙 모듈입니다.
-    /// 스폰 규칙, 머지 규칙, 승리/패배 조건을 관리합니다.
+    /// 洹쒖튃 紐⑤뱢?낅땲??
+    /// ?ㅽ룿 洹쒖튃, 癒몄? 洹쒖튃, ?밸━/?⑤같 議곌굔??愿由ы빀?덈떎.
     /// </summary>
     public sealed class RuleModule : HostModuleBase<RuleModuleConfig>
     {
@@ -17,44 +17,44 @@ namespace MyProject.MergeGame.Modules
         public override bool IsRequired => true;
 
         /// <inheritdoc />
-        public override int Priority => 90; // MapModule 다음으로 초기화
+        public override int Priority => 90; // MapModule ?ㅼ쓬?쇰줈 珥덇린??
 
         /// <summary>
-        /// 승리 조건입니다.
+        /// ?밸━ 議곌굔?낅땲??
         /// </summary>
         public VictoryConditionType VictoryCondition => Config.VictoryCondition;
 
         /// <summary>
-        /// 패배 조건입니다.
+        /// ?⑤같 議곌굔?낅땲??
         /// </summary>
         public DefeatConditionType DefeatCondition => Config.DefeatCondition;
 
         /// <summary>
-        /// 스폰 규칙입니다.
+        /// ?ㅽ룿 洹쒖튃?낅땲??
         /// </summary>
         public SpawnRuleType SpawnRule => Config.SpawnRule;
 
         /// <summary>
-        /// 유닛 스폰 비용입니다.
+        /// ?좊떅 ?ㅽ룿 鍮꾩슜?낅땲??
         /// </summary>
         public int UnitSpawnCost => Config.UnitSpawnCost;
 
         /// <summary>
-        /// 최대 유닛 등급입니다.
+        /// 理쒕? ?좊떅 ?깃툒?낅땲??
         /// </summary>
         public int MaxUnitGrade => Config.MaxUnitGrade;
 
         /// <inheritdoc />
         protected override void OnInitialize()
         {
-            // 내부 이벤트 구독 (모듈 전용)
+            // ?대? ?대깽??援щ룆 (紐⑤뱢 ?꾩슜)
             SubscribeInnerEvent<MergeValidationRequestInnerEvent>(OnMergeValidationRequest);
             SubscribeInnerEvent<SpawnValidationRequestInnerEvent>(OnSpawnValidationRequest);
             SubscribeInnerEvent<GameEndCheckRequestInnerEvent>(OnGameEndCheckRequest);
             SubscribeInnerEvent<ScoreCalculationRequestInnerEvent>(OnScoreCalculationRequest);
             SubscribeInnerEvent<MonsterKillRewardRequestInnerEvent>(OnMonsterKillRewardRequest);
 
-            // 공유 내부 이벤트 구독 (다른 모듈에서 호출)
+            // 怨듭쑀 ?대? ?대깽??援щ룆 (?ㅻⅨ 紐⑤뱢?먯꽌 ?몄텧)
             SubscribeInnerEvent<GetSpawnCostRequest>(OnGetSpawnCostRequest);
             SubscribeInnerEvent<CanMergeRequest>(OnCanMergeRequest);
             SubscribeInnerEvent<CheckGameEndRequest>(OnCheckGameEndRequest);
@@ -64,47 +64,48 @@ namespace MyProject.MergeGame.Modules
         /// <inheritdoc />
         protected override void OnDispose()
         {
-            // 내부 이벤트 구독 해제 (모듈 전용)
+            // ?대? ?대깽??援щ룆 ?댁젣 (紐⑤뱢 ?꾩슜)
             UnsubscribeInnerEvent<MergeValidationRequestInnerEvent>(OnMergeValidationRequest);
             UnsubscribeInnerEvent<SpawnValidationRequestInnerEvent>(OnSpawnValidationRequest);
             UnsubscribeInnerEvent<GameEndCheckRequestInnerEvent>(OnGameEndCheckRequest);
             UnsubscribeInnerEvent<ScoreCalculationRequestInnerEvent>(OnScoreCalculationRequest);
             UnsubscribeInnerEvent<MonsterKillRewardRequestInnerEvent>(OnMonsterKillRewardRequest);
 
-            // 공유 내부 이벤트 구독 해제
+            // 怨듭쑀 ?대? ?대깽??援щ룆 ?댁젣
             UnsubscribeInnerEvent<GetSpawnCostRequest>(OnGetSpawnCostRequest);
             UnsubscribeInnerEvent<CanMergeRequest>(OnCanMergeRequest);
             UnsubscribeInnerEvent<CheckGameEndRequest>(OnCheckGameEndRequest);
             UnsubscribeInnerEvent<CalculateRewardRequest>(OnCalculateRewardRequest);
         }
 
-        #region 검증 메서드
+        #region 寃利?硫붿꽌??
 
         /// <summary>
-        /// 머지 가능 여부를 검증합니다.
+        /// 癒몄? 媛???щ?瑜?寃利앺빀?덈떎.
         /// </summary>
         public bool CanMerge(int sourceGrade, int targetGrade, string sourceType, string targetType, out string failReason)
         {
+            // 핵심 로직을 처리합니다.
             failReason = null;
 
-            // 등급 체크
+            // ?깃툒 泥댄겕
             if (sourceGrade != targetGrade)
             {
-                failReason = "등급이 다릅니다.";
+                failReason = "?깃툒???ㅻ쫭?덈떎.";
                 return false;
             }
 
-            // 최대 등급 체크
+            // 理쒕? ?깃툒 泥댄겕
             if (sourceGrade >= Config.MaxUnitGrade)
             {
-                failReason = "최대 등급에 도달했습니다.";
+                failReason = "理쒕? ?깃툒???꾨떖?덉뒿?덈떎.";
                 return false;
             }
 
-            // 타입 체크 (설정에 따라)
+            // ???泥댄겕 (?ㅼ젙???곕씪)
             if (Config.RequireSameTypeForMerge && sourceType != targetType)
             {
-                failReason = "타입이 다릅니다.";
+                failReason = "??낆씠 ?ㅻ쫭?덈떎.";
                 return false;
             }
 
@@ -112,15 +113,16 @@ namespace MyProject.MergeGame.Modules
         }
 
         /// <summary>
-        /// 스폰 가능 여부를 검증합니다.
+        /// ?ㅽ룿 媛???щ?瑜?寃利앺빀?덈떎.
         /// </summary>
         public bool CanSpawn(int currentGold, out string failReason)
         {
+            // 핵심 로직을 처리합니다.
             failReason = null;
 
             if (currentGold < Config.UnitSpawnCost)
             {
-                failReason = "골드가 부족합니다.";
+                failReason = "怨⑤뱶媛 遺議깊빀?덈떎.";
                 return false;
             }
 
@@ -128,14 +130,14 @@ namespace MyProject.MergeGame.Modules
         }
 
         /// <summary>
-        /// 게임 종료 여부를 검증합니다.
+        /// 寃뚯엫 醫낅즺 ?щ?瑜?寃利앺빀?덈떎.
         /// </summary>
         public (bool isEnd, bool isVictory) CheckGameEnd(
             int currentHp,
             int currentScore,
             int maxUnitGrade)
         {
-            // 패배 조건 체크
+            // ?⑤같 議곌굔 泥댄겕
             switch (Config.DefeatCondition)
             {
                 case DefeatConditionType.PlayerDeath:
@@ -146,8 +148,8 @@ namespace MyProject.MergeGame.Modules
                     break;
             }
 
-            // 승리 조건 체크
-            // LastPlayerStanding은 Host의 CheckGlobalGameOver()에서 처리
+            // ?밸━ 議곌굔 泥댄겕
+            // LastPlayerStanding? Host??CheckGlobalGameOver()?먯꽌 泥섎━
             switch (Config.VictoryCondition)
             {
                 case VictoryConditionType.ScoreReach:
@@ -170,34 +172,39 @@ namespace MyProject.MergeGame.Modules
 
         #endregion
 
-        #region 계산 메서드
+        #region 怨꾩궛 硫붿꽌??
 
         /// <summary>
-        /// 머지 점수를 계산합니다.
+        /// 癒몄? ?먯닔瑜?怨꾩궛?⑸땲??
         /// </summary>
         public int CalculateMergeScore(int resultGrade)
         {
+            // 핵심 로직을 처리합니다.
             return resultGrade * Config.ScorePerGrade;
         }
 
         /// <summary>
-        /// 몬스터 처치 보상을 계산합니다.
+        /// 紐ъ뒪??泥섏튂 蹂댁긽??怨꾩궛?⑸땲??
         /// </summary>
         public (int gold, int score) CalculateMonsterKillReward(string monsterId)
         {
-            // 기본 보상
+            // 湲곕낯 蹂댁긽
             return (Config.GoldPerMonsterKill, 10);
         }
 
         /// <summary>
-        /// 웨이브 완료 보상을 계산합니다.
+        /// ?⑥씠釉??꾨즺 蹂댁긽??怨꾩궛?⑸땲??
         /// </summary>
         #endregion
 
-        #region 내부 이벤트 핸들러
+        #region ?대? ?대깽???몃뱾??
+        /// <summary>
+        /// OnMergeValidationRequest 함수를 처리합니다.
+        /// </summary>
 
         private void OnMergeValidationRequest(MergeValidationRequestInnerEvent evt)
         {
+            // 핵심 로직을 처리합니다.
             evt.CanMerge = CanMerge(
                 evt.SourceGrade,
                 evt.TargetGrade,
@@ -206,16 +213,24 @@ namespace MyProject.MergeGame.Modules
                 out var failReason);
             evt.FailReason = failReason;
         }
+        /// <summary>
+        /// OnSpawnValidationRequest 함수를 처리합니다.
+        /// </summary>
 
         private void OnSpawnValidationRequest(SpawnValidationRequestInnerEvent evt)
         {
+            // 핵심 로직을 처리합니다.
             evt.CanSpawn = CanSpawn(evt.CurrentGold, out var failReason);
             evt.SpawnCost = Config.UnitSpawnCost;
             evt.FailReason = failReason;
         }
+        /// <summary>
+        /// OnGameEndCheckRequest 함수를 처리합니다.
+        /// </summary>
 
         private void OnGameEndCheckRequest(GameEndCheckRequestInnerEvent evt)
         {
+            // 핵심 로직을 처리합니다.
             var (isEnd, isVictory) = CheckGameEnd(
                 evt.CurrentHp,
                 evt.CurrentScore,
@@ -224,14 +239,22 @@ namespace MyProject.MergeGame.Modules
             evt.IsGameEnd = isEnd;
             evt.IsVictory = isVictory;
         }
+        /// <summary>
+        /// OnScoreCalculationRequest 함수를 처리합니다.
+        /// </summary>
 
         private void OnScoreCalculationRequest(ScoreCalculationRequestInnerEvent evt)
         {
+            // 핵심 로직을 처리합니다.
             evt.CalculatedScore = CalculateMergeScore(evt.MergedGrade);
         }
+        /// <summary>
+        /// OnMonsterKillRewardRequest 함수를 처리합니다.
+        /// </summary>
 
         private void OnMonsterKillRewardRequest(MonsterKillRewardRequestInnerEvent evt)
         {
+            // 핵심 로직을 처리합니다.
             var (gold, score) = CalculateMonsterKillReward(evt.MonsterId);
             evt.RewardGold = gold;
             evt.RewardScore = score;
@@ -239,15 +262,23 @@ namespace MyProject.MergeGame.Modules
 
         #endregion
 
-        #region 공유 내부 이벤트 핸들러
+        #region 怨듭쑀 ?대? ?대깽???몃뱾??
+        /// <summary>
+        /// OnGetSpawnCostRequest 함수를 처리합니다.
+        /// </summary>
 
         private void OnGetSpawnCostRequest(GetSpawnCostRequest evt)
         {
+            // 핵심 로직을 처리합니다.
             evt.Cost = Config.UnitSpawnCost;
         }
+        /// <summary>
+        /// OnCanMergeRequest 함수를 처리합니다.
+        /// </summary>
 
         private void OnCanMergeRequest(CanMergeRequest evt)
         {
+            // 핵심 로직을 처리합니다.
             evt.CanMerge = CanMerge(
                 evt.SourceGrade,
                 evt.TargetGrade,
@@ -256,9 +287,13 @@ namespace MyProject.MergeGame.Modules
                 out var failReason);
             evt.FailReason = failReason;
         }
+        /// <summary>
+        /// OnCheckGameEndRequest 함수를 처리합니다.
+        /// </summary>
 
         private void OnCheckGameEndRequest(CheckGameEndRequest evt)
         {
+            // 핵심 로직을 처리합니다.
             var (isEnd, isVictory) = CheckGameEnd(
                 evt.CurrentHp,
                 evt.CurrentScore,
@@ -267,9 +302,13 @@ namespace MyProject.MergeGame.Modules
             evt.IsGameEnd = isEnd;
             evt.IsVictory = isVictory;
         }
+        /// <summary>
+        /// OnCalculateRewardRequest 함수를 처리합니다.
+        /// </summary>
 
         private void OnCalculateRewardRequest(CalculateRewardRequest evt)
         {
+            // 핵심 로직을 처리합니다.
             switch (evt.Type)
             {
                 case CalculateRewardRequest.RewardType.MonsterKill:

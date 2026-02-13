@@ -1,21 +1,21 @@
-using System;
+﻿using System;
 
 namespace Noname.GameHost.Module
 {
     /// <summary>
-    /// Host 모듈의 기본 구현입니다.
+    /// Host 紐⑤뱢??湲곕낯 援ы쁽?낅땲??
     /// </summary>
     public abstract class HostModuleBase : IHostModule
     {
         private bool _disposed;
 
         /// <summary>
-        /// Host 컨텍스트입니다.
+        /// Host 而⑦뀓?ㅽ듃?낅땲??
         /// </summary>
         protected IHostContext Context { get; private set; }
 
         /// <summary>
-        /// 내부 이벤트 버스입니다.
+        /// ?대? ?대깽??踰꾩뒪?낅땲??
         /// </summary>
         protected IInnerEventBus InnerEventBus => Context?.InnerEventBus;
 
@@ -34,6 +34,7 @@ namespace Noname.GameHost.Module
         /// <inheritdoc />
         public void Initialize(IHostContext context)
         {
+            // 핵심 로직을 처리합니다.
             if (IsInitialized)
             {
                 return;
@@ -47,6 +48,7 @@ namespace Noname.GameHost.Module
         /// <inheritdoc />
         public void Tick(long tick, float deltaTime)
         {
+            // 핵심 로직을 처리합니다.
             if (!IsInitialized) return;
             OnTick(tick, deltaTime);
         }
@@ -54,6 +56,7 @@ namespace Noname.GameHost.Module
         /// <inheritdoc />
         public void Startup()
         {
+            // 핵심 로직을 처리합니다.
             if (!IsInitialized) return;
             OnStartup();
         }
@@ -61,37 +64,38 @@ namespace Noname.GameHost.Module
         /// <inheritdoc />
         public void Shutdown()
         {
+            // 핵심 로직을 처리합니다.
             if (!IsInitialized) return;
             OnShutdown();
         }
 
         /// <summary>
-        /// 초기화 시 호출됩니다.
+        /// 珥덇린?????몄텧?⑸땲??
         /// </summary>
         protected virtual void OnInitialize() { }
 
         /// <summary>
-        /// 매 틱 호출됩니다.
+        /// 留????몄텧?⑸땲??
         /// </summary>
         protected virtual void OnTick(long tick, float deltaTime) { }
 
         /// <summary>
-        /// 시작 시 호출됩니다.
+        /// ?쒖옉 ???몄텧?⑸땲??
         /// </summary>
         protected virtual void OnStartup() { }
 
         /// <summary>
-        /// 정지 시 호출됩니다.
+        /// ?뺤? ???몄텧?⑸땲??
         /// </summary>
         protected virtual void OnShutdown() { }
 
         /// <summary>
-        /// 리소스 해제 시 호출됩니다.
+        /// 由ъ냼???댁젣 ???몄텧?⑸땲??
         /// </summary>
         protected virtual void OnDispose() { }
 
         /// <summary>
-        /// 외부 이벤트를 발행합니다.
+        /// ?몃? ?대깽?몃? 諛쒗뻾?⑸땲??
         /// </summary>
         protected void PublishEvent<TEvent>(TEvent eventData) where TEvent : GameEventBase
         {
@@ -99,7 +103,7 @@ namespace Noname.GameHost.Module
         }
 
         /// <summary>
-        /// 내부 이벤트를 발행합니다.
+        /// ?대? ?대깽?몃? 諛쒗뻾?⑸땲??
         /// </summary>
         protected void PublishInnerEvent<TEvent>(TEvent eventData) where TEvent : IInnerEvent
         {
@@ -107,7 +111,7 @@ namespace Noname.GameHost.Module
         }
 
         /// <summary>
-        /// 내부 이벤트를 구독합니다.
+        /// ?대? ?대깽?몃? 援щ룆?⑸땲??
         /// </summary>
         protected void SubscribeInnerEvent<TEvent>(Action<TEvent> handler) where TEvent : IInnerEvent
         {
@@ -115,7 +119,7 @@ namespace Noname.GameHost.Module
         }
 
         /// <summary>
-        /// 내부 이벤트 구독을 해제합니다.
+        /// ?대? ?대깽??援щ룆???댁젣?⑸땲??
         /// </summary>
         protected void UnsubscribeInnerEvent<TEvent>(Action<TEvent> handler) where TEvent : IInnerEvent
         {
@@ -123,15 +127,19 @@ namespace Noname.GameHost.Module
         }
 
         /// <summary>
-        /// 다른 모듈을 조회합니다.
+        /// ?ㅻⅨ 紐⑤뱢??議고쉶?⑸땲??
         /// </summary>
         protected TModule GetModule<TModule>() where TModule : class, IHostModule
         {
             return Context?.GetModule<TModule>();
         }
+        /// <summary>
+        /// Dispose 함수를 처리합니다.
+        /// </summary>
 
         public void Dispose()
         {
+            // 핵심 로직을 처리합니다.
             if (_disposed) return;
             _disposed = true;
 
@@ -141,9 +149,9 @@ namespace Noname.GameHost.Module
     }
 
     /// <summary>
-    /// 설정을 가진 Host 모듈의 기본 구현입니다.
+    /// ?ㅼ젙??媛吏?Host 紐⑤뱢??湲곕낯 援ы쁽?낅땲??
     /// </summary>
-    /// <typeparam name="TConfig">설정 타입</typeparam>
+    /// <typeparam name="TConfig">?ㅼ젙 ???/typeparam>
     public abstract class HostModuleBase<TConfig> : HostModuleBase, IHostModule<TConfig>
         where TConfig : class, new()
     {
@@ -153,12 +161,13 @@ namespace Noname.GameHost.Module
         /// <inheritdoc />
         public void Configure(TConfig config)
         {
+            // 핵심 로직을 처리합니다.
             Config = config ?? new TConfig();
             OnConfigure(Config);
         }
 
         /// <summary>
-        /// 설정 적용 시 호출됩니다.
+        /// ?ㅼ젙 ?곸슜 ???몄텧?⑸땲??
         /// </summary>
         protected virtual void OnConfigure(TConfig config) { }
     }

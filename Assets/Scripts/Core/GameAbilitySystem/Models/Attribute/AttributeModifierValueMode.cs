@@ -1,17 +1,17 @@
-    /// <summary>
-    /// 주석 정리
+﻿    /// <summary>
+    /// 二쇱꽍 ?뺣━
     /// </summary>
     public enum AttributeModifierValueMode
     {
         None,
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         Static,
 
         /// <summary>
-        /// 주석 정리
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         Calculated
     }

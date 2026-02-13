@@ -1,12 +1,12 @@
-namespace MyProject.MergeGame
+﻿namespace MyProject.MergeGame
 {
     /// <summary>
-    /// 개발용 헬퍼. 설정 값 및 정의들을 일단 여기서 관리. 추후에 데이터로 관리해야한다.
+    /// 媛쒕컻???ы띁. ?ㅼ젙 媛?諛??뺤쓽?ㅼ쓣 ?쇰떒 ?ш린??愿由? 異뷀썑???곗씠?곕줈 愿由ы빐?쇳븳??
     /// </summary>
     public static class DevHelperSet
     {
         /// <summary>
-        /// Id 헬퍼
+        /// Id ?ы띁
         /// </summary>
         public static class DevIdHelper
         {
@@ -27,16 +27,16 @@ namespace MyProject.MergeGame
 
         public static class DevRuleHelper
         {
-            //타워 시작 등급
+            //????쒖옉 ?깃툒
             public static readonly int DEV_TOWER_INITIAL_GRADE = 1;
 
-            //타워 최대 등급
+            //???理쒕? ?깃툒
             public static readonly int DEV_TOWER_MAX_GRADE = 8;
 
-            //타워 등급당 점수
+            //????깃툒???먯닔
             public static readonly int DEV_SCORE_PER_GRADE = 100;
 
-            //몬스터 누적 패배 기준
+            //紐ъ뒪???꾩쟻 ?⑤같 湲곗?
             public static readonly int DEV_MAX_MONSTER_STACK = 100;
         }
     }

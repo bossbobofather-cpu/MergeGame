@@ -18,6 +18,7 @@ namespace MyProject.Common.UI
         /// </summary>
         public static void Publish(string message)
         {
+            // 핵심 로직을 처리합니다.
             Publish(message, new Color(0f, 0f, 0f, 0.6f));
         }
 
@@ -26,6 +27,7 @@ namespace MyProject.Common.UI
         /// </summary>
         public static void Publish(string message, Color backgroundColor)
         {
+            // 핵심 로직을 처리합니다.
             if (string.IsNullOrEmpty(message))
             {
                 return;

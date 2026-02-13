@@ -1,5 +1,4 @@
-using System;
-using Mirror;
+﻿using Mirror;
 using MyProject.Common.Bootstrap;
 using UnityEngine;
 
@@ -7,18 +6,25 @@ namespace MyProject.MergeGame.Unity.Network
 {
     public class MergeGameNetworkManager : NetworkManager, IManager
     {
-        [SerializeField] private long _userId = 1;
         [SerializeField] MergeGameServerAdapter _serverAdapterPrefab;
         MergeGameServerAdapter _serverAdapterInstance;
+        /// <summary>
+        /// Initialize 함수를 처리합니다.
+        /// </summary>
 
         public void Initialize()
         {
-            User.UserId = _userId;
+            // 핵심 로직을 처리합니다.
+            User.InitializeFromRuntime();
         }
 
-        //서버만 호출 된다.
+        //?쒕쾭留?吏꾩엯 ???몄텧 ?쒕떎.
+        /// <summary>
+        /// OnStartServer 함수를 처리합니다.
+        /// </summary>
         public override void OnStartServer()
         {
+            // 핵심 로직을 처리합니다.
             base.OnStartServer();
 
             _serverAdapterInstance = GameObject.Instantiate(_serverAdapterPrefab);
@@ -26,13 +32,17 @@ namespace MyProject.MergeGame.Unity.Network
             if(_serverAdapterInstance) _serverAdapterInstance.Initialize();
         }
 
-        //서버가 중지될 때 호출 됩니다.
+        //?쒕쾭媛 以묒??????몄텧 ?⑸땲??
+        /// <summary>
+        /// OnStopServer 함수를 처리합니다.
+        /// </summary>
         public override void OnStopServer()
         {
+            // 핵심 로직을 처리합니다.
             if (_serverAdapterInstance != null)
             {
-                // 어댑터 인스턴스를 파괴하여 리소스 누수를 방지합니다.
-                // 어댑터의 OnDestroy에서 이벤트 구독 해제 등이 처리됩니다.
+                // ?대뙌???몄뒪?댁뒪瑜??뚭눼?섏뿬 由ъ냼???꾩닔瑜?諛⑹??⑸땲??
+                // ?대뙌?곗쓽 OnDestroy?먯꽌 ?대깽??援щ룆 ?댁젣 ?깆씠 泥섎━?⑸땲??
                 Destroy(_serverAdapterInstance.gameObject);
                 _serverAdapterInstance = null;
             }
@@ -41,13 +51,12 @@ namespace MyProject.MergeGame.Unity.Network
         }
 
         /// <summary>
-        /// 클라이언트가 플레이어 추가를 요청할 때 호출됩니다.
-        /// 현재 아키텍처에서는 Mirror의 자동 플레이어 생성을 사용하지 않으므로,
-        /// 기본 동작을 막기 위해 이 메소드를 비워둡니다.
+        /// ?대씪?댁뼵?멸? ?뚮젅?댁뼱 異붽?瑜??붿껌?????몄텧?⑸땲??
+        /// ?꾩옱 ?꾪궎?띿쿂?먯꽌??Mirror???먮룞 ?뚮젅?댁뼱 ?앹꽦???ъ슜?섏? ?딆쑝誘濡?        /// 湲곕낯 ?숈옉??留됯린 ?꾪빐 蹂?硫붿냼?쒕? 鍮꾩썙?〓땲??
         /// </summary>
         public override void OnServerAddPlayer(NetworkConnectionToClient conn)
         {
-            // base.OnServerAddPlayer(conn); // 기본 프리팹 생성 로직을 호출하지 않음
+            // base.OnServerAddPlayer(conn); // 湲곕낯 ?꾨━???앹꽦 濡쒖쭅? ?몄텧?섏? ?딆쓬
         }
     }
 }

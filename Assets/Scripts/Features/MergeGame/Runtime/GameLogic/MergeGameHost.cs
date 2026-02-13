@@ -81,6 +81,11 @@ namespace MyProject.MergeGame
         /// SenderUid -> PlayerIndex 매핑입니다.
         /// </summary>
         private readonly Dictionary<long, int> _playerIndexByUid = new();
+        private readonly Random _random = new();
+
+        private int[] _killCountForOpponentInjection = Array.Empty<int>();
+        private const int KillCountThresholdForOpponentInjection = 3;
+        private const float BaseMonsterMaxHealth = 60f;
 
         #region Module System
 
@@ -127,9 +132,13 @@ namespace MyProject.MergeGame
         }
 
         #endregion
+        /// <summary>
+        /// MergeGameHost 함수를 처리합니다.
+        /// </summary>
 
         public MergeGameHost(MergeHostConfig config, ITowerDatabase towerDatabase)
         {
+            // 핵심 로직을 처리합니다.
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _towerDatabase = towerDatabase ?? throw new ArgumentNullException(nameof(towerDatabase));
             _state = new MergeHostState();
@@ -148,9 +157,10 @@ namespace MyProject.MergeGame
         /// </summary>
         public void InitializePlayers(int playerCount)
         {
+            // 핵심 로직을 처리합니다.
             _playerCount = playerCount;
             _state.InitializePlayers(playerCount);
-
+            _killCountForOpponentInjection = new int[playerCount];
         }
 
         /// <summary>
@@ -158,6 +168,7 @@ namespace MyProject.MergeGame
         /// </summary>
         public void RegisterPlayer(long uid, int playerIndex)
         {
+            // 핵심 로직을 처리합니다.
             if (playerIndex < 0 || playerIndex >= _playerCount)
             {
                 return;
@@ -167,9 +178,13 @@ namespace MyProject.MergeGame
         }
 
         #region GameHostBase Overrides
+        /// <summary>
+        /// HandleCommand 함수를 처리합니다.
+        /// </summary>
 
         protected override GameCommandOutcome<MergeCommandResult, MergeGameEvent> HandleCommand(MergeGameCommand command)
         {
+            // 핵심 로직을 처리합니다.
             if (!_playerIndexByUid.TryGetValue(command.SenderUid, out var playerIndex))
             {
                 return default;
@@ -196,9 +211,13 @@ namespace MyProject.MergeGame
                     return default;
             }
         }
+        /// <summary>
+        /// OnTick 함수를 처리합니다.
+        /// </summary>
 
         protected override void OnTick(float deltaTime)
         {
+            // 핵심 로직을 처리합니다.
             if (_state.SessionPhase != MergeSessionPhase.Playing)
             {
                 return;
@@ -256,9 +275,13 @@ namespace MyProject.MergeGame
                 PublishEvent(evt);
             }
         }
+        /// <summary>
+        /// BuildSnapshotInternal 함수를 처리합니다.
+        /// </summary>
 
         protected override MergeHostSnapshot BuildSnapshotInternal()
         {
+            // 핵심 로직을 처리합니다.
             var snapshots = new MergeHostSnapshot[_playerCount];
             for (int i = 0; i < _playerCount; i++)
             {
@@ -273,14 +296,19 @@ namespace MyProject.MergeGame
         /// </summary>
         public MergeHostSnapshot GetPlayerSnapshot(int playerIndex)
         {
+            // 핵심 로직을 처리합니다.
             var snapshots = _playerSnapshots;
             if (snapshots == null || playerIndex < 0 || playerIndex >= snapshots.Length)
                 return null;
             return snapshots[playerIndex];
         }
+        /// <summary>
+        /// BuildPlayerSnapshot 함수를 처리합니다.
+        /// </summary>
 
         private MergeHostSnapshot BuildPlayerSnapshot(int playerIndex)
         {
+            // 핵심 로직을 처리합니다.
             _tempSlotSnapshots.Clear();
             _tempTowerSnapshots.Clear();
             _tempMonsterSnapshots.Clear();
@@ -328,7 +356,8 @@ namespace MyProject.MergeGame
                     monster.Position.Y,
                     monster.Position.Z,
                     monster.ASC.Get(AttributeId.Health),
-                    monster.ASC.Get(AttributeId.MaxHealth)
+                    monster.ASC.Get(AttributeId.MaxHealth),
+                    monster.IsInjectedByOpponent
                 ));
             }
 
@@ -374,9 +403,13 @@ namespace MyProject.MergeGame
         #endregion
 
         #region Command Handlers - Legacy
+        /// <summary>
+        /// HandleReadyGame 함수를 처리합니다.
+        /// </summary>
 
         private GameCommandOutcome<MergeCommandResult, MergeGameEvent> HandleReadyGame(ReadyMergeGameCommand command)
         {
+            // 핵심 로직을 처리합니다.
             if (!_playerIndexByUid.TryGetValue(command.SenderUid, out var playerIndex))
             {
                 return default;
@@ -449,9 +482,13 @@ namespace MyProject.MergeGame
                 ReadyMergeGameResult.Ok(Tick, command.SenderUid),
                 events);
         }
+        /// <summary>
+        /// HandleEndGame 함수를 처리합니다.
+        /// </summary>
 
         private GameCommandOutcome<MergeCommandResult, MergeGameEvent> HandleEndGame(ExitMergeGameCommand command)
         {
+            // 핵심 로직을 처리합니다.
             if (!_playerIndexByUid.TryGetValue(command.SenderUid, out var playerIndex))
             {
                 return default;
@@ -481,9 +518,13 @@ namespace MyProject.MergeGame
         #endregion
 
         #region Command Handlers
+        /// <summary>
+        /// HandleSpawnTower 함수를 처리합니다.
+        /// </summary>
 
         private GameCommandOutcome<MergeCommandResult, MergeGameEvent> HandleSpawnTower(int playerIndex, SpawnTowerCommand command)
         {
+            // 핵심 로직을 처리합니다.
             if (_state.SessionPhase != MergeSessionPhase.Playing)
             {
                 return new GameCommandOutcome<MergeCommandResult, MergeGameEvent>(
@@ -568,9 +609,13 @@ namespace MyProject.MergeGame
                 events
             );
         }
+        /// <summary>
+        /// HandleMergeTower 함수를 처리합니다.
+        /// </summary>
 
         private GameCommandOutcome<MergeCommandResult, MergeGameEvent> HandleMergeTower(int playerIndex, MergeTowerCommand command)
         {
+            // 핵심 로직을 처리합니다.
             if (_state.SessionPhase != MergeSessionPhase.Playing)
             {
                 return new GameCommandOutcome<MergeCommandResult, MergeGameEvent>(
@@ -702,9 +747,13 @@ namespace MyProject.MergeGame
                 events
             );
         }
+        /// <summary>
+        /// HandleInjectMonsters 함수를 처리합니다.
+        /// </summary>
 
         private GameCommandOutcome<MergeCommandResult, MergeGameEvent> HandleInjectMonsters(int playerIndex, InjectMonstersCommand command)
         {
+            // 핵심 로직을 처리합니다.
             if (_state.SessionPhase != MergeSessionPhase.Playing)
             {
                 return new GameCommandOutcome<MergeCommandResult, MergeGameEvent>(
@@ -739,12 +788,18 @@ namespace MyProject.MergeGame
                     InjectMonstersResult.Fail(Tick, command.SenderUid, "유효하지 않은 경로입니다."));
             }
 
+            var targetSpawnPath = _state.GetMonsterPath(targetPlayerIndex, 0) ?? path;
+            var targetSpawnPosition = targetSpawnPath.GetStartPosition();
+
             var monsterId = command.MonsterId;
 
             var events = new List<MergeGameEvent>(command.Count);
             var spawned = 0;
 
-            // 상대 공격(garbage) 몬스터는 우선 보상/플레이어 데미지를 주지 않는 형태로 주입합니다.
+            // 주입 몬스터는 현재 난이도 스펙으로 생성합니다.
+            var difficultyStep = GetCurrentDifficultyStep();
+            var difficultyMultiplier = 1f + (difficultyStep - 1) * 0.1f;
+
             for (var i = 0; i < command.Count; i++)
             {
                 var monster = _state.CreateMonster(
@@ -752,28 +807,35 @@ namespace MyProject.MergeGame
                     monsterId,
                     command.PathIndex,
                     path.GetStartPosition(),
-                    damageToPlayer: 0,
-                    goldReward: 0);
+                    damageToPlayer: 10,
+                    goldReward: 10 + difficultyStep,
+                    isInjectedByOpponent: true);
                 monster.SetAI(_defaultMonsterAI);
 
-                // 최소 동작용 ASC 세팅 (추후 몬스터 정의/스케일링 정책으로 교체)
-                monster.ASC.Set(AttributeId.MaxHealth, 100f);
-                monster.ASC.Set(AttributeId.Health, 100f);
+                monster.ASC.Set(AttributeId.MaxHealth, BaseMonsterMaxHealth * difficultyMultiplier);
+                monster.ASC.Set(AttributeId.Health, BaseMonsterMaxHealth * difficultyMultiplier);
                 monster.ASC.Set(AttributeId.MoveSpeed, 2f);
 
-                events.Add(new MonsterSpawnedEvent(
-                    Tick,
-                    targetPlayerIndex,
-                    monster.Uid,
-                    monster.MonsterId,
-                    monster.PathIndex,
-                    monster.Position.X,
-                    monster.Position.Y,
-                    monster.Position.Z,
-                    monster.ASC.Get(AttributeId.MaxHealth)
-                ));
+                events.Add(CreateMonsterSpawnedEvent(targetPlayerIndex, monster));
 
                 spawned++;
+            }
+
+            if (spawned > 0)
+            {
+                events.Add(CreateMonsterInjectionTriggeredEvent(
+                    sourcePlayerIndex: playerIndex,
+                    targetPlayerIndex: targetPlayerIndex,
+                    monsterId: monsterId,
+                    injectedCount: spawned,
+                    sourceMonsterUid: 0,
+                    hasSourcePosition: false,
+                    sourceX: 0f,
+                    sourceY: 0f,
+                    sourceZ: 0f,
+                    targetSpawnX: targetSpawnPosition.X,
+                    targetSpawnY: targetSpawnPosition.Y,
+                    targetSpawnZ: targetSpawnPosition.Z));
             }
 
             return new GameCommandOutcome<MergeCommandResult, MergeGameEvent>(
@@ -783,8 +845,12 @@ namespace MyProject.MergeGame
         #endregion
 
         #region Tick Processing
+        /// <summary>
+        /// ProcessDeadMonsters 함수를 처리합니다.
+        /// </summary>
         private void ProcessDeadMonsters(int playerIndex)
         {
+            // 핵심 로직을 처리합니다.
             var deadMonsterUids = new List<long>();
 
             foreach (var monster in _state.GetMonsters(playerIndex).Values)
@@ -835,12 +901,18 @@ namespace MyProject.MergeGame
                     monster.Uid
                 ));
 
+                TryInjectOpponentMonsterByKill(playerIndex, monster.Uid, monster.MonsterId, monster.PathIndex, monster.Position.X, monster.Position.Y, monster.Position.Z);
+
                 _state.RemoveMonster(playerIndex, uid);
             }
         }
+        /// <summary>
+        /// HandleGameOver 함수를 처리합니다.
+        /// </summary>
 
         private void HandleGameOver(int playerIndex, bool isVictory)
         {
+            // 핵심 로직을 처리합니다.
             if (_state.IsPlayerGameOver(playerIndex))
             {
                 return;
@@ -858,9 +930,13 @@ namespace MyProject.MergeGame
 
             CheckGlobalGameOver();
         }
+        /// <summary>
+        /// CheckGlobalGameOver 함수를 처리합니다.
+        /// </summary>
 
         private void CheckGlobalGameOver()
         {
+            // 핵심 로직을 처리합니다.
             int activePlayerCount = 0;
             int lastActivePlayerIndex = -1;
 
@@ -886,18 +962,193 @@ namespace MyProject.MergeGame
         #endregion
 
         #region Helpers
+        /// <summary>
+        /// CalculateMergeScore 함수를 처리합니다.
+        /// </summary>
 
         private int CalculateMergeScore(int resultGrade)
         {
             // 등급이 높을수록 더 많은 점수
             return resultGrade * _config.ScorePerGrade;
         }
+        /// <summary>
+        /// GetCurrentDifficultyStep 함수를 처리합니다.
+        /// </summary>
 
+        private int GetCurrentDifficultyStep()
+        {
+            // 핵심 로직을 처리합니다.
+            var difficulty = GetModule<DifficultyModule>();
+            return difficulty?.CurrentStep ?? 0;
+        }
+        /// <summary>
+        /// CreateMonsterSpawnedEvent 함수를 처리합니다.
+        /// </summary>
+
+        private MonsterSpawnedEvent CreateMonsterSpawnedEvent(int playerIndex, MergeMonster monster)
+        {
+            // 핵심 로직을 처리합니다.
+            return new MonsterSpawnedEvent(
+                Tick,
+                playerIndex,
+                monster.Uid,
+                monster.MonsterId,
+                monster.PathIndex,
+                monster.Position.X,
+                monster.Position.Y,
+                monster.Position.Z,
+                monster.ASC.Get(AttributeId.MaxHealth)
+            );
+        }
+
+        private MonsterInjectionTriggeredEvent CreateMonsterInjectionTriggeredEvent(
+            int sourcePlayerIndex,
+            int targetPlayerIndex,
+            long monsterId,
+            int injectedCount,
+            long sourceMonsterUid,
+            bool hasSourcePosition,
+            float sourceX,
+            float sourceY,
+            float sourceZ,
+            float targetSpawnX,
+            float targetSpawnY,
+            float targetSpawnZ)
+        {
+            return new MonsterInjectionTriggeredEvent(
+                Tick,
+                sourcePlayerIndex,
+                targetPlayerIndex,
+                monsterId,
+                injectedCount,
+                sourceMonsterUid,
+                hasSourcePosition,
+                sourceX,
+                sourceY,
+                sourceZ,
+                targetSpawnX,
+                targetSpawnY,
+                targetSpawnZ);
+        }
+        /// <summary>
+        /// TryInjectOpponentMonsterByKill 함수를 처리합니다.
+        /// </summary>
+
+        private void TryInjectOpponentMonsterByKill(int killerPlayerIndex, long sourceMonsterUid, long monsterId, int preferredPathIndex, float sourceX, float sourceY, float sourceZ)
+        {
+            // 핵심 로직을 처리합니다.
+            if (_state.SessionPhase != MergeSessionPhase.Playing)
+            {
+                return;
+            }
+
+            if (_playerCount <= 1)
+            {
+                return;
+            }
+
+            if (killerPlayerIndex < 0 || killerPlayerIndex >= _killCountForOpponentInjection.Length)
+            {
+                return;
+            }
+
+            if (_state.IsPlayerGameOver(killerPlayerIndex))
+            {
+                return;
+            }
+
+            _killCountForOpponentInjection[killerPlayerIndex]++;
+
+            while (_killCountForOpponentInjection[killerPlayerIndex] >= KillCountThresholdForOpponentInjection)
+            {
+                if (!TryPickRandomOpponentPlayerIndex(killerPlayerIndex, out var targetPlayerIndex))
+                {
+                    return;
+                }
+
+                var path = _state.GetMonsterPath(targetPlayerIndex, preferredPathIndex)
+                           ?? _state.GetMonsterPath(targetPlayerIndex, 0);
+                if (path == null)
+                {
+                    return;
+                }
+
+                var targetSpawnPath = _state.GetMonsterPath(targetPlayerIndex, 0) ?? path;
+                var targetSpawnPosition = targetSpawnPath.GetStartPosition();
+
+                var difficultyStep = GetCurrentDifficultyStep();
+                var difficultyMultiplier = 1f + (difficultyStep - 1) * 0.1f;
+
+                var injectedMonster = _state.CreateMonster(
+                    targetPlayerIndex,
+                    monsterId,
+                    path.PathIndex,
+                    path.GetStartPosition(),
+                    damageToPlayer: 10,
+                    goldReward: 10 + difficultyStep,
+                    isInjectedByOpponent: true);
+                injectedMonster.SetAI(_defaultMonsterAI);
+
+                injectedMonster.ASC.Set(AttributeId.MaxHealth, BaseMonsterMaxHealth * difficultyMultiplier);
+                injectedMonster.ASC.Set(AttributeId.Health, BaseMonsterMaxHealth * difficultyMultiplier);
+                injectedMonster.ASC.Set(AttributeId.MoveSpeed, 2f);
+
+                _tickEventBuffer.Add(CreateMonsterSpawnedEvent(targetPlayerIndex, injectedMonster));
+                _tickEventBuffer.Add(CreateMonsterInjectionTriggeredEvent(
+                    sourcePlayerIndex: killerPlayerIndex,
+                    targetPlayerIndex: targetPlayerIndex,
+                    monsterId: monsterId,
+                    injectedCount: 1,
+                    sourceMonsterUid: sourceMonsterUid,
+                    hasSourcePosition: true,
+                    sourceX: sourceX,
+                    sourceY: sourceY,
+                    sourceZ: sourceZ,
+                    targetSpawnX: targetSpawnPosition.X,
+                    targetSpawnY: targetSpawnPosition.Y,
+                    targetSpawnZ: targetSpawnPosition.Z));
+
+                _killCountForOpponentInjection[killerPlayerIndex] -= KillCountThresholdForOpponentInjection;
+            }
+        }
+        /// <summary>
+        /// TryPickRandomOpponentPlayerIndex 함수를 처리합니다.
+        /// </summary>
+
+        private bool TryPickRandomOpponentPlayerIndex(int sourcePlayerIndex, out int targetPlayerIndex)
+        {
+            // 핵심 로직을 처리합니다.
+            targetPlayerIndex = -1;
+            if (_playerCount <= 1)
+            {
+                return false;
+            }
+
+            var candidates = new List<int>(_playerCount - 1);
+            for (var i = 0; i < _playerCount; i++)
+            {
+                if (i == sourcePlayerIndex || _state.IsPlayerGameOver(i))
+                {
+                    continue;
+                }
+
+                candidates.Add(i);
+            }
+
+            if (candidates.Count == 0)
+            {
+                return false;
+            }
+
+            targetPlayerIndex = candidates[_random.Next(candidates.Count)];
+            return true;
+        }
         /// <summary>
         /// 타워 전투 스탯과 기본 공격 능력을 초기화합니다.
         /// </summary>
         private void ConfigureTowerCombat(MergeTower tower, TowerDefinition definition, int grade)
         {
+            // 핵심 로직을 처리합니다.
             if (tower == null || definition == null)
             {
                 return;
@@ -913,9 +1164,13 @@ namespace MyProject.MergeGame
             tower.ASC.GiveAbility(ability);
             tower.SetAI(_defaultTowerAI);
         }
+        /// <summary>
+        /// BuildBaseAttackAbility 함수를 처리합니다.
+        /// </summary>
 
         private GameplayAbility BuildBaseAttackAbility(TowerDefinition definition, float range)
         {
+            // 핵심 로직을 처리합니다.
             var ability = new GameplayAbility
             {
                 AbilityTag = new FGameplayTag("Ability.BaseAttack"),
@@ -953,16 +1208,24 @@ namespace MyProject.MergeGame
 
             return ability;
         }
+        /// <summary>
+        /// BuildTagContainer 함수를 처리합니다.
+        /// </summary>
 
         private static GameplayTagContainer BuildTagContainer(string tag)
         {
+            // 핵심 로직을 처리합니다.
             var container = new GameplayTagContainer();
             container.AddTag(new FGameplayTag(tag));
             return container;
         }
+        /// <summary>
+        /// CreateTargetingStrategy 함수를 처리합니다.
+        /// </summary>
 
         private static ITargetingStrategy CreateTargetingStrategy(TowerTargetingType targetingType, float range)
         {
+            // 핵심 로직을 처리합니다.
             return targetingType switch
             {
                 TowerTargetingType.Nearest => TargetingStrategyFactory.Create(TargetingStrategyType.NearestEnemy, maxRange: range),
@@ -973,9 +1236,13 @@ namespace MyProject.MergeGame
                 _ => TargetingStrategyFactory.Create(TargetingStrategyType.NearestEnemy, maxRange: range)
             };
         }
+        /// <summary>
+        /// CreateFallbackDefinition 함수를 처리합니다.
+        /// </summary>
 
         private static TowerDefinition CreateFallbackDefinition(MergeTower source, int grade)
         {
+            // 핵심 로직을 처리합니다.
             if (source == null)
             {
                 return null;
@@ -1010,6 +1277,7 @@ namespace MyProject.MergeGame
         /// </summary>
         public void SetMonsterPath(int playerIndex, int pathIndex, MonsterPath path)
         {
+            // 핵심 로직을 처리합니다.
             _state.SetMonsterPath(playerIndex, pathIndex, path);
         }
 
@@ -1086,6 +1354,7 @@ namespace MyProject.MergeGame
         /// </summary>
         public IHostModule GetModule(string moduleId)
         {
+            // 핵심 로직을 처리합니다.
             return _moduleMap.TryGetValue(moduleId, out var module) ? module : null;
         }
 
@@ -1095,6 +1364,7 @@ namespace MyProject.MergeGame
         /// </summary>
         public void InitializeModules()
         {
+            // 핵심 로직을 처리합니다.
             if (_modulesInitialized)
             {
                 return;
@@ -1121,6 +1391,7 @@ namespace MyProject.MergeGame
         /// </summary>
         private void TickModules(float deltaTime)
         {
+            // 핵심 로직을 처리합니다.
             foreach (var module in _modules)
             {
                 if (module.IsInitialized)
@@ -1135,6 +1406,7 @@ namespace MyProject.MergeGame
         /// </summary>
         private void DisposeModules()
         {
+            // 핵심 로직을 처리합니다.
             foreach (var module in _modules)
             {
                 module.Shutdown();
@@ -1156,6 +1428,7 @@ namespace MyProject.MergeGame
         /// </summary>
         private void OnMonsterSpawnRequest(MonsterSpawnRequestInnerEvent evt)
         {
+            // 핵심 로직을 처리합니다.
             int playerIndex = evt.PlayerIndex;
             var pathIndex = evt.PathIndex;
             var path = _state.GetMonsterPath(playerIndex, pathIndex);
@@ -1176,29 +1449,23 @@ namespace MyProject.MergeGame
 
             // ASC 초기화 (난이도에 따라 스케일링)
             var difficultyMultiplier = 1f + (evt.DifficultyStep - 1) * 0.1f;
-            monster.ASC.Set(AttributeId.MaxHealth, 100f * difficultyMultiplier);
-            monster.ASC.Set(AttributeId.Health, 100f * difficultyMultiplier);
+            monster.ASC.Set(AttributeId.MaxHealth, BaseMonsterMaxHealth * difficultyMultiplier);
+            monster.ASC.Set(AttributeId.Health, BaseMonsterMaxHealth * difficultyMultiplier);
             monster.ASC.Set(AttributeId.MoveSpeed, 2f);
 
-            PublishEvent(new MonsterSpawnedEvent(
-                Tick,
-                playerIndex,
-                monster.Uid,
-                monster.MonsterId,
-                monster.PathIndex,
-                monster.Position.X,
-                monster.Position.Y,
-                monster.Position.Z,
-                monster.ASC.Get(AttributeId.MaxHealth)
-            ));
+            PublishEvent(CreateMonsterSpawnedEvent(playerIndex, monster));
 
             evt.Handled = true;
         }
 
         #endregion
+        /// <summary>
+        /// Dispose 함수를 처리합니다.
+        /// </summary>
 
         public override void Dispose()
         {
+            // 핵심 로직을 처리합니다.
             DisposeModules();
             _innerEventBus.Unsubscribe<MonsterSpawnRequestInnerEvent>(OnMonsterSpawnRequest);
             base.Dispose();
@@ -1207,4 +1474,13 @@ namespace MyProject.MergeGame
     }
 
 }
+
+
+
+
+
+
+
+
+
 

@@ -1,13 +1,13 @@
-namespace Noname.GameAbilitySystem
+﻿namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// 주석 정리
-    /// 주석 정리
+    /// 二쇱꽍 ?뺣━
+    /// 二쇱꽍 ?뺣━
     /// </summary>
     public interface IAbilitySystemOwner
     {
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         AbilitySystemComponent ASC { get; }
     }

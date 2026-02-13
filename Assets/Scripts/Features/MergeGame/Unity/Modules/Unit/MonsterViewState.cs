@@ -25,6 +25,7 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         public void SetBaseScale(Vector3 baseScale)
         {
+            // 핵심 로직을 처리합니다.
             _baseScale = baseScale;
             if (_state == MonsterVisualState.Idle)
             {
@@ -37,13 +38,18 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         public void MarkMoving()
         {
+            // 핵심 로직을 처리합니다.
             _state = MonsterVisualState.Move;
             _moveTimer = _moveStateTimeout;
             transform.localScale = _baseScale * _moveScaleMultiplier;
         }
+        /// <summary>
+        /// Update 함수를 처리합니다.
+        /// </summary>
 
         private void Update()
         {
+            // 핵심 로직을 처리합니다.
             if (_state != MonsterVisualState.Move)
             {
                 return;

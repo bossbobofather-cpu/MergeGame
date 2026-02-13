@@ -1,70 +1,70 @@
-using System;
+﻿using System;
 
 namespace Noname.GameHost.Module
 {
     /// <summary>
-    /// Host 모듈의 공통 인터페이스입니다.
+    /// Host 紐⑤뱢??怨듯넻 ?명꽣?섏씠?ㅼ엯?덈떎.
     /// </summary>
     public interface IHostModule : IDisposable
     {
         /// <summary>
-        /// 모듈 ID입니다.
+        /// 紐⑤뱢 ID?낅땲??
         /// </summary>
         string ModuleId { get; }
 
         /// <summary>
-        /// 모듈 우선순위입니다. 낮을수록 먼저 실행됩니다.
+        /// 紐⑤뱢 ?곗꽑?쒖쐞?낅땲?? ??쓣?섎줉 癒쇱? ?ㅽ뻾?⑸땲??
         /// </summary>
         int Priority { get; }
 
         /// <summary>
-        /// 필수 모듈 여부입니다.
+        /// ?꾩닔 紐⑤뱢 ?щ??낅땲??
         /// </summary>
         bool IsRequired { get; }
 
         /// <summary>
-        /// 모듈이 초기화되었는지 여부입니다.
+        /// 紐⑤뱢??珥덇린?붾릺?덈뒗吏 ?щ??낅땲??
         /// </summary>
         bool IsInitialized { get; }
 
         /// <summary>
-        /// 모듈을 초기화합니다.
+        /// 紐⑤뱢??珥덇린?뷀빀?덈떎.
         /// </summary>
-        /// <param name="context">Host 컨텍스트</param>
+        /// <param name="context">Host 而⑦뀓?ㅽ듃</param>
         void Initialize(IHostContext context);
 
         /// <summary>
-        /// 매 틱 호출됩니다.
+        /// 留????몄텧?⑸땲??
         /// </summary>
-        /// <param name="tick">현재 틱</param>
-        /// <param name="deltaTime">델타 타임</param>
+        /// <param name="tick">?꾩옱 ??/param>
+        /// <param name="deltaTime">?명? ???/param>
         void Tick(long tick, float deltaTime);
 
         /// <summary>
-        /// 모듈을 시작합니다.
+        /// 紐⑤뱢???쒖옉?⑸땲??
         /// </summary>
         void Startup();
 
         /// <summary>
-        /// 모듈을 정지합니다.
+        /// 紐⑤뱢???뺤??⑸땲??
         /// </summary>
         void Shutdown();
     }
 
     /// <summary>
-    /// 설정을 가진 Host 모듈 인터페이스입니다.
+    /// ?ㅼ젙??媛吏?Host 紐⑤뱢 ?명꽣?섏씠?ㅼ엯?덈떎.
     /// </summary>
-    /// <typeparam name="TConfig">설정 타입</typeparam>
+    /// <typeparam name="TConfig">?ㅼ젙 ???/typeparam>
     public interface IHostModule<TConfig> : IHostModule
         where TConfig : class
     {
         /// <summary>
-        /// 모듈 설정입니다.
+        /// 紐⑤뱢 ?ㅼ젙?낅땲??
         /// </summary>
         TConfig Config { get; }
 
         /// <summary>
-        /// 설정을 적용합니다.
+        /// ?ㅼ젙???곸슜?⑸땲??
         /// </summary>
         void Configure(TConfig config);
     }

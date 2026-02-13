@@ -123,6 +123,7 @@ namespace MyProject.MergeGame.Models
         /// </summary>
         public void SetAI(IMergeTowerAI ai)
         {
+            // 핵심 로직을 처리합니다.
             AI = ai;
         }
 
@@ -131,6 +132,7 @@ namespace MyProject.MergeGame.Models
         /// </summary>
         public void SetGrade(int grade)
         {
+            // 핵심 로직을 처리합니다.
             Grade = grade;
         }
 
@@ -139,6 +141,7 @@ namespace MyProject.MergeGame.Models
         /// </summary>
         public bool CanMergeWith(MergeTower other)
         {
+            // 핵심 로직을 처리합니다.
             if (other == null) return false;
             if (Uid == other.Uid) return false;
             if (Grade == DevHelperSet.DevRuleHelper.DEV_TOWER_MAX_GRADE
@@ -146,9 +149,13 @@ namespace MyProject.MergeGame.Models
 
             return TowerId == other.TowerId && Grade == other.Grade;
         }
+        /// <summary>
+        /// Dispose 함수를 처리합니다.
+        /// </summary>
 
         public void Dispose()
         {
+            // 핵심 로직을 처리합니다.
             ASC?.Dispose();
         }
     }

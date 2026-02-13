@@ -2,15 +2,15 @@
 using MyProject.MergeGame.Commands;
 using MyProject.MergeGame.Events;
 using MyProject.MergeGame.Snapshots;
+using MyProject.MergeGame.Unity.Events;
 using MyProject.MergeGame.Unity.Network;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace MyProject.MergeGame.Unity
 {
     /// <summary>
     /// MergeGame HUD 모듈입니다.
-    /// 스냅샷을 받아 현재 상태(HP/Gold/Wave/Score)를 표시합니다.
+    /// 스냅샷을 받아 현재 상태를 표시합니다.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class UIViewModule : MergeViewModuleBase
@@ -18,38 +18,75 @@ namespace MyProject.MergeGame.Unity
         [Header("Main HUD Page")]
         [SerializeField] private Page_MainHud _mainHudPrefab;
 
+        [Header("Loading Text")]
+        [SerializeField] private string _waitingOpponentReadyText = "상대방 준비 대기중...";
+
         private Page_MainHud _mainHudInstance;
+
         private int _currentMonsterCount = 0;
         private int _maxMonsterStack = 0;
         private int _difficultyStep = 0;
         private int _gold = 0;
+        /// <summary>
+        /// OnInit 함수를 처리합니다.
+        /// </summary>
 
         protected override void OnInit()
         {
+            // 핵심 로직을 처리합니다.
             base.OnInit();
-
             EnsureMainHudPage();
+
+            if (GameView != null)
+            {
+                GameView.Subscribe<MiniMapRenderTargetsUpdatedEvent>(OnMiniMapTargetsUpdated);
+            }
         }
+        /// <summary>
+        /// OnConnectedEvent 함수를 처리합니다.
+        /// </summary>
 
         public override void OnConnectedEvent()
         {
+            // 핵심 로직을 처리합니다.
             if (_mainHudInstance == null) return;
 
-            // 연결 성공 시 HUD UI Active 킨다.
             _mainHudInstance.gameObject.SetActive(true);
-            _mainHudInstance?.SetActiveReadyButton(true);
+            _mainHudInstance.SetActiveReadyButton(true);
+            _mainHudInstance.SetActiveSpawnButton(false);
+            _mainHudInstance.SetActiveLoadingText(false);
+            _mainHudInstance.ClearObserverMiniMaps();
         }
+        /// <summary>
+        /// OnDisconnectedEvent 함수를 처리합니다.
+        /// </summary>
+
+        public override void OnDisconnectedEvent()
+        {
+            // 핵심 로직을 처리합니다.
+            if (_mainHudInstance == null) return;
+
+            _mainHudInstance.SetActiveReadyButton(false);
+            _mainHudInstance.SetActiveSpawnButton(false);
+            _mainHudInstance.SetActiveLoadingText(false);
+            _mainHudInstance.ClearObserverMiniMaps();
+        }
+        /// <summary>
+        /// OnCommandResultMsg 함수를 처리합니다.
+        /// </summary>
 
         public override void OnCommandResultMsg(MergeCommandResult result)
         {
+            // 핵심 로직을 처리합니다.
             if (result == null) return;
 
             if (result is ReadyMergeGameResult readyCmdResult)
             {
                 if (readyCmdResult.Success)
                 {
-                    // Ready 성공했으면 Ready 버튼 숨긴다.
                     _mainHudInstance?.SetActiveReadyButton(false);
+                    _mainHudInstance?.SetLoadingText(_waitingOpponentReadyText);
+                    _mainHudInstance?.SetActiveLoadingText(true);
 
                     _mainHudInstance?.SetActiveMonsterNumText(true);
                     _mainHudInstance?.SetActiveDifficultyStepText(true);
@@ -59,21 +96,29 @@ namespace MyProject.MergeGame.Unity
                     RefreshDifficultyText();
                     RefreshGoldNumText();
                 }
+                else
+                {
+                    _mainHudInstance?.SetActiveReadyButton(true);
+                    _mainHudInstance?.SetActiveLoadingText(false);
+                }
             }
         }
+        /// <summary>
+        /// OnEventMsg 함수를 처리합니다.
+        /// </summary>
 
         public override void OnEventMsg(MergeGameEvent evt)
         {
+            // 핵심 로직을 처리합니다.
             if (!IsMyEvent(evt)) return;
 
             if (evt is GameStartedEvent)
             {
-                // GameStartedEvent 이벤트가 오면 스폰 버튼 활성화
+                _mainHudInstance?.SetActiveLoadingText(false);
                 _mainHudInstance?.SetActiveSpawnButton(true);
             }
             else if (evt is MonsterSpawnedEvent)
             {
-                // 스냅샷 반영 전까지 HUD 즉시성 확보를 위해 이벤트에서도 증가시킵니다.
                 _currentMonsterCount++;
                 RefreshMonsterNumText();
             }
@@ -93,12 +138,17 @@ namespace MyProject.MergeGame.Unity
                 _mainHudInstance?.SetResultText(result);
                 _mainHudInstance?.SetActiveResultText(true);
 
+                _mainHudInstance?.SetActiveLoadingText(false);
                 _mainHudInstance?.SetActiveSpawnButton(false);
             }
         }
+        /// <summary>
+        /// OnSnapshotMsg 함수를 처리합니다.
+        /// </summary>
 
         public override void OnSnapshotMsg(MergeHostSnapshot snapshot)
         {
+            // 핵심 로직을 처리합니다.
             if (snapshot == null || !IsMySnapshot(snapshot))
             {
                 return;
@@ -113,9 +163,51 @@ namespace MyProject.MergeGame.Unity
             RefreshDifficultyText();
             RefreshGoldNumText();
         }
+        /// <summary>
+        /// OnMiniMapTargetsUpdated 함수를 처리합니다.
+        /// </summary>
+
+        private void OnMiniMapTargetsUpdated(MiniMapRenderTargetsUpdatedEvent evt)
+        {
+            // 핵심 로직을 처리합니다.
+            if (_mainHudInstance == null || evt == null)
+            {
+                return;
+            }
+
+            var slotCount = _mainHudInstance.ObserverMiniMapSlotCount;
+            if (slotCount <= 0)
+            {
+                return;
+            }
+
+            _mainHudInstance.ClearObserverMiniMaps();
+
+            var targets = evt.Targets;
+            if (targets == null)
+            {
+                return;
+            }
+
+            var writeIndex = 0;
+            for (var i = 0; i < targets.Count; i++)
+            {
+                if (writeIndex >= slotCount)
+                {
+                    break;
+                }
+
+                _mainHudInstance.SetObserverMiniMapTexture(writeIndex, targets[i].PlayerIndex, targets[i].Texture);
+                writeIndex++;
+            }
+        }
+        /// <summary>
+        /// EnsureMainHudPage 함수를 처리합니다.
+        /// </summary>
 
         private void EnsureMainHudPage()
         {
+            // 핵심 로직을 처리합니다.
             if (_mainHudInstance != null)
             {
                 return;
@@ -127,12 +219,9 @@ namespace MyProject.MergeGame.Unity
                 return;
             }
 
-            if (_mainHudInstance == null)
-            {
-                _mainHudInstance = _mainHudPrefab != null
-                    ? ui.OpenPage(_mainHudPrefab)
-                    : ui.OpenPage<Page_MainHud>();
-            }
+            _mainHudInstance = _mainHudPrefab != null
+                ? ui.OpenPage(_mainHudPrefab)
+                : ui.OpenPage<Page_MainHud>();
 
             if (_mainHudInstance == null)
             {
@@ -149,19 +238,24 @@ namespace MyProject.MergeGame.Unity
                 _mainHudInstance.ReadyButton.onClick.AddListener(HandleReadyClicked);
             }
 
-            // 만들어두고 액티브 꺼둔다.
-            // 서버 연결 성공 시 켠다.
             _mainHudInstance.gameObject.SetActive(false);
-
             _mainHudInstance.SetActiveSpawnButton(false);
             _mainHudInstance.SetActiveReadyButton(false);
             _mainHudInstance.SetActiveResultText(false);
+            _mainHudInstance.SetActiveLoadingText(false);
+            _mainHudInstance.SetLoadingText(_waitingOpponentReadyText);
+            _mainHudInstance.ClearObserverMiniMaps();
+
             _mainHudInstance.SetActiveMonsterNumText(true);
             RefreshMonsterNumText();
         }
+        /// <summary>
+        /// HandleSpawnTowerClicked 함수를 처리합니다.
+        /// </summary>
 
         private void HandleSpawnTowerClicked()
         {
+            // 핵심 로직을 처리합니다.
             if (GameView == null)
             {
                 return;
@@ -171,9 +265,13 @@ namespace MyProject.MergeGame.Unity
                 new SpawnTowerCommand(GameView.LocalUserId),
                 MergeNetCommandType.SpawnTower);
         }
+        /// <summary>
+        /// HandleReadyClicked 함수를 처리합니다.
+        /// </summary>
 
         private void HandleReadyClicked()
         {
+            // 핵심 로직을 처리합니다.
             if (GameView == null)
             {
                 return;
@@ -181,9 +279,13 @@ namespace MyProject.MergeGame.Unity
 
             GameView.SendReady();
         }
+        /// <summary>
+        /// RefreshMonsterNumText 함수를 처리합니다.
+        /// </summary>
 
         private void RefreshMonsterNumText()
         {
+            // 핵심 로직을 처리합니다.
             if (_mainHudInstance == null)
             {
                 return;
@@ -192,9 +294,13 @@ namespace MyProject.MergeGame.Unity
             var maxText = _maxMonsterStack > 0 ? _maxMonsterStack.ToString() : "?";
             _mainHudInstance.SetMonsterNumText($"몬스터 : {_currentMonsterCount} / {maxText}");
         }
+        /// <summary>
+        /// RefreshGoldNumText 함수를 처리합니다.
+        /// </summary>
 
         private void RefreshGoldNumText()
         {
+            // 핵심 로직을 처리합니다.
             if (_mainHudInstance == null)
             {
                 return;
@@ -202,9 +308,13 @@ namespace MyProject.MergeGame.Unity
 
             _mainHudInstance.SetGoldText($"Gold : {_gold}");
         }
+        /// <summary>
+        /// RefreshDifficultyText 함수를 처리합니다.
+        /// </summary>
 
         private void RefreshDifficultyText()
         {
+            // 핵심 로직을 처리합니다.
             if (_mainHudInstance == null)
             {
                 return;
@@ -212,9 +322,18 @@ namespace MyProject.MergeGame.Unity
 
             _mainHudInstance.SetDifficultyText($"Difficulty Step : {_difficultyStep}");
         }
+        /// <summary>
+        /// OnShutdown 함수를 처리합니다.
+        /// </summary>
 
         protected override void OnShutdown()
         {
+            // 핵심 로직을 처리합니다.
+            if (GameView != null)
+            {
+                GameView.Unsubscribe<MiniMapRenderTargetsUpdatedEvent>(OnMiniMapTargetsUpdated);
+            }
+
             if (_mainHudInstance != null)
             {
                 if (_mainHudInstance.SpawnTowerButton != null)
@@ -226,10 +345,11 @@ namespace MyProject.MergeGame.Unity
                 {
                     _mainHudInstance.ReadyButton.onClick.RemoveListener(HandleReadyClicked);
                 }
+
+                _mainHudInstance.ClearObserverMiniMaps();
             }
 
             _mainHudInstance = null;
-
             base.OnShutdown();
         }
     }

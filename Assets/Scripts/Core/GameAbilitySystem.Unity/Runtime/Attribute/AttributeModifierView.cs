@@ -50,6 +50,7 @@ namespace Noname.GameCore.Helper
         /// </summary>
         public bool Equals(AttributeModifierView other)
         {
+            // 핵심 로직을 처리합니다.
             return _valueMode == other._valueMode
                 && string.Equals(_attributeId, other._attributeId, StringComparison.Ordinal)
                 && _operation == other._operation
@@ -62,6 +63,7 @@ namespace Noname.GameCore.Helper
         /// </summary>
         public override bool Equals(object obj)
         {
+            // 핵심 로직을 처리합니다.
             return obj is AttributeModifierView other && Equals(other);
         }
 
@@ -70,6 +72,7 @@ namespace Noname.GameCore.Helper
         /// </summary>
         public override int GetHashCode()
         {
+            // 핵심 로직을 처리합니다.
             unchecked
             {
                 var hash = (int)_valueMode;

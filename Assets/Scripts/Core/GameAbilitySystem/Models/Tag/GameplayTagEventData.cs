@@ -1,25 +1,25 @@
-namespace Noname.GameAbilitySystem
+﻿namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// 주석 정리
+    /// 二쇱꽍 ?뺣━
     /// </summary>
     public struct GameplayTagEventData
     {
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public FGameplayTag EventTag;
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public object Payload;
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public GameplayTagEventData(FGameplayTag eventTag, object payload = null)
         {
-            // 주석 정리
+            // 二쇱꽍 ?뺣━
             EventTag = eventTag;
             Payload = payload;
         }

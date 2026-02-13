@@ -2,6 +2,7 @@
 using MyProject.MergeGame.Events;
 using MyProject.MergeGame.Snapshots;
 using UnityEngine;
+
 namespace MyProject.MergeGame.Unity
 {
     /// <summary>
@@ -15,9 +16,11 @@ namespace MyProject.MergeGame.Unity
     {
         [Header("Prefab (Optional)")]
         [SerializeField] private GameObject _projectilePrefab;
+
         [Header("Fallback Visual")]
         [SerializeField] private bool _usePrimitiveFallback = true;
         [SerializeField] private Vector3 _projectileScale = new Vector3(0.25f, 0.25f, 0.25f);
+
         [Header("Settings")]
         [SerializeField] private float _defaultProjectileSpeed = 8f;
 
@@ -27,34 +30,52 @@ namespace MyProject.MergeGame.Unity
         [SerializeField] private Color _trapRangeColor = new Color(1f, 0.2f, 0.2f, 0.25f);
         [SerializeField] private float _trapPulseSpeed = 6f;
 
-        private readonly Dictionary<long, ProjectileInstance> _projectileMap = new();
+        private readonly Dictionary<int, Dictionary<long, ProjectileInstance>> _projectileMapByPlayer = new();
         private readonly List<long> _removeBuffer = new();
         private readonly HashSet<long> _snapshotUids = new();
+        /// <summary>
+        /// OnEventMsg 함수를 처리합니다.
+        /// </summary>
 
         public override void OnEventMsg(MergeGameEvent evt)
         {
-            if (!IsMyEvent(evt))
-            {
-                return;
-            }
+            // 핵심 로직을 처리합니다.
             if (evt is not TowerAttackedEvent attackedEvent)
             {
                 return;
             }
+
             if (attackedEvent.AttackType != TowerAttackType.Projectile)
             {
                 return;
             }
-            var start = new Vector3(attackedEvent.AttackerX, attackedEvent.AttackerY, attackedEvent.AttackerZ);
-            var target = new Vector3(attackedEvent.TargetX, attackedEvent.TargetY, attackedEvent.TargetZ);
+
+            var start = ApplyOffset(attackedEvent.PlayerIndex, attackedEvent.AttackerX, attackedEvent.AttackerY, attackedEvent.AttackerZ);
+            var target = ApplyOffset(attackedEvent.PlayerIndex, attackedEvent.TargetX, attackedEvent.TargetY, attackedEvent.TargetZ);
             var speed = attackedEvent.ProjectileSpeed > 0f ? attackedEvent.ProjectileSpeed : _defaultProjectileSpeed;
-            SpawnProjectile(attackedEvent.ProjectileUid, start, target, speed, attackedEvent.ProjectileType, attackedEvent.ThrowRadius);
+
+            SpawnProjectile(
+                attackedEvent.PlayerIndex,
+                attackedEvent.ProjectileUid,
+                start,
+                target,
+                speed,
+                attackedEvent.ProjectileType,
+                attackedEvent.ThrowRadius);
         }
+        /// <summary>
+        /// OnSnapshotMsg 함수를 처리합니다.
+        /// </summary>
 
         public override void OnSnapshotMsg(MergeHostSnapshot snapshot)
         {
-            if (snapshot == null || !IsMySnapshot(snapshot)) return;
+            // 핵심 로직을 처리합니다.
+            if (snapshot == null)
+            {
+                return;
+            }
 
+            var projectileMap = GetOrCreateProjectileMap(snapshot.PlayerIndex);
             _snapshotUids.Clear();
 
             var projectiles = snapshot.Projectiles;
@@ -65,7 +86,7 @@ namespace MyProject.MergeGame.Unity
 
             // Host에서 이미 제거된 투사체 정리
             _removeBuffer.Clear();
-            foreach (var kv in _projectileMap)
+            foreach (var kv in projectileMap)
             {
                 if (!_snapshotUids.Contains(kv.Key))
                 {
@@ -76,62 +97,92 @@ namespace MyProject.MergeGame.Unity
             for (var i = 0; i < _removeBuffer.Count; i++)
             {
                 var uid = _removeBuffer[i];
-                if (_projectileMap.TryGetValue(uid, out var proj))
+                if (projectileMap.TryGetValue(uid, out var proj))
                 {
                     DestroyProjectile(proj);
                 }
-                _projectileMap.Remove(uid);
+
+                projectileMap.Remove(uid);
             }
         }
+        /// <summary>
+        /// Update 함수를 처리합니다.
+        /// </summary>
 
         private void Update()
         {
-            if (_projectileMap.Count == 0)
+            // 핵심 로직을 처리합니다.
+            if (_projectileMapByPlayer.Count == 0)
             {
                 return;
             }
-            var deltaTime = Time.deltaTime;
-            _removeBuffer.Clear();
-            foreach (var kv in _projectileMap)
-            {
-                var projectile = kv.Value;
-                if (projectile.Type == ProjectileType.Throw)
-                    UpdateThrowProjectile(projectile, deltaTime);
-                else
-                    UpdateDirectProjectile(projectile, deltaTime);
 
-                if (projectile.ShouldRemove)
-                {
-                    _removeBuffer.Add(kv.Key);
-                }
-            }
-            for (var i = 0; i < _removeBuffer.Count; i++)
+            var deltaTime = Time.deltaTime;
+
+            foreach (var playerMapPair in _projectileMapByPlayer)
             {
-                var uid = _removeBuffer[i];
-                if (_projectileMap.TryGetValue(uid, out var projectile))
+                var projectileMap = playerMapPair.Value;
+                if (projectileMap == null || projectileMap.Count == 0)
                 {
-                    DestroyProjectile(projectile);
+                    continue;
                 }
-                _projectileMap.Remove(uid);
+
+                _removeBuffer.Clear();
+                foreach (var kv in projectileMap)
+                {
+                    var projectile = kv.Value;
+                    if (projectile.Type == ProjectileType.Throw)
+                    {
+                        UpdateThrowProjectile(projectile, deltaTime);
+                    }
+                    else
+                    {
+                        UpdateDirectProjectile(projectile, deltaTime);
+                    }
+
+                    if (projectile.ShouldRemove)
+                    {
+                        _removeBuffer.Add(kv.Key);
+                    }
+                }
+
+                for (var i = 0; i < _removeBuffer.Count; i++)
+                {
+                    var uid = _removeBuffer[i];
+                    if (projectileMap.TryGetValue(uid, out var projectile))
+                    {
+                        DestroyProjectile(projectile);
+                    }
+
+                    projectileMap.Remove(uid);
+                }
             }
         }
+        /// <summary>
+        /// UpdateDirectProjectile 함수를 처리합니다.
+        /// </summary>
 
         private void UpdateDirectProjectile(ProjectileInstance projectile, float deltaTime)
         {
+            // 핵심 로직을 처리합니다.
             projectile.Elapsed += deltaTime;
             var t = projectile.TravelTime <= 0f ? 1f : Mathf.Clamp01(projectile.Elapsed / projectile.TravelTime);
             if (projectile.GameObject != null)
             {
-                projectile.GameObject.transform.localPosition = Vector3.Lerp(projectile.Start, projectile.Target, t);
+                projectile.GameObject.transform.position = Vector3.Lerp(projectile.Start, projectile.Target, t);
             }
             if (t >= 1f)
             {
                 projectile.ShouldRemove = true;
             }
         }
+        /// <summary>
+        /// UpdateThrowProjectile 함수를 처리합니다.
+        /// </summary>
 
         private void UpdateThrowProjectile(ProjectileInstance projectile, float deltaTime)
         {
+            // 핵심 로직을 처리합니다.
             if (!projectile.IsLanded)
             {
                 // 비행 단계: 포물선
@@ -142,7 +193,7 @@ namespace MyProject.MergeGame.Unity
                 {
                     var horizontalPos = Vector3.Lerp(projectile.Start, projectile.Target, t);
                     var arcY = projectile.ArcHeight * 4f * t * (1f - t);
-                    projectile.GameObject.transform.localPosition =
+                    projectile.GameObject.transform.position =
                         new Vector3(horizontalPos.x, horizontalPos.y + arcY, horizontalPos.z);
                 }
 
@@ -154,7 +205,7 @@ namespace MyProject.MergeGame.Unity
 
                     if (projectile.GameObject != null)
                     {
-                        projectile.GameObject.transform.localPosition = projectile.Target;
+                        projectile.GameObject.transform.position = projectile.Target;
                         ApplyColor(projectile.GameObject, _trapActiveColor);
                     }
 
@@ -176,11 +227,17 @@ namespace MyProject.MergeGame.Unity
                 }
             }
         }
+        /// <summary>
+        /// SpawnProjectile 함수를 처리합니다.
+        /// </summary>
 
-        private void SpawnProjectile(long uid, Vector3 start, Vector3 target, float speed, ProjectileType projectileType, float throwRadius = 0f)
+        private void SpawnProjectile(int playerIndex, long uid, Vector3 start, Vector3 target, float speed, ProjectileType projectileType, float throwRadius = 0f)
         {
+            // 핵심 로직을 처리합니다.
+            var projectileMap = GetOrCreateProjectileMap(playerIndex);
+
             // 이미 같은 UID의 투사체가 있으면 무시
-            if (uid != 0 && _projectileMap.ContainsKey(uid))
+            if (uid != 0 && projectileMap.ContainsKey(uid))
             {
                 return;
             }
@@ -190,10 +247,14 @@ namespace MyProject.MergeGame.Unity
             {
                 return;
             }
+
             obj.transform.SetParent(transform, false);
-            obj.transform.localPosition = start;
+            obj.transform.position = start;
             obj.transform.localScale = _projectileScale;
-            obj.name = projectileType == ProjectileType.Throw ? "Projectile_Throw" : "Projectile_Direct";
+            obj.name = projectileType == ProjectileType.Throw
+                ? $"Projectile_P{playerIndex}_Throw_{uid}"
+                : $"Projectile_P{playerIndex}_Direct_{uid}";
+
             ApplyProjectileTint(obj, projectileType);
             var distance = Vector3.Distance(start, target);
             var travelTime = speed <= 0f ? 0f : distance / speed;
@@ -214,30 +275,44 @@ namespace MyProject.MergeGame.Unity
                 ShouldRemove = false
             };
 
-            _projectileMap[uid] = instance;
+            projectileMap[uid] = instance;
         }
+        /// <summary>
+        /// CreateProjectileObject 함수를 처리합니다.
+        /// </summary>
+
         private GameObject CreateProjectileObject()
         {
+            // 핵심 로직을 처리합니다.
             if (_projectilePrefab != null)
             {
                 return Instantiate(_projectilePrefab);
             }
+
             if (_usePrimitiveFallback)
             {
                 return GameObject.CreatePrimitive(PrimitiveType.Sphere);
             }
+
             return new GameObject("Projectile");
         }
+        /// <summary>
+        /// ApplyProjectileTint 함수를 처리합니다.
+        /// </summary>
+
         private static void ApplyProjectileTint(GameObject obj, ProjectileType projectileType)
         {
+            // 핵심 로직을 처리합니다.
             var renderer = obj.GetComponentInChildren<Renderer>();
             if (renderer == null)
             {
                 return;
             }
+
             var color = projectileType == ProjectileType.Throw
                 ? new Color(1f, 0.45f, 0.2f, 1f)
                 : new Color(0.4f, 0.8f, 1f, 1f);
+
             try
             {
                 renderer.material.color = color;
@@ -246,14 +321,19 @@ namespace MyProject.MergeGame.Unity
             {
             }
         }
+        /// <summary>
+        /// CreateRangeIndicator 함수를 처리합니다.
+        /// </summary>
 
         private GameObject CreateRangeIndicator(Vector3 position, float radius)
         {
+            // 핵심 로직을 처리합니다.
             var indicator = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             Destroy(indicator.GetComponent<Collider>());
             indicator.transform.SetParent(transform, false);
+
             var diameter = radius * 2f;
-            indicator.transform.localPosition = position;
+            indicator.transform.position = position;
             indicator.transform.localScale = new Vector3(diameter, 0.01f, diameter);
             indicator.name = "TrapRange";
 
@@ -266,9 +346,13 @@ namespace MyProject.MergeGame.Unity
 
             return indicator;
         }
+        /// <summary>
+        /// ApplyColor 함수를 처리합니다.
+        /// </summary>
 
         private static void ApplyColor(GameObject obj, Color color)
         {
+            // 핵심 로직을 처리합니다.
             var renderer = obj.GetComponentInChildren<Renderer>();
             if (renderer == null) return;
             try
@@ -279,28 +363,69 @@ namespace MyProject.MergeGame.Unity
             {
             }
         }
+        /// <summary>
+        /// DestroyProjectile 함수를 처리합니다.
+        /// </summary>
 
         private void DestroyProjectile(ProjectileInstance proj)
         {
+            // 핵심 로직을 처리합니다.
             if (proj.RangeIndicator != null)
             {
                 Destroy(proj.RangeIndicator);
             }
+
             if (proj.GameObject != null)
             {
                 Destroy(proj.GameObject);
             }
         }
+        /// <summary>
+        /// GetOrCreateProjectileMap 함수를 처리합니다.
+        /// </summary>
+
+        private Dictionary<long, ProjectileInstance> GetOrCreateProjectileMap(int playerIndex)
+        {
+            // 핵심 로직을 처리합니다.
+            if (_projectileMapByPlayer.TryGetValue(playerIndex, out var projectileMap))
+            {
+                return projectileMap;
+            }
+
+            projectileMap = new Dictionary<long, ProjectileInstance>();
+            _projectileMapByPlayer[playerIndex] = projectileMap;
+            return projectileMap;
+        }
+        /// <summary>
+        /// ApplyOffset 함수를 처리합니다.
+        /// </summary>
+
+        private Vector3 ApplyOffset(int playerIndex, float x, float y, float z)
+        {
+            // 핵심 로직을 처리합니다.
+            var offset = GameView != null ? GameView.GetPlayerOffsetPosition(playerIndex) : Vector3.zero;
+            return new Vector3(x, y, z) + offset;
+        }
+        /// <summary>
+        /// OnShutdown 함수를 처리합니다.
+        /// </summary>
 
         protected override void OnShutdown()
         {
+            // 핵심 로직을 처리합니다.
             base.OnShutdown();
-            foreach (var kv in _projectileMap)
+
+            foreach (var playerMap in _projectileMapByPlayer.Values)
             {
-                DestroyProjectile(kv.Value);
+                foreach (var kv in playerMap)
+                {
+                    DestroyProjectile(kv.Value);
+                }
             }
-            _projectileMap.Clear();
+
+            _projectileMapByPlayer.Clear();
         }
+
         private sealed class ProjectileInstance
         {
             public GameObject GameObject;
@@ -319,5 +444,3 @@ namespace MyProject.MergeGame.Unity
         }
     }
 }
-
-

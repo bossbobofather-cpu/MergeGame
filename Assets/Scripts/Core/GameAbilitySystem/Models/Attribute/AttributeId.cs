@@ -1,7 +1,7 @@
-namespace Noname.GameAbilitySystem
+﻿namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// 주석 정리
+    /// 二쇱꽍 ?뺣━
     /// </summary>
     public struct AttributeId
     {
@@ -11,23 +11,35 @@ namespace Noname.GameAbilitySystem
         {
             Name = name;
         }
+        /// <summary>
+        /// Equals 함수를 처리합니다.
+        /// </summary>
 
         public override bool Equals(object obj)
         {
+            // 핵심 로직을 처리합니다.
             return obj is AttributeId other && Name == other.Name;
         }
+        /// <summary>
+        /// GetHashCode 함수를 처리합니다.
+        /// </summary>
 
         public override int GetHashCode()
         {
+            // 핵심 로직을 처리합니다.
             return Name != null ? Name.GetHashCode() : 0;
         }
+        /// <summary>
+        /// ToString 함수를 처리합니다.
+        /// </summary>
 
         public override string ToString()
         {
+            // 핵심 로직을 처리합니다.
             return Name ?? string.Empty;
         }
 
-        // 주석 정리
+        // 二쇱꽍 ?뺣━
         public static readonly AttributeId Level = new("Level");
         public static readonly AttributeId MoveSpeed = new AttributeId("MoveSpeed");
         public static readonly AttributeId JumpSpeed = new AttributeId("JumpSpeed");

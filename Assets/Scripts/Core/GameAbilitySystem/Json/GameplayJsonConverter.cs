@@ -15,6 +15,7 @@ namespace Noname.GameAbilitySystem.Json
         /// </summary>
         public static GameplayAbility FromDto(GameplayAbilityDto dto)
         {
+            // 핵심 로직을 처리합니다.
             if (dto == null) return null;
 
             return new GameplayAbility
@@ -36,6 +37,7 @@ namespace Noname.GameAbilitySystem.Json
         /// </summary>
         public static GameplayEffect FromDto(GameplayEffectDto dto)
         {
+            // 핵심 로직을 처리합니다.
             if (dto == null) return null;
 
             return new GameplayEffect
@@ -60,6 +62,7 @@ namespace Noname.GameAbilitySystem.Json
         /// </summary>
         public static AttributeModifier FromDto(AttributeModifierDto dto)
         {
+            // 핵심 로직을 처리합니다.
             if (dto == null) return default;
 
             return new AttributeModifier
@@ -83,6 +86,7 @@ namespace Noname.GameAbilitySystem.Json
         /// </summary>
         public static GameplayAbilityDto ToDto(GameplayAbility ability)
         {
+            // 핵심 로직을 처리합니다.
             if (ability == null) return null;
 
             return new GameplayAbilityDto
@@ -104,6 +108,7 @@ namespace Noname.GameAbilitySystem.Json
         /// </summary>
         public static GameplayEffectDto ToDto(GameplayEffect effect)
         {
+            // 핵심 로직을 처리합니다.
             if (effect == null) return null;
 
             return new GameplayEffectDto
@@ -128,6 +133,7 @@ namespace Noname.GameAbilitySystem.Json
         /// </summary>
         public static AttributeModifierDto ToDto(AttributeModifier modifier)
         {
+            // 핵심 로직을 처리합니다.
             return new AttributeModifierDto
             {
                 ValueMode = modifier.ValueMode.ToString(),
@@ -149,6 +155,7 @@ namespace Noname.GameAbilitySystem.Json
         /// </summary>
         public static ITargetingStrategy CreateTargetingStrategy(TargetingStrategyDto dto)
         {
+            // 핵심 로직을 처리합니다.
             if (dto == null || string.IsNullOrEmpty(dto.Type)) return null;
 
             return TargetingStrategyFactory.Create(
@@ -164,6 +171,7 @@ namespace Noname.GameAbilitySystem.Json
         /// </summary>
         public static TargetingStrategyDto ToDto(ITargetingStrategy strategy)
         {
+            // 핵심 로직을 처리합니다.
             if (strategy == null) return null;
 
             return strategy switch
@@ -200,6 +208,7 @@ namespace Noname.GameAbilitySystem.Json
         /// </summary>
         public static IEffectDurationPolicy CreateDurationPolicy(DurationPolicyDto dto)
         {
+            // 핵심 로직을 처리합니다.
             if (dto == null || string.IsNullOrEmpty(dto.Type)) return null;
             return EffectDurationPolicyFactory.Create(dto.Type);
         }
@@ -209,6 +218,7 @@ namespace Noname.GameAbilitySystem.Json
         /// </summary>
         public static IEffectDurationPolicy CreateDurationPolicy(EffectDurationPolicyType type)
         {
+            // 핵심 로직을 처리합니다.
             return EffectDurationPolicyFactory.Create(type);
         }
 
@@ -217,6 +227,7 @@ namespace Noname.GameAbilitySystem.Json
         /// </summary>
         public static DurationPolicyDto ToDto(IEffectDurationPolicy policy)
         {
+            // 핵심 로직을 처리합니다.
             if (policy == null) return null;
 
             var typeName = EffectDurationPolicyFactory.GetTypeName(policy);
@@ -226,9 +237,13 @@ namespace Noname.GameAbilitySystem.Json
         #endregion
 
         #region 蹂???뱀뀡
+        /// <summary>
+        /// FromDtoList 함수를 처리합니다.
+        /// </summary>
 
         private static List<GameplayEffect> FromDtoList(List<GameplayEffectDto> dtos)
         {
+            // 핵심 로직을 처리합니다.
             if (dtos == null) return new List<GameplayEffect>();
             var result = new List<GameplayEffect>(dtos.Count);
             foreach (var dto in dtos)
@@ -238,9 +253,13 @@ namespace Noname.GameAbilitySystem.Json
             }
             return result;
         }
+        /// <summary>
+        /// FromDtoList 함수를 처리합니다.
+        /// </summary>
 
         private static List<AttributeModifier> FromDtoList(List<AttributeModifierDto> dtos)
         {
+            // 핵심 로직을 처리합니다.
             if (dtos == null) return new List<AttributeModifier>();
             var result = new List<AttributeModifier>(dtos.Count);
             foreach (var dto in dtos)
@@ -249,9 +268,13 @@ namespace Noname.GameAbilitySystem.Json
             }
             return result;
         }
+        /// <summary>
+        /// ToDtoList 함수를 처리합니다.
+        /// </summary>
 
         private static List<GameplayEffectDto> ToDtoList(List<GameplayEffect> effects)
         {
+            // 핵심 로직을 처리합니다.
             if (effects == null) return null;
             var result = new List<GameplayEffectDto>(effects.Count);
             foreach (var effect in effects)
@@ -261,9 +284,13 @@ namespace Noname.GameAbilitySystem.Json
             }
             return result;
         }
+        /// <summary>
+        /// ToDtoList 함수를 처리합니다.
+        /// </summary>
 
         private static List<AttributeModifierDto> ToDtoList(List<AttributeModifier> modifiers)
         {
+            // 핵심 로직을 처리합니다.
             if (modifiers == null) return null;
             var result = new List<AttributeModifierDto>(modifiers.Count);
             foreach (var modifier in modifiers)
@@ -272,9 +299,13 @@ namespace Noname.GameAbilitySystem.Json
             }
             return result;
         }
+        /// <summary>
+        /// TagsFromStrings 함수를 처리합니다.
+        /// </summary>
 
         private static GameplayTagContainer TagsFromStrings(List<string> tags)
         {
+            // 핵심 로직을 처리합니다.
             var container = new GameplayTagContainer();
             if (tags == null) return container;
             foreach (var tag in tags)
@@ -286,9 +317,13 @@ namespace Noname.GameAbilitySystem.Json
             }
             return container;
         }
+        /// <summary>
+        /// TagsToStrings 함수를 처리합니다.
+        /// </summary>
 
         private static List<string> TagsToStrings(GameplayTagContainer container)
         {
+            // 핵심 로직을 처리합니다.
             if (container == null) return null;
             var result = new List<string>();
             foreach (var tag in container.Tags)
@@ -300,9 +335,13 @@ namespace Noname.GameAbilitySystem.Json
             }
             return result.Count > 0 ? result : null;
         }
+        /// <summary>
+        /// ParseDurationType 함수를 처리합니다.
+        /// </summary>
 
         private static EffectDurationType ParseDurationType(string value)
         {
+            // 핵심 로직을 처리합니다.
             if (string.IsNullOrEmpty(value)) return EffectDurationType.Instant;
             return value.ToLowerInvariant() switch
             {
@@ -312,9 +351,13 @@ namespace Noname.GameAbilitySystem.Json
                 _ => EffectDurationType.Instant
             };
         }
+        /// <summary>
+        /// ParseOperation 함수를 처리합니다.
+        /// </summary>
 
         private static AttributeModifierOperationType ParseOperation(string value)
         {
+            // 핵심 로직을 처리합니다.
             if (string.IsNullOrEmpty(value)) return AttributeModifierOperationType.Add;
             return value.ToLowerInvariant() switch
             {
@@ -325,9 +368,13 @@ namespace Noname.GameAbilitySystem.Json
                 _ => AttributeModifierOperationType.Add
             };
         }
+        /// <summary>
+        /// ParseValueMode 함수를 처리합니다.
+        /// </summary>
 
         private static AttributeModifierValueMode ParseValueMode(string value)
         {
+            // 핵심 로직을 처리합니다.
             if(Enum.TryParse<AttributeModifierValueMode>(value, out var type))
             {
                 return type;
@@ -335,9 +382,13 @@ namespace Noname.GameAbilitySystem.Json
             
             return AttributeModifierValueMode.None;
         }
+        /// <summary>
+        /// ParseCalculatorType 함수를 처리합니다.
+        /// </summary>
 
         private static AttributeCalculatorType ParseCalculatorType(string value)
         {
+            // 핵심 로직을 처리합니다.
             if(Enum.TryParse<AttributeCalculatorType>(value, out var type))
             {
                 return type;

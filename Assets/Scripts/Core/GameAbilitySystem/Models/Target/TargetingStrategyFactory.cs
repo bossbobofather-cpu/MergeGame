@@ -1,12 +1,12 @@
-namespace Noname.GameAbilitySystem
+﻿namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// 주석 정리
+    /// 二쇱꽍 ?뺣━
     /// </summary>
     public static class TargetingStrategyFactory
     {
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public static ITargetingStrategy Create(
             TargetingStrategyType type,
@@ -27,7 +27,7 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public static ITargetingStrategy Create(
             string typeName,
@@ -51,10 +51,11 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public static TargetingStrategyType GetStrategyType(ITargetingStrategy strategy)
         {
+            // 핵심 로직을 처리합니다.
             return strategy switch
             {
                 SelfTargetingStrategy => TargetingStrategyType.Self,
@@ -68,10 +69,11 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public static string GetStrategyTypeName(ITargetingStrategy strategy)
         {
+            // 핵심 로직을 처리합니다.
             return strategy switch
             {
                 SelfTargetingStrategy => "Self",

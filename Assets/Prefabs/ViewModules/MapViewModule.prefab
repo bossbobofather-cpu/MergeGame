@@ -49,6 +49,3 @@ MonoBehaviour:
   _slotPrefab: {fileID: 8682254135275872838, guid: 7f24f1e7709258d418a2048b79a93fdc, type: 3}
   _pathPointPrefab: {fileID: 4033982210415859564, guid: 13904db48ea422e49895586ef92088b2, type: 3}
   _pathLinePrefab: {fileID: 4287178083797069928, guid: 432d09fc3768fbb4c962d6dde2539398, type: 3}
-  _autoAddSlotCollider: 1
-  _slotColliderSize: {x: 1, y: 1, z: 1}
-  _slotColliderCenter: {x: 0, y: 0, z: 0}

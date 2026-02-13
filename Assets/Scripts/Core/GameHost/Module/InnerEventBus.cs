@@ -1,36 +1,36 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Noname.GameHost.Module
 {
     /// <summary>
-    /// 내부 이벤트 버스 인터페이스입니다.
+    /// ?대? ?대깽??踰꾩뒪 ?명꽣?섏씠?ㅼ엯?덈떎.
     /// </summary>
     public interface IInnerEventBus
     {
         /// <summary>
-        /// 이벤트를 구독합니다.
+        /// ?대깽?몃? 援щ룆?⑸땲??
         /// </summary>
         void Subscribe<TEvent>(Action<TEvent> handler) where TEvent : IInnerEvent;
 
         /// <summary>
-        /// 이벤트 구독을 해제합니다.
+        /// ?대깽??援щ룆???댁젣?⑸땲??
         /// </summary>
         void Unsubscribe<TEvent>(Action<TEvent> handler) where TEvent : IInnerEvent;
 
         /// <summary>
-        /// 이벤트를 발행합니다.
+        /// ?대깽?몃? 諛쒗뻾?⑸땲??
         /// </summary>
         void Publish<TEvent>(TEvent eventData) where TEvent : IInnerEvent;
 
         /// <summary>
-        /// 모든 구독을 해제합니다.
+        /// 紐⑤뱺 援щ룆???댁젣?⑸땲??
         /// </summary>
         void Clear();
     }
 
     /// <summary>
-    /// Host 내부 모듈 간 통신을 위한 이벤트 버스입니다.
+    /// Host ?대? 紐⑤뱢 媛??듭떊???꾪븳 ?대깽??踰꾩뒪?낅땲??
     /// </summary>
     public sealed class InnerEventBus : IInnerEventBus
     {
@@ -90,13 +90,17 @@ namespace Noname.GameHost.Module
                 }
                 catch (Exception ex)
                 {
-                    GameHostLog.LogError($"[InnerEventBus] 이벤트 처리 오류 {typeof(TEvent).Name}: {ex}");
+                    GameHostLog.LogError($"[InnerEventBus] ?대깽??泥섎━ ?ㅻ쪟 {typeof(TEvent).Name}: {ex}");
                 }
             }
         }
+        /// <summary>
+        /// Clear 함수를 처리합니다.
+        /// </summary>
 
         public void Clear()
         {
+            // 핵심 로직을 처리합니다.
             lock (_lock)
             {
                 _handlers.Clear();

@@ -52,6 +52,7 @@ namespace MyProject.Common.GameView
         /// </summary>
         public void Initialize()
         {
+            // 핵심 로직을 처리합니다.
             if (_initialized)
             {
                 return;
@@ -75,6 +76,7 @@ namespace MyProject.Common.GameView
         /// </summary>
         protected void StartupModule()
         {
+            // 핵심 로직을 처리합니다.
             if (_started)
             {
                 return;
@@ -95,6 +97,7 @@ namespace MyProject.Common.GameView
         /// </summary>
         protected void ShutdownModule()
         {
+            // 핵심 로직을 처리합니다.
             if (!_started)
             {
                 return;
@@ -141,9 +144,13 @@ namespace MyProject.Common.GameView
         {
             GameEventBus.Publish(context);
         }
+        /// <summary>
+        /// BuildModuleList 함수를 처리합니다.
+        /// </summary>
 
         private void BuildModuleList()
         {
+            // 핵심 로직을 처리합니다.
             _modules.Clear();
             _moduleInstances.Clear();
 
@@ -194,14 +201,22 @@ namespace MyProject.Common.GameView
                 _modules.Add(module);
             }
         }
+        /// <summary>
+        /// Update 함수를 처리합니다.
+        /// </summary>
 
         protected virtual void Update()
         {
+            // 핵심 로직을 처리합니다.
 
         }
+        /// <summary>
+        /// OnDestroy 함수를 처리합니다.
+        /// </summary>
 
         protected virtual void OnDestroy()
         {
+            // 핵심 로직을 처리합니다.
             ShutdownModule();
         }
 
@@ -210,6 +225,7 @@ namespace MyProject.Common.GameView
         /// </summary>
         protected virtual void OnInitialize()
         {
+            // 핵심 로직을 처리합니다.
 
         }
 
@@ -218,6 +234,7 @@ namespace MyProject.Common.GameView
         /// </summary>
         protected virtual void OnStartup()
         {
+            // 핵심 로직을 처리합니다.
         }
 
         /// <summary>
@@ -225,6 +242,7 @@ namespace MyProject.Common.GameView
         /// </summary>
         protected virtual void OnShutdown()
         {
+            // 핵심 로직을 처리합니다.
             
         }
     }

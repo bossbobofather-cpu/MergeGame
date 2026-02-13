@@ -123,9 +123,13 @@ namespace MyProject.MergeGame.AI
                 monster.PathProgress
             ));
         }
+        /// <summary>
+        /// GetNextValidPathIndex 함수를 처리합니다.
+        /// </summary>
 
         private static int GetNextValidPathIndex(MergeHostState state, int playerIndex, int currentPathIndex)
         {
+            // 핵심 로직을 처리합니다.
             var count = state.GetPlayerState(playerIndex)?.Paths.Count ?? 0;
             if (count <= 0)
             {

@@ -70,6 +70,7 @@ namespace MyProject.MergeGame.Systems
         /// </summary>
         public IReadOnlyList<ActiveProjectile> GetActiveProjectiles(int playerIndex)
         {
+            // 핵심 로직을 처리합니다.
             _activeProjectileBuffer.Clear();
             for (var i = 0; i < _projectiles.Count; i++)
             {
@@ -85,9 +86,13 @@ namespace MyProject.MergeGame.Systems
             }
             return _activeProjectileBuffer;
         }
+        /// <summary>
+        /// MergeCombatSystem 함수를 처리합니다.
+        /// </summary>
 
         public MergeCombatSystem(MergeHostState state)
         {
+            // 핵심 로직을 처리합니다.
             _state = state ?? throw new ArgumentNullException(nameof(state));
             _targetContext = new TargetContext(GetEnemiesForTower, GetAlliesForTower, GetPositionForAsc);
         }
@@ -128,6 +133,7 @@ namespace MyProject.MergeGame.Systems
         /// </summary>
         public void TickProjectiles(long tick, int playerIndex, float deltaTime, List<MergeGameEvent> events)
         {
+            // 핵심 로직을 처리합니다.
             if (events == null || _projectiles.Count == 0)
             {
                 return;
@@ -366,9 +372,13 @@ namespace MyProject.MergeGame.Systems
 
             return uid;
         }
+        /// <summary>
+        /// ResolveDirectHit 함수를 처리합니다.
+        /// </summary>
 
         private void ResolveDirectHit(long tick, int playerIndex, PendingProjectile projectile, List<MergeGameEvent> events)
         {
+            // 핵심 로직을 처리합니다.
             var monster = _state.GetMonster(playerIndex, projectile.TargetUid);
             if (monster == null || !monster.IsAlive)
             {
@@ -394,9 +404,13 @@ namespace MyProject.MergeGame.Systems
                 projectile.AttackerUid
             ));
         }
+        /// <summary>
+        /// ResolveThrowHit 함수를 처리합니다.
+        /// </summary>
 
         private bool ResolveThrowHit(long tick, int playerIndex, PendingProjectile projectile, List<MergeGameEvent> events)
         {
+            // 핵심 로직을 처리합니다.
             var targets = ResolveThrowTargets(playerIndex, projectile);
             if (targets.Count == 0)
             {
@@ -436,9 +450,13 @@ namespace MyProject.MergeGame.Systems
 
             return hasHit;
         }
+        /// <summary>
+        /// ResolveThrowTargets 함수를 처리합니다.
+        /// </summary>
 
         private IReadOnlyList<AbilitySystemComponent> ResolveThrowTargets(int playerIndex, PendingProjectile projectile)
         {
+            // 핵심 로직을 처리합니다.
             if (projectile.SourceAscSnapshot != null && projectile.TargetingStrategy != null)
             {
                 var impactContext = CreateImpactContext(playerIndex, projectile.SourceAscSnapshot, projectile.Impact);
@@ -488,9 +506,13 @@ namespace MyProject.MergeGame.Systems
             var dealt = beforeHealth - afterHealth;
             return dealt > 0f ? dealt : 0f;
         }
+        /// <summary>
+        /// CreateSourceSnapshot 함수를 처리합니다.
+        /// </summary>
 
         private AbilitySystemComponent CreateSourceSnapshot(AbilitySystemComponent sourceAsc)
         {
+            // 핵심 로직을 처리합니다.
             if (sourceAsc == null)
             {
                 return null;
@@ -515,18 +537,26 @@ namespace MyProject.MergeGame.Systems
 
             return new AbilitySystemComponent(snapshotAttributes, new List<GameplayAbility>(), snapshotTags);
         }
+        /// <summary>
+        /// CreateImpactContext 함수를 처리합니다.
+        /// </summary>
 
         private TargetContext CreateImpactContext(int playerIndex, AbilitySystemComponent owner, Point3D impact)
         {
+            // 핵심 로직을 처리합니다.
             return new TargetContext(
                 getEnemies: _ => GetEnemiesForPlayer(playerIndex),
                 getAllies: GetAlliesForTower,
                 getPosition: asc => asc == owner ? impact : GetPositionForAsc(asc),
                 random: _targetContext.Random);
         }
+        /// <summary>
+        /// ResolveThrowPoint 함수를 처리합니다.
+        /// </summary>
 
         private Point3D ResolveThrowPoint(int playerIndex, MergeTower tower)
         {
+            // 핵심 로직을 처리합니다.
             var path = _state.GetMonsterPath(playerIndex, 0);
             if (path != null)
             {
@@ -536,9 +566,13 @@ namespace MyProject.MergeGame.Systems
 
             return tower.Position;
         }
+        /// <summary>
+        /// GetEnemiesForTower 함수를 처리합니다.
+        /// </summary>
 
         private IReadOnlyList<AbilitySystemComponent> GetEnemiesForTower(AbilitySystemComponent owner)
         {
+            // 핵심 로직을 처리합니다.
             _monsterAscList.Clear();
 
             if (owner?.Owner is MergeTower tower)
@@ -554,9 +588,13 @@ namespace MyProject.MergeGame.Systems
 
             return _monsterAscList;
         }
+        /// <summary>
+        /// GetEnemiesForPlayer 함수를 처리합니다.
+        /// </summary>
 
         private IReadOnlyList<AbilitySystemComponent> GetEnemiesForPlayer(int playerIndex)
         {
+            // 핵심 로직을 처리합니다.
             _monsterAscList.Clear();
             foreach (var monster in _state.GetAllMonsters(playerIndex))
             {
@@ -568,14 +606,22 @@ namespace MyProject.MergeGame.Systems
 
             return _monsterAscList;
         }
+        /// <summary>
+        /// GetAlliesForTower 함수를 처리합니다.
+        /// </summary>
 
         private IReadOnlyList<AbilitySystemComponent> GetAlliesForTower(AbilitySystemComponent owner)
         {
+            // 핵심 로직을 처리합니다.
             return Array.Empty<AbilitySystemComponent>();
         }
+        /// <summary>
+        /// GetPositionForAsc 함수를 처리합니다.
+        /// </summary>
 
         private Point3D GetPositionForAsc(AbilitySystemComponent asc)
         {
+            // 핵심 로직을 처리합니다.
             if (asc == null)
             {
                 return Point3D.zero;
@@ -593,9 +639,13 @@ namespace MyProject.MergeGame.Systems
 
             return Point3D.zero;
         }
+        /// <summary>
+        /// FindMonsterByAsc 함수를 처리합니다.
+        /// </summary>
 
         private MergeMonster FindMonsterByAsc(int playerIndex, AbilitySystemComponent asc)
         {
+            // 핵심 로직을 처리합니다.
             if (asc?.Owner is MergeMonster monster)
             {
                 return monster;

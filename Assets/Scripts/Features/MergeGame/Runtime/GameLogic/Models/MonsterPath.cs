@@ -27,18 +27,26 @@ namespace MyProject.MergeGame.Models
         /// 경로의 총 길이입니다.
         /// </summary>
         public float TotalLength => _totalLength;
+        /// <summary>
+        /// MonsterPath 함수를 처리합니다.
+        /// </summary>
 
         public MonsterPath(int pathIndex, IEnumerable<Point3D> waypoints)
         {
+            // 핵심 로직을 처리합니다.
             PathIndex = pathIndex;
             _waypoints = new List<Point3D>(waypoints);
             _segmentLengths = new List<float>();
 
             CalculateSegmentLengths();
         }
+        /// <summary>
+        /// CalculateSegmentLengths 함수를 처리합니다.
+        /// </summary>
 
         private void CalculateSegmentLengths()
         {
+            // 핵심 로직을 처리합니다.
             _totalLength = 0f;
             _segmentLengths.Clear();
 
@@ -122,6 +130,7 @@ namespace MyProject.MergeGame.Models
         /// </summary>
         public Point3D GetStartPosition()
         {
+            // 핵심 로직을 처리합니다.
             return _waypoints.Count > 0 ? _waypoints[0] : Point3D.zero;
         }
 
@@ -130,6 +139,7 @@ namespace MyProject.MergeGame.Models
         /// </summary>
         public Point3D GetEndPosition()
         {
+            // 핵심 로직을 처리합니다.
             return _waypoints.Count > 0 ? _waypoints[^1] : Point3D.zero;
         }
     }

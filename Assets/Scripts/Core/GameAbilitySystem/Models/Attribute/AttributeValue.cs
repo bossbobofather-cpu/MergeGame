@@ -1,15 +1,19 @@
-namespace Noname.GameAbilitySystem
+﻿namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// 주석 정리
-    /// 주석 정리
+    /// 二쇱꽍 ?뺣━
+    /// 二쇱꽍 ?뺣━
     /// </summary>
     public sealed class AttributeValue
     {
         private float _currentValue;
+        /// <summary>
+        /// AttributeValue 함수를 처리합니다.
+        /// </summary>
 
         public AttributeValue(AttributeId attributeId, float baseValue = 0f, float minValue = 0f, float maxValue = 0f)
         {
+            // 핵심 로직을 처리합니다.
             AttributeId = attributeId;
             BaseValue = baseValue;
             MinValue = minValue;
@@ -18,24 +22,24 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public AttributeId AttributeId { get; }
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public float BaseValue { get; set; }
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public float CurrentValue
         {
             get => _currentValue;
             set
             {
-                // 주석 정리
+                // 二쇱꽍 ?뺣━
                 if (MaxValue > 0f && value > MaxValue)
                 {
                     _currentValue = MaxValue;
@@ -52,12 +56,12 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public float MinValue { get; set; }
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public float MaxValue { get; set; }
     }

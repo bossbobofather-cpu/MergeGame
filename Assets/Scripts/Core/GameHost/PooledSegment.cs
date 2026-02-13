@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Buffers;
 
 namespace Noname.GameHost
@@ -15,9 +15,13 @@ namespace Noname.GameHost
         }
 
         public ArraySegment<byte> Segment => new(Buffer, 0, Length);
+        /// <summary>
+        /// Dispose 함수를 처리합니다.
+        /// </summary>
 
         public void Dispose()
         {
+            // 핵심 로직을 처리합니다.
             if (Buffer != null)
                 ArrayPool<byte>.Shared.Return(Buffer);
         }

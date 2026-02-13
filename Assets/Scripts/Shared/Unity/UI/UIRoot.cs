@@ -59,34 +59,54 @@ namespace MyProject.Common.UI
         /// 시스템 루트입니다.
         /// </summary>
         public RectTransform SystemRoot => _systemRoot;
+        /// <summary>
+        /// Awake 함수를 처리합니다.
+        /// </summary>
 
 
         private void Awake()
         {
+            // 핵심 로직을 처리합니다.
             ApplyCanvasSettings();
 
             AttackToMainCameraStack();
         }
+        /// <summary>
+        /// OnDestroy 함수를 처리합니다.
+        /// </summary>
 
         private void OnDestroy()
         {
+            // 핵심 로직을 처리합니다.
             DettachFromMainCameraStack();    
         }
+        /// <summary>
+        /// OnValidate 함수를 처리합니다.
+        /// </summary>
 
         private void OnValidate()
         {
+            // 핵심 로직을 처리합니다.
             ApplyCanvasSettings();
         }
+        /// <summary>
+        /// ApplyCanvasSettings 함수를 처리합니다.
+        /// </summary>
 
         private void ApplyCanvasSettings()
         {
+            // 핵심 로직을 처리합니다.
             ApplyCanvas(_pageCanvas, _pageOrder);
             ApplyCanvas(_popupCanvas, _popupOrder);
             ApplyCanvas(_systemCanvas, _systemOrder);
         }
+        /// <summary>
+        /// ApplyCanvas 함수를 처리합니다.
+        /// </summary>
 
         private void ApplyCanvas(Canvas canvas, int sortingOrder)
         {
+            // 핵심 로직을 처리합니다.
             if (canvas == null)
             {
                 return;
@@ -97,18 +117,26 @@ namespace MyProject.Common.UI
             canvas.overrideSorting = true;
             canvas.sortingOrder = sortingOrder;
         }
+        /// <summary>
+        /// AttackToMainCameraStack 함수를 처리합니다.
+        /// </summary>
 
         private void AttackToMainCameraStack()
         {
+            // 핵심 로직을 처리합니다.
             if(Camera.main == null) return;
 
             // var baseData = Camera.main.GetUniversalAdditionalCameraData();
             // if (!baseData.cameraStack.Contains(_uiCamera))
             //     baseData.cameraStack.Add(_uiCamera);
         }
+        /// <summary>
+        /// DettachFromMainCameraStack 함수를 처리합니다.
+        /// </summary>
 
         private void DettachFromMainCameraStack()
         {
+            // 핵심 로직을 처리합니다.
             if(Camera.main == null) return;
 
             // var baseData = Camera.main.GetUniversalAdditionalCameraData();

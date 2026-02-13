@@ -1,39 +1,39 @@
-using System;
+﻿using System;
 
 namespace Noname.GameAbilitySystem.Json
 {
     /// <summary>
-    /// 주석 정리
+    /// 二쇱꽍 ?뺣━
     /// </summary>
     [Serializable]
     public class AttributeModifierDto
     {
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public string ValueMode;
 
-        // 주석 정리
+        // 二쇱꽍 ?뺣━
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public string AttributeId;
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public string Operation;
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public float Magnitude;
 
-        // 주석 정리
+        // 二쇱꽍 ?뺣━
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public AttributeCalculatorType CalculatorType;
     }

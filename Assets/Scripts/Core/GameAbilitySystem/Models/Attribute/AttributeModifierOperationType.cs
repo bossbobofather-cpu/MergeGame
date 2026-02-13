@@ -1,17 +1,17 @@
-namespace Noname.GameAbilitySystem
+﻿namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// 주석 정리
+    /// 二쇱꽍 ?뺣━
     /// </summary>
     public enum AttributeModifierOperationType
     {
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         Add,
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         AddPercent,
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         Multiply,
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         Override
     }
 }

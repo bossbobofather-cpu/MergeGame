@@ -14,9 +14,13 @@ namespace MyProject.MergeGame.Unity
 
         public int PathIndex => _pathIndex;
         public int WaypointIndex => _waypointIndex;
+        /// <summary>
+        /// SetIndices 함수를 처리합니다.
+        /// </summary>
 
         public void SetIndices(int pathIndex, int waypointIndex)
         {
+            // 핵심 로직을 처리합니다.
             _pathIndex = pathIndex;
             _waypointIndex = waypointIndex;
         }

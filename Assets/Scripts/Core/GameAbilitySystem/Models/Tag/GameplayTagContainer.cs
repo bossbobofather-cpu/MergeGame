@@ -1,11 +1,11 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// 주석 정리
-    /// 주석 정리
+    /// 二쇱꽍 ?뺣━
+    /// 二쇱꽍 ?뺣━
     /// </summary>
     public sealed class GameplayTagContainer
     {
@@ -14,36 +14,43 @@ namespace Noname.GameAbilitySystem
         private readonly HashSet<int> _expandedTags = new();
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public IReadOnlyList<FGameplayTag> Tags => _tags;
+        /// <summary>
+        /// GameplayTagContainer 함수를 처리합니다.
+        /// </summary>
 
         public GameplayTagContainer()
         {
+            // 핵심 로직을 처리합니다.
 
         }
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public bool HasTag(FGameplayTag tag)
         {
+            // 핵심 로직을 처리합니다.
             return HasTagInternal(tag, includeParents: true);
         }
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public bool HasTagExact(FGameplayTag tag)
         {
+            // 핵심 로직을 처리합니다.
             return HasTagInternal(tag, includeParents: false);
         }
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public bool HasAny(GameplayTagContainer other)
         {
+            // 핵심 로직을 처리합니다.
             if (other == null)
             {
                 return false;
@@ -61,10 +68,11 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public bool HasAll(GameplayTagContainer other)
         {
+            // 핵심 로직을 처리합니다.
             if (other == null)
             {
                 return true;
@@ -82,10 +90,11 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public bool AddTag(FGameplayTag tag)
         {
+            // 핵심 로직을 처리합니다.
             if (string.IsNullOrEmpty(tag.Value))
             {
                 return false;
@@ -102,10 +111,11 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public void RemoveTag(FGameplayTag tag)
         {
+            // 핵심 로직을 처리합니다.
             for (var i = _tags.Count - 1; i >= 0; i--)
             {
                 if (_tags[i].Equals(tag))
@@ -118,17 +128,22 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public void Clear()
         {
+            // 핵심 로직을 처리합니다.
             _tags.Clear();
             _explicitTags.Clear();
             _expandedTags.Clear();
         }
+        /// <summary>
+        /// HasTagInternal 함수를 처리합니다.
+        /// </summary>
 
         private bool HasTagInternal(FGameplayTag tag, bool includeParents)
         {
+            // 핵심 로직을 처리합니다.
             if (string.IsNullOrEmpty(tag.Value))
             {
                 return false;
@@ -136,9 +151,13 @@ namespace Noname.GameAbilitySystem
 
             return includeParents ? _expandedTags.Contains(tag.Hash) : _explicitTags.Contains(tag.Hash);
         }
+        /// <summary>
+        /// RebuildCache 함수를 처리합니다.
+        /// </summary>
 
         private void RebuildCache()
         {
+            // 핵심 로직을 처리합니다.
             _explicitTags.Clear();
             _expandedTags.Clear();
 
@@ -156,20 +175,28 @@ namespace Noname.GameAbilitySystem
                 }
             }
         }
+        /// <summary>
+        /// AddToCache 함수를 처리합니다.
+        /// </summary>
 
         private void AddToCache(FGameplayTag tag)
         {
+            // 핵심 로직을 처리합니다.
             if (_explicitTags.Add(tag.Hash))
             {
                 AddParentsToCache(tag);
             }
         }
+        /// <summary>
+        /// AddParentsToCache 함수를 처리합니다.
+        /// </summary>
 
         private void AddParentsToCache(FGameplayTag tag)
         {
+            // 핵심 로직을 처리합니다.
             _expandedTags.Add(tag.Hash);
 
-            // 주석 정리
+            // 二쇱꽍 ?뺣━
             var lastDotIndex = tag.Value.LastIndexOf('.');
             while (lastDotIndex > 0)
             {

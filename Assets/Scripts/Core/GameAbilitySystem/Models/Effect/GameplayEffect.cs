@@ -68,9 +68,13 @@ namespace Noname.GameAbilitySystem
         /// Duration 계산 정책입니다.
         /// </summary>
         public IEffectDurationPolicy DurationPolicy { get; set; }
+        /// <summary>
+        /// GameplayEffect 함수를 처리합니다.
+        /// </summary>
 
         public GameplayEffect()
         {
+            // 핵심 로직을 처리합니다.
             Modifiers = new List<AttributeModifier>();
             GrantedTags = new GameplayTagContainer();
             RequiredTags = new GameplayTagContainer();

@@ -1,15 +1,15 @@
-using System;
+﻿using System;
 
 namespace Noname.GameAbilitySystem.Json
 {
     /// <summary>
-    /// 주석 정리
+    /// 二쇱꽍 ?뺣━
     /// </summary>
     [Serializable]
     public class DurationPolicyDto
     {
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public string Type;
     }

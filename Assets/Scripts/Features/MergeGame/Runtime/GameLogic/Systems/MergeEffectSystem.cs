@@ -27,6 +27,7 @@ namespace MyProject.MergeGame.Systems
         /// </summary>
         public void AddEvent(MergeGameEvent evt)
         {
+            // 핵심 로직을 처리합니다.
             _events.Add(evt);
         }
     }

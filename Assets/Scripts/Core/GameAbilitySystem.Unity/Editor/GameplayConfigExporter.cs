@@ -14,10 +14,14 @@ namespace Noname.GameCore.Helper.Editor
     public static class GameplayConfigExporter
     {
         private const string DefaultExportPath = "Assets/Data/Abilities";
+        /// <summary>
+        /// ExportAllAbilityConfigs 함수를 처리합니다.
+        /// </summary>
 
         [MenuItem("GameAbilitySystem/Export All Ability Configs to JSON")]
         public static void ExportAllAbilityConfigs()
         {
+            // 핵심 로직을 처리합니다.
             var configs = FindAllAssets<GameplayAbilityConfig>();
             if (configs.Count == 0)
             {
@@ -40,10 +44,14 @@ namespace Noname.GameCore.Helper.Editor
             AssetDatabase.Refresh();
             Debug.Log($"[GameplayConfigExporter] Exported {exportedCount} ability configs to {DefaultExportPath}");
         }
+        /// <summary>
+        /// ExportAllEffectConfigs 함수를 처리합니다.
+        /// </summary>
 
         [MenuItem("GameAbilitySystem/Export All Effect Configs to JSON")]
         public static void ExportAllEffectConfigs()
         {
+            // 핵심 로직을 처리합니다.
             var configs = FindAllAssets<GameplayEffectConfig>();
             if (configs.Count == 0)
             {
@@ -67,10 +75,14 @@ namespace Noname.GameCore.Helper.Editor
             AssetDatabase.Refresh();
             Debug.Log($"[GameplayConfigExporter] Exported {exportedCount} effect configs to {exportPath}");
         }
+        /// <summary>
+        /// ExportSelectedConfig 함수를 처리합니다.
+        /// </summary>
 
         [MenuItem("GameAbilitySystem/Export Selected Config to JSON")]
         public static void ExportSelectedConfig()
         {
+            // 핵심 로직을 처리합니다.
             var selected = Selection.activeObject;
             if (selected == null)
             {
@@ -116,6 +128,7 @@ namespace Noname.GameCore.Helper.Editor
         /// </summary>
         public static GameplayAbilityDto ConvertToDto(GameplayAbilityConfig config)
         {
+            // 핵심 로직을 처리합니다.
             if (config == null) return null;
 
             return new GameplayAbilityDto
@@ -137,6 +150,7 @@ namespace Noname.GameCore.Helper.Editor
         /// </summary>
         public static GameplayEffectDto ConvertToDto(this GameplayEffectConfig config)
         {
+            // 핵심 로직을 처리합니다.
             if (config == null) return null;
 
             return new GameplayEffectDto
@@ -161,6 +175,7 @@ namespace Noname.GameCore.Helper.Editor
         /// </summary>
         private static DurationPolicyDto ConvertToDTO(this EffectDurationPolicyType policyType)
         {
+            // 핵심 로직을 처리합니다.
             if (policyType == EffectDurationPolicyType.None) return null;
 
             return new DurationPolicyDto
@@ -174,6 +189,7 @@ namespace Noname.GameCore.Helper.Editor
         /// </summary>
         public static TargetingStrategyDto ConvertTargetingToDTO(this GameplayAbilityConfig config)
         {
+            // 핵심 로직을 처리합니다.
             if (config.TargetingStrategyType == TargetingStrategyType.None) return null;
 
             return new TargetingStrategyDto
@@ -184,9 +200,13 @@ namespace Noname.GameCore.Helper.Editor
                 Radius = config.TargetingRadius
             };
         }
+        /// <summary>
+        /// ConvertToDTO 함수를 처리합니다.
+        /// </summary>
 
         private static List<GameplayEffectDto> ConvertToDTO(this List<GameplayEffectConfig> configs)
         {
+            // 핵심 로직을 처리합니다.
             if (configs == null || configs.Count == 0) return null;
 
             var result = new List<GameplayEffectDto>(configs.Count);
@@ -199,9 +219,13 @@ namespace Noname.GameCore.Helper.Editor
             }
             return result.Count > 0 ? result : null;
         }
+        /// <summary>
+        /// ConvertToDTO 함수를 처리합니다.
+        /// </summary>
 
         private static List<AttributeModifierDto> ConvertToDTO(this IReadOnlyList<AttributeModifierView> modifiers)
         {
+            // 핵심 로직을 처리합니다.
             if (modifiers == null || modifiers.Count == 0) return null;
 
             var result = new List<AttributeModifierDto>(modifiers.Count);
@@ -218,9 +242,13 @@ namespace Noname.GameCore.Helper.Editor
             }
             return result;
         }
+        /// <summary>
+        /// ConvertToDTO 함수를 처리합니다.
+        /// </summary>
 
         private static List<string> ConvertToDTO(this GameplayTagContainerView container)
         {
+            // 핵심 로직을 처리합니다.
             if (container == null || container.Tags == null || container.Tags.Count == 0)
                 return null;
 
@@ -256,9 +284,13 @@ namespace Noname.GameCore.Helper.Editor
 
             return result;
         }
+        /// <summary>
+        /// EnsureDirectoryExists 함수를 처리합니다.
+        /// </summary>
 
         private static void EnsureDirectoryExists(string path)
         {
+            // 핵심 로직을 처리합니다.
             if (!Directory.Exists(path))
             {
                 Directory.CreateDirectory(path);

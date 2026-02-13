@@ -55,6 +55,11 @@ namespace MyProject.MergeGame.Models
         public int GoldReward { get; }
 
         /// <summary>
+        /// 상대 플레이어에게서 주입된 몬스터인지 여부입니다.
+        /// </summary>
+        public bool IsInjectedByOpponent { get; }
+
+        /// <summary>
         /// 생존 여부입니다.
         /// </summary>
         public bool IsAlive => ASC.Get(AttributeId.Health) > 0;
@@ -70,7 +75,8 @@ namespace MyProject.MergeGame.Models
             int pathIndex,
             Point3D startPosition,
             int damageToPlayer,
-            int goldReward)
+            int goldReward,
+            bool isInjectedByOpponent = false)
         {
             Uid = uid;
             MonsterId = monsterId;
@@ -79,6 +85,7 @@ namespace MyProject.MergeGame.Models
             Position = startPosition;
             DamageToPlayer = damageToPlayer;
             GoldReward = goldReward;
+            IsInjectedByOpponent = isInjectedByOpponent;
 
             ASC = new AbilitySystemComponent();
             ASC.SetOwner(this);
@@ -89,6 +96,7 @@ namespace MyProject.MergeGame.Models
         /// </summary>
         public void SetAI(IMergeMonsterAI ai)
         {
+            // 핵심 로직을 처리합니다.
             AI = ai;
         }
 
@@ -97,12 +105,18 @@ namespace MyProject.MergeGame.Models
         /// </summary>
         public void TakeDamage(float damage)
         {
+            // 핵심 로직을 처리합니다.
             ASC.Add(AttributeId.Health, -damage);
         }
+        /// <summary>
+        /// Dispose 함수를 처리합니다.
+        /// </summary>
 
         public void Dispose()
         {
+            // 핵심 로직을 처리합니다.
             ASC?.Dispose();
         }
     }
 }
+

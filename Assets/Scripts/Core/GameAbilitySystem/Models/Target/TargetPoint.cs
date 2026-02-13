@@ -17,9 +17,13 @@
             Y = y;
             Z = z;
         }
+        /// <summary>
+        /// DistanceSquared 함수를 처리합니다.
+        /// </summary>
 
         public static float DistanceSquared(in Point3D a, in Point3D b)
         {
+            // 핵심 로직을 처리합니다.
             var dx = a.X - b.X;
             var dy = a.Y - b.Y;
             var dz = a.Z - b.Z;

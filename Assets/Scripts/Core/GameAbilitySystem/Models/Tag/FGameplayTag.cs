@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// 주석 정리
-    /// 주석 정리
+    /// 二쇱꽍 ?뺣━
+    /// 二쇱꽍 ?뺣━
     /// </summary>
     [Serializable]
     public struct FGameplayTag : IEquatable<FGameplayTag>
@@ -13,9 +13,9 @@ namespace Noname.GameAbilitySystem
         private int _hash;
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         public FGameplayTag(string value)
         {
             _value = value;
@@ -27,12 +27,12 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public string Value => _value;
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public int Hash
         {
@@ -40,7 +40,7 @@ namespace Noname.GameAbilitySystem
             {
                 if (_hash == 0 && !string.IsNullOrEmpty(_value))
                 {
-                    // 주석 정리
+                    // 二쇱꽍 ?뺣━
                     _hash = GameplayTagUtility.Fnv1a32(_value);
                 }
                 return _hash;
@@ -48,45 +48,49 @@ namespace Noname.GameAbilitySystem
         }
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
         public bool IsValid => GameplayTagUtility.IsValidTagString(_value);
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
-        /// 주석 정리
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
+        /// 二쇱꽍 ?뺣━
         public bool Equals(FGameplayTag other)
         {
+            // 핵심 로직을 처리합니다.
             return Hash == other.Hash;
         }
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
-        /// 주석 정리
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
+        /// 二쇱꽍 ?뺣━
         public override bool Equals(object obj)
         {
+            // 핵심 로직을 처리합니다.
             return obj is FGameplayTag other && Equals(other);
         }
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         public override int GetHashCode()
         {
+            // 핵심 로직을 처리합니다.
             return Hash;
         }
 
         /// <summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         /// </summary>
-        /// 주석 정리
+        /// 二쇱꽍 ?뺣━
         public override string ToString()
         {
+            // 핵심 로직을 처리합니다.
             return _value ?? string.Empty;
         }
     }

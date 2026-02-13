@@ -9,9 +9,13 @@ namespace Noname.GameAbilitySystem
     {
         private readonly HashSet<AbilitySystemComponent> _targetSet = new();
         private readonly List<AbilitySystemComponent> _targets = new();
+        /// <summary>
+        /// TargetData 함수를 처리합니다.
+        /// </summary>
 
         public TargetData(AbilitySystemComponent source, Point3D? hitLocation = null)
         {
+            // 핵심 로직을 처리합니다.
             Source = source;
             HitLocation = hitLocation;
         }
@@ -36,6 +40,7 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         public void AddTarget(AbilitySystemComponent target)
         {
+            // 핵심 로직을 처리합니다.
             if (target == null)
             {
                 return;

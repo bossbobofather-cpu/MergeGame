@@ -84,6 +84,7 @@ namespace MyProject.MergeGame.Unity.Network
         MonsterDamaged = 31,
         MonsterDied = 32,
         MonsterMoved = 33,
+        MonsterInjected = 34,
 
         DifficultyStepChangedEvent = 40,
 
@@ -103,4 +104,6 @@ namespace MyProject.MergeGame.Unity.Network
         public ArraySegment<byte> Payload;
     }
 }
+
+
 

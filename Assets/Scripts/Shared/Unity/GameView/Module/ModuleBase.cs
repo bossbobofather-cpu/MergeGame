@@ -24,6 +24,7 @@ namespace MyProject.Common.GameView
         /// </summary>
         public void Initialize(IGameView view)
         {
+            // 핵심 로직을 처리합니다.
             _view = view;
             OnInit();
         }
@@ -33,6 +34,7 @@ namespace MyProject.Common.GameView
         /// </summary>
         public void Startup()
         {
+            // 핵심 로직을 처리합니다.
             OnStartup();
         }
 
@@ -41,6 +43,7 @@ namespace MyProject.Common.GameView
         /// </summary>
         public void Shutdown()
         {
+            // 핵심 로직을 처리합니다.
             OnShutdown();
         }
 
@@ -49,6 +52,7 @@ namespace MyProject.Common.GameView
         /// </summary>
         protected virtual void OnInit()
         {
+            // 핵심 로직을 처리합니다.
         }
 
         /// <summary>
@@ -56,6 +60,7 @@ namespace MyProject.Common.GameView
         /// </summary>
         protected virtual void OnStartup()
         {
+            // 핵심 로직을 처리합니다.
         }
 
         /// <summary>
@@ -63,6 +68,7 @@ namespace MyProject.Common.GameView
         /// </summary>
         protected virtual void OnShutdown()
         {
+            // 핵심 로직을 처리합니다.
         }
     }
 }

@@ -12,7 +12,7 @@ namespace MyProject.MergeGame.Unity
     /// <summary>
     /// 타워 뷰 모듈입니다.
     /// 스냅샷을 Source of Truth로 삼아 오브젝트를 생성/갱신/제거합니다.
-    /// 드래그 & 드롭으로 타워 머지를 지원합니다.
+    /// 드래그 & 드롭으로 로컬 플레이어 타워 머지를 지원합니다.
     /// </summary>
     [DisallowMultipleComponent]
     public sealed class TowerViewModule : MergeViewModuleBase
@@ -36,11 +36,13 @@ namespace MyProject.MergeGame.Unity
         [SerializeField] private float _hitScanLineWidth = 0.05f;
         [SerializeField] private Color _hitScanLineColor = new Color(1f, 0.8f, 0.2f, 1f);
 
-        private readonly Dictionary<long, GameObject> _towerObjects = new();
+        private readonly Dictionary<int, Dictionary<long, GameObject>> _towerObjectsByPlayer = new();
+        private readonly Dictionary<int, IReadOnlyList<SlotPositionData>> _cachedSlotPositionsByPlayer = new();
         private readonly HashSet<long> _seen = new();
         private readonly List<long> _removeBuffer = new();
-        private IReadOnlyList<SlotPositionData> _cachedSlotPositions;
-        private MergeHostSnapshot _lastSnapshot;
+
+        private MergeHostSnapshot _localSnapshot;
+
         // 등급 단계가 확실히 구분되도록 8단계 고정 팔레트를 사용합니다.
         private static readonly Color[] GradePalette =
         {
@@ -62,24 +64,27 @@ namespace MyProject.MergeGame.Unity
         private Transform _dragVisualTransform;
         private Vector3 _dragVisualOriginalLocal;
         private bool _waitingForMergeResult;
+        /// <summary>
+        /// OnInit 함수를 처리합니다.
+        /// </summary>
 
         protected override void OnInit()
         {
+            // 핵심 로직을 처리합니다.
             base.OnInit();
             _mainCamera = Camera.main;
         }
+        /// <summary>
+        /// OnEventMsg 함수를 처리합니다.
+        /// </summary>
 
         public override void OnEventMsg(MergeGameEvent evt)
         {
-            if (!IsMyEvent(evt))
-            {
-                return;
-            }
-            
+            // 핵심 로직을 처리합니다.
             switch (evt)
             {
                 case MapInitializedEvent mapEvt:
-                    _cachedSlotPositions = mapEvt.SlotPositions;
+                    _cachedSlotPositionsByPlayer[mapEvt.PlayerIndex] = mapEvt.SlotPositions;
                     break;
 
                 case TowerSpawnedEvent spawned:
@@ -91,7 +96,7 @@ namespace MyProject.MergeGame.Unity
                     break;
 
                 case TowerRemovedEvent removed:
-                    HandleRemoveTowerEvent(removed.TowerUid);
+                    HandleRemoveTowerEvent(removed.PlayerIndex, removed.TowerUid);
                     break;
 
                 case TowerMergedEvent merged:
@@ -99,20 +104,32 @@ namespace MyProject.MergeGame.Unity
                     break;
             }
         }
+        /// <summary>
+        /// OnSnapshotMsg 함수를 처리합니다.
+        /// </summary>
 
         public override void OnSnapshotMsg(MergeHostSnapshot snapshot)
         {
-            if (snapshot == null || !IsMySnapshot(snapshot))
+            // 핵심 로직을 처리합니다.
+            if (snapshot == null)
             {
                 return;
             }
 
-            _lastSnapshot = snapshot;
+            if (GameView != null && GameView.AssignedPlayerIndex >= 0 && snapshot.PlayerIndex == GameView.AssignedPlayerIndex)
+            {
+                _localSnapshot = snapshot;
+            }
+
             SyncTowers(snapshot);
         }
+        /// <summary>
+        /// OnCommandResultMsg 함수를 처리합니다.
+        /// </summary>
 
         public override void OnCommandResultMsg(MergeCommandResult result)
         {
+            // 핵심 로직을 처리합니다.
             if (result is not MergeTowerResult mergeResult) return;
             if (!_waitingForMergeResult) return;
 
@@ -125,9 +142,13 @@ namespace MyProject.MergeGame.Unity
         }
 
         #region Drag & Merge
+        /// <summary>
+        /// Update 함수를 처리합니다.
+        /// </summary>
 
         private void Update()
         {
+            // 핵심 로직을 처리합니다.
             if (_waitingForMergeResult) return;
             if (_mainCamera == null) return;
             var mouse = Mouse.current;
@@ -140,9 +161,13 @@ namespace MyProject.MergeGame.Unity
             else if (mouse.leftButton.wasReleasedThisFrame && _isDragging)
                 EndDrag(mouse);
         }
+        /// <summary>
+        /// TryBeginDrag 함수를 처리합니다.
+        /// </summary>
 
         private void TryBeginDrag(Mouse mouse)
         {
+            // 핵심 로직을 처리합니다.
             var ray = _mainCamera.ScreenPointToRay(mouse.position.ReadValue());
             if (!Physics.Raycast(ray, out var hit)) return;
 
@@ -151,18 +176,22 @@ namespace MyProject.MergeGame.Unity
             // 내 타워만 드래그 가능
             if (!IsLocalTower(uid)) return;
 
-            var root = _towerObjects[uid];
-            if (root == null || root.transform.childCount == 0) return;
+            if (!TryGetLocalTowerMap(out var localTowerMap)) return;
+            if (!localTowerMap.TryGetValue(uid, out var root) || root == null || root.transform.childCount == 0) return;
 
             _dragTowerUid = uid;
             _dragFromSlotIndex = slotIndex;
-            _dragVisualTransform = root.transform.GetChild(0);  //지금은 visual child 하나
+            _dragVisualTransform = root.transform.GetChild(0);  // 지금은 visual child 하나
             _dragVisualOriginalLocal = _dragVisualTransform.localPosition;
             _isDragging = true;
         }
+        /// <summary>
+        /// UpdateDrag 함수를 처리합니다.
+        /// </summary>
 
         private void UpdateDrag(Mouse mouse)
         {
+            // 핵심 로직을 처리합니다.
             if (_dragVisualTransform == null)
             {
                 _isDragging = false;
@@ -176,9 +205,13 @@ namespace MyProject.MergeGame.Unity
                 _dragVisualTransform.position = ray.GetPoint(dist);
             }
         }
+        /// <summary>
+        /// EndDrag 함수를 처리합니다.
+        /// </summary>
 
         private void EndDrag(Mouse mouse)
         {
+            // 핵심 로직을 처리합니다.
             _isDragging = false;
 
             var ray = _mainCamera.ScreenPointToRay(mouse.position.ReadValue());
@@ -199,17 +232,33 @@ namespace MyProject.MergeGame.Unity
 
             ResetDragVisual();
         }
+        /// <summary>
+        /// ResetDragVisual 함수를 처리합니다.
+        /// </summary>
 
         private void ResetDragVisual()
         {
+            // 핵심 로직을 처리합니다.
             if (_dragVisualTransform != null)
                 _dragVisualTransform.localPosition = _dragVisualOriginalLocal;
             _dragVisualTransform = null;
         }
+        /// <summary>
+        /// TryFindTowerByObject 함수를 처리합니다.
+        /// </summary>
 
         private bool TryFindTowerByObject(GameObject obj, out long uid, out int slotIndex)
         {
-            foreach (var kv in _towerObjects)
+            // 핵심 로직을 처리합니다.
+            uid = 0;
+            slotIndex = -1;
+
+            if (!TryGetLocalTowerMap(out var localTowerMap))
+            {
+                return false;
+            }
+
+            foreach (var kv in localTowerMap)
             {
                 if (kv.Value == null) continue;
                 if (kv.Value == obj || obj.transform.IsChildOf(kv.Value.transform))
@@ -219,27 +268,35 @@ namespace MyProject.MergeGame.Unity
                     return slotIndex >= 0;
                 }
             }
-            uid = 0;
-            slotIndex = -1;
+
             return false;
         }
+        /// <summary>
+        /// GetSlotIndexByUid 함수를 처리합니다.
+        /// </summary>
 
         private int GetSlotIndexByUid(long uid)
         {
-            if (_lastSnapshot == null) return -1;
-            var towers = _lastSnapshot.Towers;
+            // 핵심 로직을 처리합니다.
+            if (_localSnapshot == null) return -1;
+            var towers = _localSnapshot.Towers;
             for (var i = 0; i < towers.Count; i++)
             {
                 if (towers[i].Uid == uid) return towers[i].SlotIndex;
             }
             return -1;
         }
+        /// <summary>
+        /// IsLocalTower 함수를 처리합니다.
+        /// </summary>
 
         private bool IsLocalTower(long uid)
         {
-            if (_lastSnapshot == null) return false;
-            if (_lastSnapshot.PlayerIndex != GameView.AssignedPlayerIndex) return false;
-            var towers = _lastSnapshot.Towers;
+            // 핵심 로직을 처리합니다.
+            if (_localSnapshot == null) return false;
+            if (GameView == null || _localSnapshot.PlayerIndex != GameView.AssignedPlayerIndex) return false;
+
+            var towers = _localSnapshot.Towers;
             for (var i = 0; i < towers.Count; i++)
             {
                 if (towers[i].Uid == uid) return true;
@@ -250,9 +307,14 @@ namespace MyProject.MergeGame.Unity
         #endregion
 
         #region Snapshot Sync
+        /// <summary>
+        /// SyncTowers 함수를 처리합니다.
+        /// </summary>
 
         private void SyncTowers(MergeHostSnapshot snapshot)
         {
+            // 핵심 로직을 처리합니다.
+            var towerMap = GetOrCreateTowerMap(snapshot.PlayerIndex);
             _seen.Clear();
 
             var towers = snapshot.Towers;
@@ -261,70 +323,89 @@ namespace MyProject.MergeGame.Unity
                 var t = towers[i];
                 _seen.Add(t.Uid);
 
-                if (!_towerObjects.TryGetValue(t.Uid, out var obj) || obj == null)
+                if (!towerMap.TryGetValue(t.Uid, out var obj) || obj == null)
                 {
                     obj = CreateTowerObject(t.TowerId);
-                    _towerObjects[t.Uid] = obj;
+                    if (obj == null)
+                    {
+                        continue;
+                    }
+
+                    towerMap[t.Uid] = obj;
                 }
 
-                if (TryGetCachedSlotPosition(t.SlotIndex, out var pos))
+                if (TryGetCachedSlotPosition(snapshot.PlayerIndex, t.SlotIndex, out var pos))
                 {
                     obj.transform.position = pos;
                 }
                 else
                 {
-                    obj.transform.position = new Vector3(t.PositionX, t.PositionY, t.PositionZ);
+                    obj.transform.position = ApplyOffset(snapshot.PlayerIndex, t.PositionX, t.PositionY, t.PositionZ);
                 }
 
-                obj.name = $"Tower_{t.Uid}_G{t.Grade}";
-
+                obj.name = $"Tower_P{snapshot.PlayerIndex}_{t.Uid}_G{t.Grade}";
                 ApplyGradeColor(obj, t.Grade);
             }
 
-            RemoveNotSeen(_towerObjects);
+            RemoveNotSeen(towerMap);
         }
 
         #endregion
 
         #region Event Handlers
+        /// <summary>
+        /// HandleSpawnTowerEvent 함수를 처리합니다.
+        /// </summary>
 
         private void HandleSpawnTowerEvent(TowerSpawnedEvent evt)
         {
+            // 핵심 로직을 처리합니다.
             if (evt == null)
             {
                 return;
             }
 
-            if (_towerObjects.TryGetValue(evt.TowerUid, out var obj) && obj != null)
+            var towerMap = GetOrCreateTowerMap(evt.PlayerIndex);
+            if (towerMap.TryGetValue(evt.TowerUid, out var existing) && existing != null)
             {
                 return;
             }
 
-            obj = CreateTowerObject(evt.TowerId);
-            _towerObjects[evt.TowerUid] = obj;
+            var obj = CreateTowerObject(evt.TowerId);
+            if (obj == null)
+            {
+                return;
+            }
 
+            towerMap[evt.TowerUid] = obj;
 
-            if (TryGetCachedSlotPosition(evt.SlotIndex, out var pos))
+            if (TryGetCachedSlotPosition(evt.PlayerIndex, evt.SlotIndex, out var pos))
             {
                 obj.transform.position = pos;
             }
             else
             {
-                obj.transform.position = new Vector3(evt.PositionX, evt.PositionY, evt.PositionZ);
+                obj.transform.position = ApplyOffset(evt.PlayerIndex, evt.PositionX, evt.PositionY, evt.PositionZ);
             }
 
-            obj.name = $"Tower_{evt.TowerUid}_G{evt.Grade}";
+            obj.name = $"Tower_P{evt.PlayerIndex}_{evt.TowerUid}_G{evt.Grade}";
             ApplyGradeColor(obj, evt.Grade);
         }
+        /// <summary>
+        /// HandleTowerAttackEvent 함수를 처리합니다.
+        /// </summary>
 
         private void HandleTowerAttackEvent(TowerAttackedEvent evt)
         {
+            // 핵심 로직을 처리합니다.
             if (evt == null)
             {
                 return;
             }
 
-            if (_towerObjects.TryGetValue(evt.AttackerUid, out var obj) && obj != null)
+            if (TryGetTowerMap(evt.PlayerIndex, out var towerMap)
+                && towerMap.TryGetValue(evt.AttackerUid, out var obj)
+                && obj != null)
             {
                 var state = obj.GetComponent<TowerViewState>() ?? obj.AddComponent<TowerViewState>();
                 state.TriggerAttack();
@@ -332,60 +413,89 @@ namespace MyProject.MergeGame.Unity
 
             if (evt.AttackType == TowerAttackType.HitScan && _enableHitScanLine)
             {
-                var start = new Vector3(evt.AttackerX, evt.AttackerY, evt.AttackerZ);
-                var target = new Vector3(evt.TargetX, evt.TargetY, evt.TargetZ);
+                var start = ApplyOffset(evt.PlayerIndex, evt.AttackerX, evt.AttackerY, evt.AttackerZ);
+                var target = ApplyOffset(evt.PlayerIndex, evt.TargetX, evt.TargetY, evt.TargetZ);
                 SpawnHitScanLine(start, target);
             }
         }
+        /// <summary>
+        /// HandleTowerMergedEvent 함수를 처리합니다.
+        /// </summary>
 
         private void HandleTowerMergedEvent(TowerMergedEvent evt)
         {
-            // 1. source/target 타워 제거
-            HandleRemoveTowerEvent(evt.SourceTowerUid);
-            HandleRemoveTowerEvent(evt.TargetTowerUid);
+            // 핵심 로직을 처리합니다.
+            if (evt == null)
+            {
+                return;
+            }
 
-            // 2. result 타워 생성 + 슬롯 위치 배치
+            HandleRemoveTowerEvent(evt.PlayerIndex, evt.SourceTowerUid);
+            HandleRemoveTowerEvent(evt.PlayerIndex, evt.TargetTowerUid);
+
+            var towerMap = GetOrCreateTowerMap(evt.PlayerIndex);
             var obj = CreateTowerObject(evt.ResultTowerId);
             if (obj != null)
             {
-                _towerObjects[evt.ResultTowerUid] = obj;
+                towerMap[evt.ResultTowerUid] = obj;
 
-                if (TryGetCachedSlotPosition(evt.SlotIndex, out var pos))
+                if (TryGetCachedSlotPosition(evt.PlayerIndex, evt.SlotIndex, out var pos))
+                {
                     obj.transform.position = pos;
+                }
+                else
+                {
+                    obj.transform.position = GetPlayerOffset(evt.PlayerIndex);
+                }
 
-                obj.name = $"Tower_{evt.ResultTowerUid}_G{evt.ResultGrade}";
+                obj.name = $"Tower_P{evt.PlayerIndex}_{evt.ResultTowerUid}_G{evt.ResultGrade}";
                 ApplyGradeColor(obj, evt.ResultGrade);
             }
 
-            // 3. 드래그 비주얼 정리
-            _dragVisualTransform = null;
-            _waitingForMergeResult = false;
+            if (GameView != null && evt.PlayerIndex == GameView.AssignedPlayerIndex)
+            {
+                _dragVisualTransform = null;
+                _waitingForMergeResult = false;
+            }
         }
+        /// <summary>
+        /// HandleRemoveTowerEvent 함수를 처리합니다.
+        /// </summary>
 
-        private void HandleRemoveTowerEvent(long uid)
+        private void HandleRemoveTowerEvent(int playerIndex, long uid)
         {
-            // 드래그 중인 타워가 제거되면 드래그 취소
-            if (_isDragging && _dragTowerUid == uid)
+            // 핵심 로직을 처리합니다.
+            var localPlayerIndex = GameView != null ? GameView.AssignedPlayerIndex : -1;
+            if (_isDragging && playerIndex == localPlayerIndex && _dragTowerUid == uid)
             {
                 _isDragging = false;
                 _dragVisualTransform = null;
                 _waitingForMergeResult = false;
             }
 
-            if (_towerObjects.TryGetValue(uid, out var obj) && obj != null)
+            if (!TryGetTowerMap(playerIndex, out var towerMap))
+            {
+                return;
+            }
+
+            if (towerMap.TryGetValue(uid, out var obj) && obj != null)
             {
                 Destroy(obj);
             }
 
-            _towerObjects.Remove(uid);
+            towerMap.Remove(uid);
         }
 
         #endregion
 
         #region Helpers
+        /// <summary>
+        /// SpawnHitScanLine 함수를 처리합니다.
+        /// </summary>
 
         private void SpawnHitScanLine(Vector3 start, Vector3 target)
         {
+            // 핵심 로직을 처리합니다.
             var line = _hitScanLinePrefab != null
                 ? Instantiate(_hitScanLinePrefab, transform)
                 : CreateLineRendererFallback();
@@ -395,6 +505,7 @@ namespace MyProject.MergeGame.Unity
                 return;
             }
 
+            line.useWorldSpace = true;
             line.positionCount = 2;
             line.SetPosition(0, start);
             line.SetPosition(1, target);
@@ -405,20 +516,28 @@ namespace MyProject.MergeGame.Unity
 
             Destroy(line.gameObject, _hitScanLineDuration);
         }
+        /// <summary>
+        /// CreateLineRendererFallback 함수를 처리합니다.
+        /// </summary>
 
         private LineRenderer CreateLineRendererFallback()
         {
+            // 핵심 로직을 처리합니다.
             var obj = new GameObject("HitScanLine");
             obj.transform.SetParent(transform, false);
 
             var line = obj.AddComponent<LineRenderer>();
             line.material = new Material(Shader.Find("Sprites/Default"));
-            line.useWorldSpace = false;
+            line.useWorldSpace = true;
             return line;
         }
+        /// <summary>
+        /// RemoveNotSeen 함수를 처리합니다.
+        /// </summary>
 
         private void RemoveNotSeen(Dictionary<long, GameObject> dict)
         {
+            // 핵심 로직을 처리합니다.
             _removeBuffer.Clear();
 
             foreach (var kv in dict)
@@ -440,17 +559,20 @@ namespace MyProject.MergeGame.Unity
                 dict.Remove(uid);
             }
         }
+        /// <summary>
+        /// CreateTowerObject 함수를 처리합니다.
+        /// </summary>
 
         private GameObject CreateTowerObject(long towerId)
         {
-            GameObject selectionPrefab = null;
-            selectionPrefab = _defaultTowerPrefab;
+            // 핵심 로직을 처리합니다.
+            GameObject selectionPrefab = _defaultTowerPrefab;
 
-            if(_towerPrefabs != null && _towerPrefabs.Count > 0)
+            if (_towerPrefabs != null && _towerPrefabs.Count > 0)
             {
-                foreach(var towerPrefab in _towerPrefabs)
+                foreach (var towerPrefab in _towerPrefabs)
                 {
-                    if(towerPrefab.Id == towerId && towerPrefab.Prefab != null)
+                    if (towerPrefab.Id == towerId && towerPrefab.Prefab != null)
                     {
                         selectionPrefab = towerPrefab.Prefab;
                         break;
@@ -465,12 +587,16 @@ namespace MyProject.MergeGame.Unity
             }
 
             var instance = Instantiate(selectionPrefab, transform);
-            var tower = instance.GetComponent<TowerViewState>() ?? instance.AddComponent<TowerViewState>();
+            _ = instance.GetComponent<TowerViewState>() ?? instance.AddComponent<TowerViewState>();
             return instance;
         }
+        /// <summary>
+        /// ApplyGradeColor 함수를 처리합니다.
+        /// </summary>
 
         private static void ApplyGradeColor(GameObject obj, int grade)
         {
+            // 핵심 로직을 처리합니다.
             var renderer = obj.GetComponentInChildren<Renderer>();
             if (renderer == null)
             {
@@ -478,7 +604,7 @@ namespace MyProject.MergeGame.Unity
             }
 
             var maxGrade = Mathf.Max(1, DevHelperSet.DevRuleHelper.DEV_TOWER_MAX_GRADE);
-            var normalized = maxGrade > 1? Mathf.Clamp01((grade - 1f) / (maxGrade - 1f)): 0f;
+            var normalized = maxGrade > 1 ? Mathf.Clamp01((grade - 1f) / (maxGrade - 1f)) : 0f;
             var paletteIndex = Mathf.Clamp(Mathf.RoundToInt(normalized * (GradePalette.Length - 1)), 0, GradePalette.Length - 1);
             var color = GradePalette[paletteIndex];
 
@@ -491,45 +617,122 @@ namespace MyProject.MergeGame.Unity
                 // 일부 렌더러/머티리얼은 color 프로퍼티가 없을 수 있습니다.
             }
         }
+        /// <summary>
+        /// TryGetCachedSlotPosition 함수를 처리합니다.
+        /// </summary>
 
-        private bool TryGetCachedSlotPosition(int slotIndex, out Vector3 out_Pos)
+        private bool TryGetCachedSlotPosition(int playerIndex, int slotIndex, out Vector3 outPos)
         {
-            out_Pos = Vector3.zero;
+            // 핵심 로직을 처리합니다.
+            outPos = Vector3.zero;
 
-            if (_cachedSlotPositions == null) return false;
-            if (_cachedSlotPositions.Count == 0) return false;
-
-            for (var i = 0; i < _cachedSlotPositions.Count; i++)
+            if (!_cachedSlotPositionsByPlayer.TryGetValue(playerIndex, out var slotPositions)
+                || slotPositions == null
+                || slotPositions.Count == 0)
             {
-                var pos = _cachedSlotPositions[i];
-                if (pos.Index == slotIndex)
+                return false;
+            }
+
+            for (var i = 0; i < slotPositions.Count; i++)
+            {
+                var pos = slotPositions[i];
+                if (pos.Index != slotIndex)
                 {
-                    //타워 피벗이 지금은 정중앙이라서
-                    var towerSizeYHalf = 0.5f;
-                    out_Pos = new Vector3(pos.X, pos.Y + towerSizeYHalf, pos.Z);
-                    return true;
+                    continue;
                 }
+
+                var towerSizeYHalf = 0.5f;
+                outPos = new Vector3(pos.X, pos.Y + towerSizeYHalf, pos.Z) + GetPlayerOffset(playerIndex);
+                return true;
             }
 
             return false;
         }
+        /// <summary>
+        /// GetOrCreateTowerMap 함수를 처리합니다.
+        /// </summary>
+
+        private Dictionary<long, GameObject> GetOrCreateTowerMap(int playerIndex)
+        {
+            // 핵심 로직을 처리합니다.
+            if (_towerObjectsByPlayer.TryGetValue(playerIndex, out var towerMap))
+            {
+                return towerMap;
+            }
+
+            towerMap = new Dictionary<long, GameObject>();
+            _towerObjectsByPlayer[playerIndex] = towerMap;
+            return towerMap;
+        }
+        /// <summary>
+        /// TryGetTowerMap 함수를 처리합니다.
+        /// </summary>
+
+        private bool TryGetTowerMap(int playerIndex, out Dictionary<long, GameObject> towerMap)
+        {
+            // 핵심 로직을 처리합니다.
+            return _towerObjectsByPlayer.TryGetValue(playerIndex, out towerMap);
+        }
+        /// <summary>
+        /// TryGetLocalTowerMap 함수를 처리합니다.
+        /// </summary>
+
+        private bool TryGetLocalTowerMap(out Dictionary<long, GameObject> towerMap)
+        {
+            // 핵심 로직을 처리합니다.
+            towerMap = null;
+            if (GameView == null || GameView.AssignedPlayerIndex < 0)
+            {
+                return false;
+            }
+
+            return _towerObjectsByPlayer.TryGetValue(GameView.AssignedPlayerIndex, out towerMap);
+        }
+        /// <summary>
+        /// GetPlayerOffset 함수를 처리합니다.
+        /// </summary>
+
+        private Vector3 GetPlayerOffset(int playerIndex)
+        {
+            // 핵심 로직을 처리합니다.
+            return GameView != null
+                ? GameView.GetPlayerOffsetPosition(playerIndex)
+                : Vector3.zero;
+        }
+        /// <summary>
+        /// ApplyOffset 함수를 처리합니다.
+        /// </summary>
+
+        private Vector3 ApplyOffset(int playerIndex, float x, float y, float z)
+        {
+            // 핵심 로직을 처리합니다.
+            return new Vector3(x, y, z) + GetPlayerOffset(playerIndex);
+        }
 
         #endregion
+        /// <summary>
+        /// OnShutdown 함수를 처리합니다.
+        /// </summary>
 
         protected override void OnShutdown()
         {
+            // 핵심 로직을 처리합니다.
             base.OnShutdown();
 
-            foreach (var kv in _towerObjects)
+            foreach (var playerMap in _towerObjectsByPlayer.Values)
             {
-                if (kv.Value != null)
+                foreach (var kv in playerMap)
                 {
-                    Destroy(kv.Value);
+                    if (kv.Value != null)
+                    {
+                        Destroy(kv.Value);
+                    }
                 }
             }
 
-            _towerObjects.Clear();
+            _towerObjectsByPlayer.Clear();
+            _cachedSlotPositionsByPlayer.Clear();
+            _localSnapshot = null;
         }
     }
 }
-

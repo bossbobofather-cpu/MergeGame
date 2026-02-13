@@ -7,8 +7,12 @@ namespace Noname.GameAbilitySystem
     /// </summary>
     public sealed class SelfTargetingStrategy : ITargetingStrategy
     {
+        /// <summary>
+        /// FindTargets 함수를 처리합니다.
+        /// </summary>
         public TargetData FindTargets(AbilitySystemComponent owner, TargetContext context)
         {
+            // 핵심 로직을 처리합니다.
             var data = new TargetData(owner);
             data.AddTarget(owner);
             return data;
@@ -20,8 +24,12 @@ namespace Noname.GameAbilitySystem
     /// </summary>
     public sealed class RandomTargetingStrategy : ITargetingStrategy
     {
+        /// <summary>
+        /// FindTargets 함수를 처리합니다.
+        /// </summary>
         public TargetData FindTargets(AbilitySystemComponent owner, TargetContext context)
         {
+            // 핵심 로직을 처리합니다.
             var data = new TargetData(owner);
             if (owner == null || context == null)
             {
@@ -51,9 +59,13 @@ namespace Noname.GameAbilitySystem
         {
             _maxRange = maxRange;
         }
+        /// <summary>
+        /// FindTargets 함수를 처리합니다.
+        /// </summary>
 
         public TargetData FindTargets(AbilitySystemComponent owner, TargetContext context)
         {
+            // 핵심 로직을 처리합니다.
             var data = new TargetData(owner);
             if (owner == null || context == null)
             {
@@ -106,9 +118,13 @@ namespace Noname.GameAbilitySystem
         }
 
         public LowestHpTargetingStrategy() : this(AttributeId.Health) { }
+        /// <summary>
+        /// FindTargets 함수를 처리합니다.
+        /// </summary>
 
         public TargetData FindTargets(AbilitySystemComponent owner, TargetContext context)
         {
+            // 핵심 로직을 처리합니다.
             var data = new TargetData(owner);
             if (owner == null || context == null)
             {
@@ -153,9 +169,13 @@ namespace Noname.GameAbilitySystem
             _maxTargets = Math.Max(1, maxTargets);
             _maxRange = maxRange;
         }
+        /// <summary>
+        /// FindTargets 함수를 처리합니다.
+        /// </summary>
 
         public TargetData FindTargets(AbilitySystemComponent owner, TargetContext context)
         {
+            // 핵심 로직을 처리합니다.
             var data = new TargetData(owner);
             if (owner == null || context == null)
             {
@@ -221,9 +241,13 @@ namespace Noname.GameAbilitySystem
         {
             _radius = Math.Max(0f, radius);
         }
+        /// <summary>
+        /// FindTargets 함수를 처리합니다.
+        /// </summary>
 
         public TargetData FindTargets(AbilitySystemComponent owner, TargetContext context)
         {
+            // 핵심 로직을 처리합니다.
             var data = new TargetData(owner);
             if (owner == null || context == null)
             {

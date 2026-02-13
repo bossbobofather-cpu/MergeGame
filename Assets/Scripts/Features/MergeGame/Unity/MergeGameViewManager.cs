@@ -17,9 +17,13 @@ namespace MyProject.MergeGame.Unity
     /// MergeGame View Manager 입니다.
     /// - 서버에서 전달된 Snapshot/Event를 수신합니다.
     /// - 입력은 CommandMsg로 서버에 전송합니다.
+    /// - 플레이어별 월드 오프셋 규칙을 제공합니다.
     /// </summary>
     public class MergeGameViewManager : GameViewManager
     {
+        [Header("Observer Layout")]
+        [SerializeField] private float _playerOffsetStepX = 300f;
+
         private readonly Color _logColor = new Color(0f, 0f, 0f, 0.6f);
         private readonly Color _errorColor = new Color(0.8f, 0.2f, 0.2f, 0.6f);
         private readonly Color _startColor = new Color(0.2f, 0.6f, 1f, 0.6f);
@@ -40,8 +44,17 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         public long LocalUserId => User.UserId;
 
+        /// <summary>
+        /// 원격 플레이어 간 X축 간격입니다.
+        /// </summary>
+        public float PlayerOffsetStepX => _playerOffsetStepX;
+        /// <summary>
+        /// OnInitialize 함수를 처리합니다.
+        /// </summary>
+
         protected override void OnInitialize()
         {
+            // 핵심 로직을 처리합니다.
             base.OnInitialize();
 
             NetworkClient.UnregisterHandler<NetCommandResultMessage>();
@@ -65,9 +78,13 @@ namespace MyProject.MergeGame.Unity
             
             NetworkClient.OnDisconnectedEvent += HandleDisconnected;
         }
+        /// <summary>
+        /// OnDestroy 함수를 처리합니다.
+        /// </summary>
 
         protected override void OnDestroy()
         {
+            // 핵심 로직을 처리합니다.
             if (NetworkManager.singleton != null && NetworkManager.singleton.authenticator != null)
             {
                 NetworkManager.singleton.authenticator.OnClientAuthenticated.RemoveListener(HandleConnected);
@@ -79,10 +96,45 @@ namespace MyProject.MergeGame.Unity
 
             base.OnDestroy();
         }
+        /// <summary>
+        /// Update 함수를 처리합니다.
+        /// </summary>
 
         protected override void Update()
         {
+            // 핵심 로직을 처리합니다.
             base.Update();
+        }
+
+        /// <summary>
+        /// 플레이어 인덱스를 화면 배치용 오프셋 인덱스로 변환합니다.
+        /// 로컬 플레이어는 항상 0, 그 외 플레이어는 (PlayerIndex + 1)입니다.
+        /// </summary>
+        public int GetPlayerOffsetIndex(int playerIndex)
+        {
+            // 핵심 로직을 처리합니다.
+            if (playerIndex < 0)
+            {
+                return 0;
+            }
+
+            if (_assignedPlayerIndex >= 0 && playerIndex == _assignedPlayerIndex)
+            {
+                return 0;
+            }
+
+            return playerIndex + 1;
+        }
+
+        /// <summary>
+        /// 플레이어의 월드 오프셋 위치(X축)를 반환합니다.
+        /// </summary>
+        public Vector3 GetPlayerOffsetPosition(int playerIndex)
+        {
+            // 핵심 로직을 처리합니다.
+            var step = Mathf.Max(0f, _playerOffsetStepX);
+            var offsetIndex = GetPlayerOffsetIndex(playerIndex);
+            return new Vector3(offsetIndex * step, 0f, 0f);
         }
 
         /// <summary>
@@ -90,6 +142,7 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         public void SendCommand(NetCommandMessage msg)
         {
+            // 핵심 로직을 처리합니다.
             if (!NetworkClient.isConnected)
             {
                 Debug.LogWarning("[MergeGameView] 서버에 연결되어 있지 않습니다.");
@@ -105,6 +158,7 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         public void SendReady()
         {
+            // 핵심 로직을 처리합니다.
             if (_readySent)
             {
                 return;
@@ -127,30 +181,40 @@ namespace MyProject.MergeGame.Unity
             });
 
             pooled.Dispose();
-        }        
+        }
+        /// <summary>
+        /// HandleConnected 함수를 처리합니다.
+        /// </summary>
+
         private void HandleConnected()
         {
+            // 핵심 로직을 처리합니다.
             Debug.Log("[MergeGameView] Connected");
 
-            foreach(var module in Modules)
+            foreach (var module in Modules)
             {
-                var mergeViewMoudle = module as IMergeViewModule; 
-                if(mergeViewMoudle == null) continue;
+                var mergeViewMoudle = module as IMergeViewModule;
+                if (mergeViewMoudle == null) continue;
 
                 mergeViewMoudle.OnConnectedEvent();
             }
         }
+        /// <summary>
+        /// HandleDisconnected 함수를 처리합니다.
+        /// </summary>
+
         private void HandleDisconnected()
         {
+            // 핵심 로직을 처리합니다.
             Debug.Log("[MergeGameView] Disconnected");
 
             _readySent = false;
             _assignedPlayerIndex = -1;
 
-            foreach(var module in Modules)
+            foreach (var module in Modules)
             {
                 var mergeViewMoudle = module as IMergeViewModule;
-                if(mergeViewMoudle == null) continue;
+                if (mergeViewMoudle == null) continue;
 
                 mergeViewMoudle.OnDisconnectedEvent();
             }
@@ -161,6 +225,7 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         public void SendCommand(MergeGameCommand command, MergeNetCommandType commandType)
         {
+            // 핵심 로직을 처리합니다.
             if (!NetworkClient.isConnected)
             {
                 Debug.LogWarning("[MergeGameView] 서버에 연결되어 있지 않습니다.");
@@ -183,6 +248,7 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         private void OnCommandResultMsg(NetCommandResultMessage msg)
         {
+            // 핵심 로직을 처리합니다.
             MergeCommandResult result = msg.CommandType switch
             {
                 MergeNetCommandType.ReadyGame => ReadyMergeGameResult.ReadFrom(msg.Payload),
@@ -195,10 +261,10 @@ namespace MyProject.MergeGame.Unity
 
             if (result == null) return;
 
-            foreach(var module in Modules)
+            foreach (var module in Modules)
             {
                 var mergeViewMoudle = module as IMergeViewModule;
-                if(mergeViewMoudle == null) continue;
+                if (mergeViewMoudle == null) continue;
 
                 mergeViewMoudle.OnCommandResultMsg(result);
             }
@@ -209,6 +275,7 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         private void OnEventMsg(NetEventMessage msg)
         {
+            // 핵심 로직을 처리합니다.
             MergeGameEvent evt = DeserializeEvent(msg);
             if (evt == null) return;
 
@@ -217,17 +284,21 @@ namespace MyProject.MergeGame.Unity
                 _assignedPlayerIndex = evt.PlayerIndex;
             }
 
-            foreach(var module in Modules)
+            foreach (var module in Modules)
             {
                 var mergeViewMoudle = module as IMergeViewModule;
-                if(mergeViewMoudle == null) continue;
+                if (mergeViewMoudle == null) continue;
 
                 mergeViewMoudle.OnEventMsg(evt);
             }
         }
+        /// <summary>
+        /// DeserializeEvent 함수를 처리합니다.
+        /// </summary>
 
         private static MergeGameEvent DeserializeEvent(NetEventMessage msg)
         {
+            // 핵심 로직을 처리합니다.
             return msg.EventType switch
             {
                 MergeNetEventType.PlayerAssigned => ConnectedInfoEvent.ReadFrom(msg.Payload),
@@ -244,6 +315,7 @@ namespace MyProject.MergeGame.Unity
                 MergeNetEventType.MonsterDamaged => MonsterDamagedEvent.ReadFrom(msg.Payload),
                 MergeNetEventType.MonsterDied => MonsterDiedEvent.ReadFrom(msg.Payload),
                 MergeNetEventType.MonsterMoved => MonsterMovedEvent.ReadFrom(msg.Payload),
+                MergeNetEventType.MonsterInjected => MonsterInjectionTriggeredEvent.ReadFrom(msg.Payload),
                 MergeNetEventType.DifficultyStepChangedEvent => DifficultyStepChangedEvent.ReadFrom(msg.Payload),
                 MergeNetEventType.ScoreChanged => ScoreChangedEvent.ReadFrom(msg.Payload),
                 MergeNetEventType.PlayerGoldChanged => PlayerGoldChangedEvent.ReadFrom(msg.Payload),
@@ -256,13 +328,14 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         private void OnSnapshotMsg(NetSnapshotMessage msg)
         {
+            // 핵심 로직을 처리합니다.
             var snapshot = MergeHostSnapshot.ReadFrom(msg.Payload);
             if (snapshot == null) return;
 
-            foreach(var module in Modules)
+            foreach (var module in Modules)
             {
                 var mergeViewMoudle = module as IMergeViewModule;
-                if(mergeViewMoudle == null) continue;
+                if (mergeViewMoudle == null) continue;
 
                 mergeViewMoudle.OnSnapshotMsg(snapshot);
             }

@@ -34,6 +34,7 @@ namespace MyProject.MergeGame.Unity.Network
         /// </summary>
         public void Configure(bool reserveSlot0ForLocalHost)
         {
+            // 핵심 로직을 처리합니다.
             _reserveSlot0ForLocalHost = reserveSlot0ForLocalHost;
         }
 
@@ -43,6 +44,7 @@ namespace MyProject.MergeGame.Unity.Network
         /// </summary>
         public void SetMaxPlayers(int maxPlayers)
         {
+            // 핵심 로직을 처리합니다.
             _maxPlayers = Mathf.Clamp(maxPlayers, 1, MaxSupportedPlayers);
         }
 
@@ -51,11 +53,16 @@ namespace MyProject.MergeGame.Unity.Network
 
         private bool _matchStarted;
         private float _snapshotTimer;
+        private readonly HashSet<long> _readyResultAckedUids = new();
 
         private bool _initialized;
+        /// <summary>
+        /// Initialize 함수를 처리합니다.
+        /// </summary>
 
         public void Initialize()
         {
+            // 핵심 로직을 처리합니다.
             if (_initialized)
             {
                 return;
@@ -96,9 +103,13 @@ namespace MyProject.MergeGame.Unity.Network
 
             Debug.Log("[MergeGameServerAdapter] ServerAdapter initialized.");
         }
+        /// <summary>
+        /// OnDestroy 함수를 처리합니다.
+        /// </summary>
 
         private void OnDestroy()
         {
+            // 핵심 로직을 처리합니다.
             if (!_initialized)
             {
                 return;
@@ -124,9 +135,13 @@ namespace MyProject.MergeGame.Unity.Network
 
             _initialized = false;
         }
+        /// <summary>
+        /// Update 함수를 처리합니다.
+        /// </summary>
 
         private void Update()
         {
+            // 핵심 로직을 처리합니다.
             if (!_initialized || !NetworkServer.active || _host == null)
             {
                 return;
@@ -134,51 +149,58 @@ namespace MyProject.MergeGame.Unity.Network
 
             // 서버 프레임에서 Host의 Result/Event를 메인 스레드로 디스패치합니다.
             _host.FlushEvents();
-
             // 스냅샷 주기 전송
             _snapshotTimer += Time.deltaTime;
             if (_snapshotTimer >= _snapshotSendInterval)
             {
                 _snapshotTimer -= _snapshotSendInterval;
+                BroadcastSnapshotsToAllClients();
+            }
+        }
+        /// <summary>
+        /// BroadcastSnapshotsToAllClients 함수를 처리합니다.
+        /// </summary>
+
+        private void BroadcastSnapshotsToAllClients()
+        {
+            // 핵심 로직을 처리합니다.
+            var maxPlayers = Mathf.Clamp(_maxPlayers, 1, MaxSupportedPlayers);
+            for (var playerIndex = 0; playerIndex < maxPlayers; playerIndex++)
+            {
+                var snapshot = _host.GetPlayerSnapshot(playerIndex);
+                if (snapshot == null)
+                {
+                    continue;
+                }
+
+                var pooled = ByteSerializer.SerializePooled(snapshot);
+                var msg = new NetSnapshotMessage
+                {
+                    PlayerIndex = playerIndex,
+                    Payload = pooled.Segment,
+                };
 
                 foreach (var playerAndConnection in _playerAndConnectionByConnId)
                 {
                     var conn = playerAndConnection.Value.Item1;
-                    if (conn == null) continue;
+                    if (conn == null)
+                    {
+                        continue;
+                    }
 
-                    var player = playerAndConnection.Value.Item2;
-                    if (player == null) continue;
-
-                    SendSnapshotToPlayer(player.Index, playerAndConnection.Value.Item1);
+                    conn.Send(msg);
                 }
+
+                pooled.Dispose();
             }
         }
-
-        private void SendSnapshotToPlayer(int playerIndex, NetworkConnectionToClient conn)
-        {
-            if (conn == null) return;
-
-            var snapshot = _host.GetPlayerSnapshot(playerIndex);
-            if (snapshot == null)
-            {
-                return;
-            }
-
-
-            var pooled = ByteSerializer.SerializePooled(snapshot);
-            var msg = new NetSnapshotMessage
-            {
-                PlayerIndex = playerIndex,
-                Payload = pooled.Segment,
-            };
-
-            conn.Send(msg);
-
-            pooled.Dispose();
-        }
+        /// <summary>
+        /// HandleConnected 함수를 처리합니다.
+        /// </summary>
 
         private void HandleConnected(NetworkConnectionToClient conn)
         {
+            // 핵심 로직을 처리합니다.
             if (conn == null)
             {
                 return;
@@ -213,6 +235,7 @@ namespace MyProject.MergeGame.Unity.Network
             }
 
             var player = new MergeGamePlayer(uid, playerIndex);
+            _readyResultAckedUids.Remove(uid);
             _playerAndConnectionByConnId.Add(conn.connectionId, (conn, player));
 
             Debug.Log($"[MergeGameServerAdapter] 클라이언트 연결 성공. connId={conn.connectionId}, playerIndex={playerIndex}");
@@ -233,9 +256,13 @@ namespace MyProject.MergeGame.Unity.Network
 
             pooled.Dispose();
         }
+        /// <summary>
+        /// TryResolveUserId 함수를 처리합니다.
+        /// </summary>
 
         private static bool TryResolveUserId(object authenticationData, out long uid)
         {
+            // 핵심 로직을 처리합니다.
             uid = 0;
             if (authenticationData == null)
             {
@@ -256,14 +283,22 @@ namespace MyProject.MergeGame.Unity.Network
                     return false;
             }
         }
+        /// <summary>
+        /// HandleDisconnected 함수를 처리합니다.
+        /// </summary>
 
         private void HandleDisconnected(NetworkConnectionToClient conn)
         {
+            // 핵심 로직을 처리합니다.
             var connId = conn.connectionId;
 
             _playerAndConnectionByConnId.TryGetValue(connId, out var playerAndConnection);
             var player = playerAndConnection.Item2;
-            player?.Dispose();
+            if (player != null)
+            {
+                _readyResultAckedUids.Remove(player.Uid);
+                player.Dispose();
+            }
 
             _playerAndConnectionByConnId.Remove(conn.connectionId);
 
@@ -271,11 +306,16 @@ namespace MyProject.MergeGame.Unity.Network
             if (_playerAndConnectionByConnId.Count == 0)
             {
                 _matchStarted = false;
+                _readyResultAckedUids.Clear();
             }
         }
+        /// <summary>
+        /// ResolvePlayerIndexForConnection 함수를 처리합니다.
+        /// </summary>
 
         private int ResolvePlayerIndexForConnection(NetworkConnectionToClient conn)
         {
+            // 핵심 로직을 처리합니다.
             var maxPlayers = Mathf.Clamp(_maxPlayers, 1, MaxSupportedPlayers);
 
             // Host 모드에서는 localConnection(connectionId=0)을 playerIndex=0으로 예약합니다.
@@ -318,6 +358,7 @@ namespace MyProject.MergeGame.Unity.Network
         /// <param name="payload"></param>
         private void HandleCommandMsg(NetworkConnectionToClient conn, NetCommandMessage msg)
         {
+            // 핵심 로직을 처리합니다.
             if (_host == null) return;
 
             _playerAndConnectionByConnId.TryGetValue(conn.connectionId, out var playerAndConnection);
@@ -355,23 +396,39 @@ namespace MyProject.MergeGame.Unity.Network
                 }
             }
         }
+        /// <summary>
+        /// HandleCommandMsg_ReadyGame 함수를 처리합니다.
+        /// </summary>
 
 
         private void HandleCommandMsg_ReadyGame(MergeGamePlayer player, ArraySegment<byte> payload)
         {
-            if (player == null) return;
-
-            if (player.State == MergeGamePlayerState.Ready || player.State == MergeGamePlayerState.Started)
+            // 핵심 로직을 처리합니다.
+            if (player == null)
             {
                 return;
             }
 
-            player.SetState(MergeGamePlayerState.Ready);
+            if (player.State == MergeGamePlayerState.Started)
+            {
+                return;
+            }
+
+            if (player.State != MergeGamePlayerState.Ready)
+            {
+                player.SetState(MergeGamePlayerState.Ready);
+            }
+
+            SendReadyAcceptedResultOnce(player);
             TryStartMatchIfReady();
         }
+        /// <summary>
+        /// TryStartMatchIfReady 함수를 처리합니다.
+        /// </summary>
 
         private void TryStartMatchIfReady()
         {
+            // 핵심 로직을 처리합니다.
             if (_matchStarted || _host == null)
             {
                 return;
@@ -415,6 +472,26 @@ namespace MyProject.MergeGame.Unity.Network
                 player.SetState(MergeGamePlayerState.Started);
             }
         }
+        /// <summary>
+        /// SendReadyAcceptedResultOnce 함수를 처리합니다.
+        /// </summary>
+
+        private void SendReadyAcceptedResultOnce(MergeGamePlayer player)
+        {
+            // 핵심 로직을 처리합니다.
+            if (player == null || _host == null)
+            {
+                return;
+            }
+
+            if (!_readyResultAckedUids.Add(player.Uid))
+            {
+                return;
+            }
+
+            var readyResult = ReadyMergeGameResult.Ok(_host.Tick, player.Uid);
+            SendResultToPlayer(readyResult, MergeNetCommandType.ReadyGame);
+        }
 
         /// <summary>
         /// 호스트로부터 받은 결과를 클라이언트에 전송한다.
@@ -422,6 +499,7 @@ namespace MyProject.MergeGame.Unity.Network
         /// <param name="result"></param>
         private void OnHostResult(MergeCommandResult result)
         {
+            // 핵심 로직을 처리합니다.
             if (result == null)
             {
                 return;
@@ -430,6 +508,11 @@ namespace MyProject.MergeGame.Unity.Network
             switch (result)
             {
                 case ReadyMergeGameResult readyResult:
+                    if (readyResult.Success && _readyResultAckedUids.Contains(readyResult.SenderUid))
+                    {
+                        break;
+                    }
+
                     SendResultToPlayer(readyResult, MergeNetCommandType.ReadyGame);
                     break;
                 case SpawnTowerResult spawnResult:
@@ -446,9 +529,13 @@ namespace MyProject.MergeGame.Unity.Network
                     break;
             }
         }
+        /// <summary>
+        /// OnHostEvent 함수를 처리합니다.
+        /// </summary>
 
         private void OnHostEvent(MergeGameEvent mergeGameEvent)
         {
+            // 핵심 로직을 처리합니다.
             if (mergeGameEvent == null)
             {
                 return;
@@ -468,6 +555,7 @@ namespace MyProject.MergeGame.Unity.Network
                 MonsterDamagedEvent => MergeNetEventType.MonsterDamaged,
                 MonsterDiedEvent => MergeNetEventType.MonsterDied,
                 MonsterMovedEvent => MergeNetEventType.MonsterMoved,
+                MonsterInjectionTriggeredEvent => MergeNetEventType.MonsterInjected,
                 DifficultyStepChangedEvent => MergeNetEventType.DifficultyStepChangedEvent,
                 ScoreChangedEvent => MergeNetEventType.ScoreChanged,
                 PlayerGoldChangedEvent => MergeNetEventType.PlayerGoldChanged,
@@ -478,9 +566,13 @@ namespace MyProject.MergeGame.Unity.Network
 
             BroadcastEvent(mergeGameEvent, eventType);
         }
+        /// <summary>
+        /// BroadcastEvent 함수를 처리합니다.
+        /// </summary>
 
         private void BroadcastEvent(MergeGameEvent evt, MergeNetEventType eventType)
         {
+            // 핵심 로직을 처리합니다.
             var pooled = ByteSerializer.SerializePooled(evt);
             var msg = new NetEventMessage
             {
@@ -500,9 +592,13 @@ namespace MyProject.MergeGame.Unity.Network
 
             pooled.Dispose();
         }
+        /// <summary>
+        /// SendResultToPlayer 함수를 처리합니다.
+        /// </summary>
 
         private void SendResultToPlayer(MergeCommandResult result, MergeNetCommandType commandType)
         {
+            // 핵심 로직을 처리합니다.
             if (false == TryGetFindPlayerAndConnectionByUid(result.SenderUid, out var playerAndConnection))
             {
                 return;
@@ -518,9 +614,13 @@ namespace MyProject.MergeGame.Unity.Network
 
             pooled.Dispose();
         }
+        /// <summary>
+        /// out 함수를 처리합니다.
+        /// </summary>
 
         private bool TryGetFindPlayerAndConnectionByUid(long uid, out (NetworkConnectionToClient conn, MergeGamePlayer player) out_PlayerAndConnection)
         {
+            // 핵심 로직을 처리합니다.
             foreach (var playerAndConnection in _playerAndConnectionByConnId)
             {
                 var player = playerAndConnection.Value.Item2;
@@ -535,9 +635,13 @@ namespace MyProject.MergeGame.Unity.Network
             out_PlayerAndConnection = default;
             return false;
         }
+        /// <summary>
+        /// BuildHost 함수를 처리합니다.
+        /// </summary>
 
         private static MergeGameHost BuildHost()
         {
+            // 핵심 로직을 처리합니다.
             var hostConfig = new MergeHostConfig()
                 .WithMaxMonsterStack(100);
 
@@ -559,6 +663,7 @@ namespace MyProject.MergeGame.Unity.Network
         /// <returns></returns>
         private static MapModuleConfig BuildMapConfig()
         {
+            // 핵심 로직을 처리합니다.
             return new MapModuleConfig
             {
                 MapId = DevHelperSet.DevIdHelper.DEV_DEFAULT_MAP_ID,
@@ -592,9 +697,13 @@ namespace MyProject.MergeGame.Unity.Network
                 }
             };
         }
+        /// <summary>
+        /// BuildRuleConfig 함수를 처리합니다.
+        /// </summary>
 
         private static RuleModuleConfig BuildRuleConfig(MergeHostConfig hostConfig)
         {
+            // 핵심 로직을 처리합니다.
             return new RuleModuleConfig
             {
                 PlayerStartGold = hostConfig.PlayerStartGold,
@@ -603,6 +712,9 @@ namespace MyProject.MergeGame.Unity.Network
                 MaxUnitGrade = hostConfig.MaxTowerGrade,
             };
         }
+        /// <summary>
+        /// BuildDifficultyConfig 함수를 처리합니다.
+        /// </summary>
 
         private static DifficultyModuleConfig BuildDifficultyConfig()
         {
@@ -676,19 +788,26 @@ namespace MyProject.MergeGame.Unity.Network
                     }
                 },
             };
+            /// <summary>
+            /// GetDefinition 함수를 처리합니다.
+            /// </summary>
 
             public TowerDefinition GetDefinition(long towerId)
             {
+                // 핵심 로직을 처리합니다.
                 return _definitions.TryGetValue(towerId, out var definition) ? definition : null;
             }
+            /// <summary>
+            /// GetRandomIdForGrade 함수를 처리합니다.
+            /// </summary>
 
             public long GetRandomIdForGrade(int grade)
             {
+                // 핵심 로직을 처리합니다.
                 return _towerIds[_random.Next(_towerIds.Length)];
             }
         }
     }
 }
-
 
 

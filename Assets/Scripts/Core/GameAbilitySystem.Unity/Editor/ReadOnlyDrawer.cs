@@ -1,21 +1,21 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using UnityEditor;
 using UnityEngine;
 
 namespace Noname.GameCore.Helper.Editor
 {
     /// <summary>
-    /// ReadOnlyAttribute가 붙은 필드를 읽기 전용으로 표시합니다.
+    /// ReadOnlyAttribute媛 遺숈? ?꾨뱶瑜??쎄린 ?꾩슜?쇰줈 ?쒖떆?⑸땲??
     /// </summary>
     [CustomPropertyDrawer(typeof(ReadOnlyAttribute))]
     public sealed class ReadOnlyDrawer : PropertyDrawer
     {
         /// <summary>
-        /// GUI 상태를 일시 비활성화해 읽기 전용으로 그립니다.
+        /// GUI ?곹깭瑜??쇱떆 鍮꾪솢?깊솕???쎄린 ?꾩슜?쇰줈 洹몃┰?덈떎.
         /// </summary>
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            // 기존 GUI 상태 보존
+            // 湲곗〈 GUI ?곹깭 蹂댁〈
             var wasEnabled = GUI.enabled;
             GUI.enabled = false;
             EditorGUI.PropertyField(position, property, label, true);
@@ -23,11 +23,11 @@ namespace Noname.GameCore.Helper.Editor
         }
 
         /// <summary>
-        /// 기본 프로퍼티 높이를 그대로 사용합니다.
+        /// 湲곕낯 ?꾨줈?쇳떚 ?믪씠瑜?洹몃?濡??ъ슜?⑸땲??
         /// </summary>
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            // 기본 높이를 그대로 사용
+            // 湲곕낯 ?믪씠瑜?洹몃?濡??ъ슜
             return EditorGUI.GetPropertyHeight(property, label, true);
         }
     }
