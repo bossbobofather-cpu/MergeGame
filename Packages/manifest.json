@@ -15,6 +15,7 @@
     "com.unity.visualscripting": "1.9.9",
     "com.veriorpies.parrelsync": "https://github.com/VeriorPies/ParrelSync.git?path=/ParrelSync",
     "com.noname.gamehost": "https://github.com/bossbobofather-cpu/GameHost.git#v0.1.0",
+    "com.noname.gameabilitysystemforunity": "https://github.com/bossbobofather-cpu/GameAbilitySystemForUnity.git#v0.1.0",
     "com.unity.modules.accessibility": "1.0.0",
     "com.unity.modules.adaptiveperformance": "1.0.0",
     "com.unity.modules.ai": "1.0.0",
