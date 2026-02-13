@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Noname.GameCore.Helper
 {
@@ -18,7 +18,6 @@ namespace Noname.GameCore.Helper
         /// <param name="message">메시지 내용</param>
         public static void Publish(string message)
         {
-            // 핵심 로직을 처리합니다.
             if (string.IsNullOrWhiteSpace(message))
             {
                 // 빈 메시지는 무시한다.

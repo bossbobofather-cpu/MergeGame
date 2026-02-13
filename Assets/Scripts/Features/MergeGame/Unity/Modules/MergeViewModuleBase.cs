@@ -1,4 +1,4 @@
-﻿using MyProject.Common.GameView;
+using MyProject.Common.GameView;
 using MyProject.MergeGame.Commands;
 using MyProject.MergeGame.Events;
 using MyProject.MergeGame.Snapshots;
@@ -20,48 +20,42 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         protected override void OnInit()
         {
-            // 핵심 로직을 처리합니다.
             GameView = View as MergeGameViewManager;
         }
         /// <summary>
-        /// OnEventMsg 함수를 처리합니다.
+        /// OnEventMsg 메서드입니다.
         /// </summary>
 
         public virtual void OnEventMsg(MergeGameEvent evt)
         {
-            // 핵심 로직을 처리합니다.
         }
         /// <summary>
-        /// OnSnapshotMsg 함수를 처리합니다.
+        /// OnSnapshotMsg 메서드입니다.
         /// </summary>
 
         public virtual void OnSnapshotMsg(MergeHostSnapshot snapshot)
         {
-            // 핵심 로직을 처리합니다.
         }
         /// <summary>
-        /// OnCommandResultMsg 함수를 처리합니다.
+        /// OnCommandResultMsg 메서드입니다.
         /// </summary>
 
         public virtual void OnCommandResultMsg(MergeCommandResult result)
         {
-            // 핵심 로직을 처리합니다.
         }
         /// <summary>
-        /// OnConnectedEvent 함수를 처리합니다.
+        /// OnConnectedEvent 메서드입니다.
         /// </summary>
 
         public virtual void OnConnectedEvent()
         {
-            // 핵심 로직을 처리합니다.
         }
         /// <summary>
-        /// OnDisconnectedEvent 함수를 처리합니다.
+        /// OnDisconnectedEvent 메서드입니다.
         /// </summary>
 
         public virtual void OnDisconnectedEvent()
         {
-            // 핵심 로직을 처리합니다.
         }
 
         /// <summary>
@@ -75,7 +69,6 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         protected bool IsMyPlayer(int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             return HasAssignedPlayer && GameView.AssignedPlayerIndex == playerIndex;
         }
 
@@ -84,7 +77,6 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         protected bool IsMyEvent(MergeGameEvent evt)
         {
-            // 핵심 로직을 처리합니다.
             return evt != null && IsMyPlayer(evt.PlayerIndex);
         }
 
@@ -93,7 +85,6 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         protected bool IsMySnapshot(MergeHostSnapshot snapshot)
         {
-            // 핵심 로직을 처리합니다.
             return snapshot != null && IsMyPlayer(snapshot.PlayerIndex);
         }
     }

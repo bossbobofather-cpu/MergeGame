@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using MyProject.MergeGame.Events;
 using MyProject.MergeGame.Snapshots;
 using UnityEngine;
@@ -34,12 +34,11 @@ namespace MyProject.MergeGame.Unity
         private readonly List<long> _removeBuffer = new();
         private readonly HashSet<long> _snapshotUids = new();
         /// <summary>
-        /// OnEventMsg 함수를 처리합니다.
+        /// OnEventMsg 메서드입니다.
         /// </summary>
 
         public override void OnEventMsg(MergeGameEvent evt)
         {
-            // 핵심 로직을 처리합니다.
             if (evt is not TowerAttackedEvent attackedEvent)
             {
                 return;
@@ -64,12 +63,11 @@ namespace MyProject.MergeGame.Unity
                 attackedEvent.ThrowRadius);
         }
         /// <summary>
-        /// OnSnapshotMsg 함수를 처리합니다.
+        /// OnSnapshotMsg 메서드입니다.
         /// </summary>
 
         public override void OnSnapshotMsg(MergeHostSnapshot snapshot)
         {
-            // 핵심 로직을 처리합니다.
             if (snapshot == null)
             {
                 return;
@@ -106,12 +104,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// Update 함수를 처리합니다.
+        /// Update 메서드입니다.
         /// </summary>
 
         private void Update()
         {
-            // 핵심 로직을 처리합니다.
             if (_projectileMapByPlayer.Count == 0)
             {
                 return;
@@ -159,12 +156,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// UpdateDirectProjectile 함수를 처리합니다.
+        /// UpdateDirectProjectile 메서드입니다.
         /// </summary>
 
         private void UpdateDirectProjectile(ProjectileInstance projectile, float deltaTime)
         {
-            // 핵심 로직을 처리합니다.
             projectile.Elapsed += deltaTime;
             var t = projectile.TravelTime <= 0f ? 1f : Mathf.Clamp01(projectile.Elapsed / projectile.TravelTime);
             if (projectile.GameObject != null)
@@ -177,12 +173,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// UpdateThrowProjectile 함수를 처리합니다.
+        /// UpdateThrowProjectile 메서드입니다.
         /// </summary>
 
         private void UpdateThrowProjectile(ProjectileInstance projectile, float deltaTime)
         {
-            // 핵심 로직을 처리합니다.
             if (!projectile.IsLanded)
             {
                 // 비행 단계: 포물선
@@ -228,12 +223,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// SpawnProjectile 함수를 처리합니다.
+        /// SpawnProjectile 메서드입니다.
         /// </summary>
 
         private void SpawnProjectile(int playerIndex, long uid, Vector3 start, Vector3 target, float speed, ProjectileType projectileType, float throwRadius = 0f)
         {
-            // 핵심 로직을 처리합니다.
             var projectileMap = GetOrCreateProjectileMap(playerIndex);
 
             // 이미 같은 UID의 투사체가 있으면 무시
@@ -278,12 +272,11 @@ namespace MyProject.MergeGame.Unity
             projectileMap[uid] = instance;
         }
         /// <summary>
-        /// CreateProjectileObject 함수를 처리합니다.
+        /// CreateProjectileObject 메서드입니다.
         /// </summary>
 
         private GameObject CreateProjectileObject()
         {
-            // 핵심 로직을 처리합니다.
             if (_projectilePrefab != null)
             {
                 return Instantiate(_projectilePrefab);
@@ -297,12 +290,11 @@ namespace MyProject.MergeGame.Unity
             return new GameObject("Projectile");
         }
         /// <summary>
-        /// ApplyProjectileTint 함수를 처리합니다.
+        /// ApplyProjectileTint 메서드입니다.
         /// </summary>
 
         private static void ApplyProjectileTint(GameObject obj, ProjectileType projectileType)
         {
-            // 핵심 로직을 처리합니다.
             var renderer = obj.GetComponentInChildren<Renderer>();
             if (renderer == null)
             {
@@ -322,12 +314,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// CreateRangeIndicator 함수를 처리합니다.
+        /// CreateRangeIndicator 메서드입니다.
         /// </summary>
 
         private GameObject CreateRangeIndicator(Vector3 position, float radius)
         {
-            // 핵심 로직을 처리합니다.
             var indicator = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             Destroy(indicator.GetComponent<Collider>());
             indicator.transform.SetParent(transform, false);
@@ -347,12 +338,11 @@ namespace MyProject.MergeGame.Unity
             return indicator;
         }
         /// <summary>
-        /// ApplyColor 함수를 처리합니다.
+        /// ApplyColor 메서드입니다.
         /// </summary>
 
         private static void ApplyColor(GameObject obj, Color color)
         {
-            // 핵심 로직을 처리합니다.
             var renderer = obj.GetComponentInChildren<Renderer>();
             if (renderer == null) return;
             try
@@ -364,12 +354,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// DestroyProjectile 함수를 처리합니다.
+        /// DestroyProjectile 메서드입니다.
         /// </summary>
 
         private void DestroyProjectile(ProjectileInstance proj)
         {
-            // 핵심 로직을 처리합니다.
             if (proj.RangeIndicator != null)
             {
                 Destroy(proj.RangeIndicator);
@@ -381,12 +370,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// GetOrCreateProjectileMap 함수를 처리합니다.
+        /// GetOrCreateProjectileMap 메서드입니다.
         /// </summary>
 
         private Dictionary<long, ProjectileInstance> GetOrCreateProjectileMap(int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             if (_projectileMapByPlayer.TryGetValue(playerIndex, out var projectileMap))
             {
                 return projectileMap;
@@ -397,22 +385,20 @@ namespace MyProject.MergeGame.Unity
             return projectileMap;
         }
         /// <summary>
-        /// ApplyOffset 함수를 처리합니다.
+        /// ApplyOffset 메서드입니다.
         /// </summary>
 
         private Vector3 ApplyOffset(int playerIndex, float x, float y, float z)
         {
-            // 핵심 로직을 처리합니다.
             var offset = GameView != null ? GameView.GetPlayerOffsetPosition(playerIndex) : Vector3.zero;
             return new Vector3(x, y, z) + offset;
         }
         /// <summary>
-        /// OnShutdown 함수를 처리합니다.
+        /// OnShutdown 메서드입니다.
         /// </summary>
 
         protected override void OnShutdown()
         {
-            // 핵심 로직을 처리합니다.
             base.OnShutdown();
 
             foreach (var playerMap in _projectileMapByPlayer.Values)

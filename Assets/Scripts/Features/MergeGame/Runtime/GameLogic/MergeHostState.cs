@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MyProject.MergeGame.Models;
 using MyProject.MergeGame.Modules;
@@ -49,22 +49,20 @@ namespace MyProject.MergeGame
                 TowerGrade = 0;
             }
             /// <summary>
-            /// Clear 함수를 처리합니다.
+            /// Clear 메서드입니다.
             /// </summary>
 
             public void Clear()
             {
-                // 핵심 로직을 처리합니다.
                 TowerUid = 0;
                 TowerGrade = 0;
             }
             /// <summary>
-            /// SetTower 함수를 처리합니다.
+            /// SetTower 메서드입니다.
             /// </summary>
 
             public void SetTower(long towerUid, int grade)
             {
-                // 핵심 로직을 처리합니다.
                 TowerUid = towerUid;
                 TowerGrade = grade;
             }
@@ -98,12 +96,11 @@ namespace MyProject.MergeGame
                 PlayerIndex = playerIndex;
             }
             /// <summary>
-            /// Clear 함수를 처리합니다.
+            /// Clear 메서드입니다.
             /// </summary>
 
             public void Clear()
             {
-                // 핵심 로직을 처리합니다.
                 foreach (var slot in Slots) slot.Clear();
                 Slots.Clear();
                 
@@ -154,7 +151,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public PlayerState GetPlayerState(int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             if (_players == null || playerIndex < 0 || playerIndex >= _players.Length)
                 return null;
             return _players[playerIndex];
@@ -194,7 +190,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public int GetUsedSlotCount(int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             var player = GetPlayerState(playerIndex);
             if (player == null) return 0;
 
@@ -222,7 +217,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public void SetPlayerGameOver(int playerIndex, bool isGameOver)
         {
-            // 핵심 로직을 처리합니다.
             var player = GetPlayerState(playerIndex);
             if (player != null) player.IsGameOver = isGameOver;
         }
@@ -236,7 +230,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public void InitializePlayers(int playerCount)
         {
-            // 핵심 로직을 처리합니다.
             _players = new PlayerState[playerCount];
             for (int i = 0; i < playerCount; i++)
             {
@@ -249,7 +242,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public void InitializeSlots(int playerIndex, IReadOnlyList<MapSlot> mapSlots)
         {
-            // 핵심 로직을 처리합니다.
             var player = GetPlayerState(playerIndex);
             if (player == null) return;
 
@@ -270,7 +262,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public void SetSessionPhase(MergeSessionPhase phase)
         {
-            // 핵심 로직을 처리합니다.
             _sessionPhase = phase;
         }
 
@@ -279,7 +270,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public void AddElapsedTime(float deltaTime)
         {
-            // 핵심 로직을 처리합니다.
             _elapsedTime += deltaTime;
         }
 
@@ -292,7 +282,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public SlotInfo GetSlot(int playerIndex, int slotIndex)
         {
-            // 핵심 로직을 처리합니다.
             var player = GetPlayerState(playerIndex);
             if (player == null) return null;
 
@@ -308,7 +297,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public int FindEmptySlotIndex(int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             var player = GetPlayerState(playerIndex);
             if (player == null) return -1;
 
@@ -331,7 +319,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public long GenerateTowerUid()
         {
-            // 핵심 로직을 처리합니다.
             return _nextTowerUid++;
         }
 
@@ -340,7 +327,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public MergeTower GetTower(int playerIndex, long uid)
         {
-            // 핵심 로직을 처리합니다.
             var player = GetPlayerState(playerIndex);
             return player != null && player.Towers.TryGetValue(uid, out var tower) ? tower : null;
         }
@@ -350,7 +336,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public MergeTower GetTowerAtSlot(int playerIndex, int slotIndex)
         {
-            // 핵심 로직을 처리합니다.
             var slot = GetSlot(playerIndex, slotIndex);
             if (slot == null || slot.IsEmpty) return null;
 
@@ -362,7 +347,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public void RemoveTower(int playerIndex, long uid)
         {
-            // 핵심 로직을 처리합니다.
             var player = GetPlayerState(playerIndex);
             if (player == null || !player.Towers.TryGetValue(uid, out var tower)) return;
 
@@ -423,7 +407,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public long GenerateUnitUid()
         {
-            // 핵심 로직을 처리합니다.
             return GenerateTowerUid();
         }
 
@@ -436,7 +419,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public long GenerateMonsterUid()
         {
-            // 핵심 로직을 처리합니다.
             return _nextMonsterUid++;
         }
 
@@ -445,7 +427,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public MergeMonster GetMonster(int playerIndex, long uid)
         {
-            // 핵심 로직을 처리합니다.
             var player = GetPlayerState(playerIndex);
             return player != null && player.Monsters.TryGetValue(uid, out var monster) ? monster : null;
         }
@@ -455,7 +436,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public void RemoveMonster(int playerIndex, long uid, bool countAsKilled = true)
         {
-            // 핵심 로직을 처리합니다.
             var player = GetPlayerState(playerIndex);
             if (player == null || !player.Monsters.TryGetValue(uid, out var monster)) return;
 
@@ -501,7 +481,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public MonsterPath GetMonsterPath(int playerIndex, int pathIndex)
         {
-            // 핵심 로직을 처리합니다.
             var player = GetPlayerState(playerIndex);
             if (player == null) return null;
 
@@ -518,7 +497,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public void SetMonsterPath(int playerIndex, int pathIndex, MonsterPath path)
         {
-            // 핵심 로직을 처리합니다.
             var player = GetPlayerState(playerIndex);
             if (player == null) return;
 
@@ -536,7 +514,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public IEnumerable<MergeMonster> GetAllMonsters(int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             var player = GetPlayerState(playerIndex);
             return player != null ? player.Monsters.Values : new List<MergeMonster>();
         }
@@ -546,7 +523,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public List<MergeMonster> GetDeadMonsters(int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             var player = GetPlayerState(playerIndex);
             if (player == null) return new List<MergeMonster>();
 
@@ -570,7 +546,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public void SetPlayerGold(int playerIndex, int gold)
         {
-            // 핵심 로직을 처리합니다.
             var player = GetPlayerState(playerIndex);
             if (player == null) return;
             player.Gold = gold;
@@ -581,7 +556,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public void AddPlayerGold(int playerIndex, int amount)
         {
-            // 핵심 로직을 처리합니다.
             var player = GetPlayerState(playerIndex);
             if (player == null) return;
             player.Gold += amount;
@@ -596,7 +570,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public void AddScore(int playerIndex, int amount)
         {
-            // 핵심 로직을 처리합니다.
             var player = GetPlayerState(playerIndex);
             if (player == null) return;
             player.Score += amount;
@@ -607,7 +580,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public void UpdateMaxGrade(int playerIndex, int grade)
         {
-            // 핵심 로직을 처리합니다.
             var player = GetPlayerState(playerIndex);
             if (player == null) return;
             if (grade > player.MaxGrade)
@@ -625,7 +597,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public void Reset()
         {
-            // 핵심 로직을 처리합니다.
             _sessionPhase = MergeSessionPhase.None;
             _elapsedTime = 0;
 
@@ -642,12 +613,11 @@ namespace MyProject.MergeGame
             _nextMonsterUid = 1;
         }
         /// <summary>
-        /// Dispose 함수를 처리합니다.
+        /// Dispose 메서드입니다.
         /// </summary>
 
         public void Dispose()
         {
-            // 핵심 로직을 처리합니다.
             Reset();
         }
 

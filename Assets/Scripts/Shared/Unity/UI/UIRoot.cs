@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace MyProject.Common.UI
 {
@@ -60,53 +60,48 @@ namespace MyProject.Common.UI
         /// </summary>
         public RectTransform SystemRoot => _systemRoot;
         /// <summary>
-        /// Awake 함수를 처리합니다.
+        /// Awake 메서드입니다.
         /// </summary>
 
 
         private void Awake()
         {
-            // 핵심 로직을 처리합니다.
             ApplyCanvasSettings();
 
             AttackToMainCameraStack();
         }
         /// <summary>
-        /// OnDestroy 함수를 처리합니다.
+        /// OnDestroy 메서드입니다.
         /// </summary>
 
         private void OnDestroy()
         {
-            // 핵심 로직을 처리합니다.
             DettachFromMainCameraStack();    
         }
         /// <summary>
-        /// OnValidate 함수를 처리합니다.
+        /// OnValidate 메서드입니다.
         /// </summary>
 
         private void OnValidate()
         {
-            // 핵심 로직을 처리합니다.
             ApplyCanvasSettings();
         }
         /// <summary>
-        /// ApplyCanvasSettings 함수를 처리합니다.
+        /// ApplyCanvasSettings 메서드입니다.
         /// </summary>
 
         private void ApplyCanvasSettings()
         {
-            // 핵심 로직을 처리합니다.
             ApplyCanvas(_pageCanvas, _pageOrder);
             ApplyCanvas(_popupCanvas, _popupOrder);
             ApplyCanvas(_systemCanvas, _systemOrder);
         }
         /// <summary>
-        /// ApplyCanvas 함수를 처리합니다.
+        /// ApplyCanvas 메서드입니다.
         /// </summary>
 
         private void ApplyCanvas(Canvas canvas, int sortingOrder)
         {
-            // 핵심 로직을 처리합니다.
             if (canvas == null)
             {
                 return;
@@ -118,29 +113,27 @@ namespace MyProject.Common.UI
             canvas.sortingOrder = sortingOrder;
         }
         /// <summary>
-        /// AttackToMainCameraStack 함수를 처리합니다.
+        /// AttackToMainCameraStack 메서드입니다.
         /// </summary>
 
         private void AttackToMainCameraStack()
         {
-            // 핵심 로직을 처리합니다.
             if(Camera.main == null) return;
 
-            // var baseData = Camera.main.GetUniversalAdditionalCameraData();
-            // if (!baseData.cameraStack.Contains(_uiCamera))
-            //     baseData.cameraStack.Add(_uiCamera);
+            // var baseData = Camera.main.GetUniversalAdditionalCameraData(); // 필요 시 카메라 스택 연결
+            // if (!baseData.cameraStack.Contains(_uiCamera)) // 스택 중복 방지
+            //     baseData.cameraStack.Add(_uiCamera); // UI 카메라 추가
         }
         /// <summary>
-        /// DettachFromMainCameraStack 함수를 처리합니다.
+        /// DettachFromMainCameraStack 메서드입니다.
         /// </summary>
 
         private void DettachFromMainCameraStack()
         {
-            // 핵심 로직을 처리합니다.
             if(Camera.main == null) return;
 
-            // var baseData = Camera.main.GetUniversalAdditionalCameraData();
-            // if (baseData != null) baseData.cameraStack.Remove(_uiCamera);
+            // var baseData = Camera.main.GetUniversalAdditionalCameraData(); // 필요 시 카메라 스택 연결
+            // if (baseData != null) baseData.cameraStack.Remove(_uiCamera); // UI 카메라 제거
         }
     }
 }

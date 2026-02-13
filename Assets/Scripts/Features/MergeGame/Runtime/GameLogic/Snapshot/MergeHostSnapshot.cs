@@ -1,4 +1,4 @@
-﻿﻿using System;
+using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using Noname.GameHost;
@@ -404,13 +404,12 @@ namespace MyProject.MergeGame.Snapshots
             Projectiles = projectiles ?? Array.Empty<ProjectileSnapshot>();
         }
         /// <summary>
-        /// GetPayloadSize 함수를 처리합니다.
+        /// GetPayloadSize 메서드입니다.
         /// </summary>
         protected override int GetPayloadSize()
         {
-            // 핵심 로직을 처리합니다.
             return
-                // Fixed header fields
+                // 고정 헤더 필드
                 sizeof(int) // PlayerIndex
                 + sizeof(int) // SessionPhase
                 + sizeof(int) // Score
@@ -425,16 +424,16 @@ namespace MyProject.MergeGame.Snapshots
                 + sizeof(float) // SpawnInterval
                 + sizeof(int) // MaxMonsterStack
 
-                // Slots
-                + sizeof(int) // Slots.Count
+                // 슬롯
+                + sizeof(int) // 슬롯.Count
                 + Slots.Count * (
                     sizeof(int) // Slot.Index
                     + sizeof(long) // Slot.TowerUid
                     + sizeof(int) // Slot.TowerGrade
                 )
 
-                // Towers
-                + sizeof(int) // Towers.Count
+                // 타워
+                + sizeof(int) // 타워.Count
                 + Towers.Count * (
                     sizeof(long) // Tower.Uid
                     + sizeof(long) // Tower.TowerId
@@ -452,8 +451,8 @@ namespace MyProject.MergeGame.Snapshots
                     + sizeof(float) // Tower.ThrowRadius
                 )
 
-                // Monsters
-                + sizeof(int) // Monsters.Count
+                // 몬스터
+                + sizeof(int) // 몬스터.Count
                 + Monsters.Count * (
                     sizeof(long) // Monster.Uid
                     + sizeof(long) // Monster.MonsterId
@@ -467,8 +466,8 @@ namespace MyProject.MergeGame.Snapshots
                     + sizeof(byte) // Monster.IsInjectedByOpponent
                 )
 
-                // Projectiles
-                + sizeof(int) // Projectiles.Count
+                // 투사체
+                + sizeof(int) // 투사체.Count
                 + Projectiles.Count * (
                     sizeof(long) // Projectile.Uid
                     + sizeof(float) // Projectile.StartX
@@ -483,13 +482,12 @@ namespace MyProject.MergeGame.Snapshots
                 );
         }
         /// <summary>
-        /// WritePayload 함수를 처리합니다.
+        /// WritePayload 메서드입니다.
         /// </summary>
 
 
         protected override int WritePayload(Span<byte> dst)
         {
-            // 핵심 로직을 처리합니다.
             var offset = 0;
 
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), PlayerIndex); offset += sizeof(int);
@@ -506,7 +504,7 @@ namespace MyProject.MergeGame.Snapshots
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), BitConverter.SingleToInt32Bits(SpawnInterval)); offset += sizeof(float);
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), MaxMonsterStack); offset += sizeof(int);
 
-            // Slots
+            // 슬롯
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), Slots.Count); offset += sizeof(int);
             for (int i = 0; i < Slots.Count; i++)
             {
@@ -516,7 +514,7 @@ namespace MyProject.MergeGame.Snapshots
                 BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), s.TowerGrade); offset += sizeof(int);
             }
 
-            // Towers
+            // 타워
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), Towers.Count); offset += sizeof(int);
             for (int i = 0; i < Towers.Count; i++)
             {
@@ -537,7 +535,7 @@ namespace MyProject.MergeGame.Snapshots
                 BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), BitConverter.SingleToInt32Bits(t.ThrowRadius)); offset += sizeof(float);
             }
 
-            // Monsters
+            // 몬스터
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), Monsters.Count); offset += sizeof(int);
             for (int i = 0; i < Monsters.Count; i++)
             {
@@ -554,7 +552,7 @@ namespace MyProject.MergeGame.Snapshots
                 dst[offset] = m.IsInjectedByOpponent ? (byte)1 : (byte)0; offset += sizeof(byte);
             }
 
-            // Projectiles
+            // 투사체
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset), Projectiles.Count); offset += sizeof(int);
             for (int i = 0; i < Projectiles.Count; i++)
             {
@@ -574,12 +572,11 @@ namespace MyProject.MergeGame.Snapshots
             return GetPayloadSize();
         }
         /// <summary>
-        /// ReadFrom 함수를 처리합니다.
+        /// ReadFrom 메서드입니다.
         /// </summary>
 
         public static MergeHostSnapshot ReadFrom(ReadOnlySpan<byte> src)
         {
-            // 핵심 로직을 처리합니다.
             var (tick, headerOffset) = ReadHeader(src);
             var offset = headerOffset;
 
@@ -597,7 +594,7 @@ namespace MyProject.MergeGame.Snapshots
             float spawnInterval = BitConverter.Int32BitsToSingle(BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset))); offset += sizeof(float);
             int maxMonsterStack = BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset)); offset += sizeof(int);
 
-            // Slots
+            // 슬롯
             int slotCount = BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset)); offset += sizeof(int);
             var slots = new SlotSnapshot[slotCount];
             for (int i = 0; i < slotCount; i++)
@@ -608,7 +605,7 @@ namespace MyProject.MergeGame.Snapshots
                 slots[i] = new SlotSnapshot(idx, tUid, tGrade);
             }
 
-            // Towers
+            // 타워
             int towerCount = BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset)); offset += sizeof(int);
             var towers = new TowerSnapshot[towerCount];
             for (int i = 0; i < towerCount; i++)
@@ -630,7 +627,7 @@ namespace MyProject.MergeGame.Snapshots
                 towers[i] = new TowerSnapshot(uid, towerId, grade, slotIndex, px, py, pz, atkDmg, atkSpd, atkRng, atkType, projType, projSpd, throwRad);
             }
 
-            // Monsters
+            // 몬스터
             int monsterCount = BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset)); offset += sizeof(int);
             var monsters = new MonsterSnapshot[monsterCount];
             for (int i = 0; i < monsterCount; i++)
@@ -648,7 +645,7 @@ namespace MyProject.MergeGame.Snapshots
                 monsters[i] = new MonsterSnapshot(uid, mId, pathIdx, progress, px, py, pz, hp, maxHp, isInjectedByOpponent);
             }
 
-            // Projectiles
+            // 투사체
             int projCount = BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset)); offset += sizeof(int);
             var projectiles = new ProjectileSnapshot[projCount];
             for (int i = 0; i < projCount; i++)

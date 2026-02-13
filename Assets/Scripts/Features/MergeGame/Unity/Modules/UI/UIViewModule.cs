@@ -1,4 +1,4 @@
-﻿using MyProject.Common.UI;
+using MyProject.Common.UI;
 using MyProject.MergeGame.Commands;
 using MyProject.MergeGame.Events;
 using MyProject.MergeGame.Snapshots;
@@ -28,12 +28,11 @@ namespace MyProject.MergeGame.Unity
         private int _difficultyStep = 0;
         private int _gold = 0;
         /// <summary>
-        /// OnInit 함수를 처리합니다.
+        /// OnInit 메서드입니다.
         /// </summary>
 
         protected override void OnInit()
         {
-            // 핵심 로직을 처리합니다.
             base.OnInit();
             EnsureMainHudPage();
 
@@ -43,12 +42,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// OnConnectedEvent 함수를 처리합니다.
+        /// OnConnectedEvent 메서드입니다.
         /// </summary>
 
         public override void OnConnectedEvent()
         {
-            // 핵심 로직을 처리합니다.
             if (_mainHudInstance == null) return;
 
             _mainHudInstance.gameObject.SetActive(true);
@@ -58,12 +56,11 @@ namespace MyProject.MergeGame.Unity
             _mainHudInstance.ClearObserverMiniMaps();
         }
         /// <summary>
-        /// OnDisconnectedEvent 함수를 처리합니다.
+        /// OnDisconnectedEvent 메서드입니다.
         /// </summary>
 
         public override void OnDisconnectedEvent()
         {
-            // 핵심 로직을 처리합니다.
             if (_mainHudInstance == null) return;
 
             _mainHudInstance.SetActiveReadyButton(false);
@@ -72,12 +69,11 @@ namespace MyProject.MergeGame.Unity
             _mainHudInstance.ClearObserverMiniMaps();
         }
         /// <summary>
-        /// OnCommandResultMsg 함수를 처리합니다.
+        /// OnCommandResultMsg 메서드입니다.
         /// </summary>
 
         public override void OnCommandResultMsg(MergeCommandResult result)
         {
-            // 핵심 로직을 처리합니다.
             if (result == null) return;
 
             if (result is ReadyMergeGameResult readyCmdResult)
@@ -104,12 +100,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// OnEventMsg 함수를 처리합니다.
+        /// OnEventMsg 메서드입니다.
         /// </summary>
 
         public override void OnEventMsg(MergeGameEvent evt)
         {
-            // 핵심 로직을 처리합니다.
             if (!IsMyEvent(evt)) return;
 
             if (evt is GameStartedEvent)
@@ -143,12 +138,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// OnSnapshotMsg 함수를 처리합니다.
+        /// OnSnapshotMsg 메서드입니다.
         /// </summary>
 
         public override void OnSnapshotMsg(MergeHostSnapshot snapshot)
         {
-            // 핵심 로직을 처리합니다.
             if (snapshot == null || !IsMySnapshot(snapshot))
             {
                 return;
@@ -164,12 +158,11 @@ namespace MyProject.MergeGame.Unity
             RefreshGoldNumText();
         }
         /// <summary>
-        /// OnMiniMapTargetsUpdated 함수를 처리합니다.
+        /// OnMiniMapTargetsUpdated 메서드입니다.
         /// </summary>
 
         private void OnMiniMapTargetsUpdated(MiniMapRenderTargetsUpdatedEvent evt)
         {
-            // 핵심 로직을 처리합니다.
             if (_mainHudInstance == null || evt == null)
             {
                 return;
@@ -202,12 +195,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// EnsureMainHudPage 함수를 처리합니다.
+        /// EnsureMainHudPage 메서드입니다.
         /// </summary>
 
         private void EnsureMainHudPage()
         {
-            // 핵심 로직을 처리합니다.
             if (_mainHudInstance != null)
             {
                 return;
@@ -250,12 +242,11 @@ namespace MyProject.MergeGame.Unity
             RefreshMonsterNumText();
         }
         /// <summary>
-        /// HandleSpawnTowerClicked 함수를 처리합니다.
+        /// HandleSpawnTowerClicked 메서드입니다.
         /// </summary>
 
         private void HandleSpawnTowerClicked()
         {
-            // 핵심 로직을 처리합니다.
             if (GameView == null)
             {
                 return;
@@ -266,12 +257,11 @@ namespace MyProject.MergeGame.Unity
                 MergeNetCommandType.SpawnTower);
         }
         /// <summary>
-        /// HandleReadyClicked 함수를 처리합니다.
+        /// HandleReadyClicked 메서드입니다.
         /// </summary>
 
         private void HandleReadyClicked()
         {
-            // 핵심 로직을 처리합니다.
             if (GameView == null)
             {
                 return;
@@ -280,12 +270,11 @@ namespace MyProject.MergeGame.Unity
             GameView.SendReady();
         }
         /// <summary>
-        /// RefreshMonsterNumText 함수를 처리합니다.
+        /// RefreshMonsterNumText 메서드입니다.
         /// </summary>
 
         private void RefreshMonsterNumText()
         {
-            // 핵심 로직을 처리합니다.
             if (_mainHudInstance == null)
             {
                 return;
@@ -295,12 +284,11 @@ namespace MyProject.MergeGame.Unity
             _mainHudInstance.SetMonsterNumText($"몬스터 : {_currentMonsterCount} / {maxText}");
         }
         /// <summary>
-        /// RefreshGoldNumText 함수를 처리합니다.
+        /// RefreshGoldNumText 메서드입니다.
         /// </summary>
 
         private void RefreshGoldNumText()
         {
-            // 핵심 로직을 처리합니다.
             if (_mainHudInstance == null)
             {
                 return;
@@ -309,12 +297,11 @@ namespace MyProject.MergeGame.Unity
             _mainHudInstance.SetGoldText($"Gold : {_gold}");
         }
         /// <summary>
-        /// RefreshDifficultyText 함수를 처리합니다.
+        /// RefreshDifficultyText 메서드입니다.
         /// </summary>
 
         private void RefreshDifficultyText()
         {
-            // 핵심 로직을 처리합니다.
             if (_mainHudInstance == null)
             {
                 return;
@@ -323,12 +310,11 @@ namespace MyProject.MergeGame.Unity
             _mainHudInstance.SetDifficultyText($"Difficulty Step : {_difficultyStep}");
         }
         /// <summary>
-        /// OnShutdown 함수를 처리합니다.
+        /// OnShutdown 메서드입니다.
         /// </summary>
 
         protected override void OnShutdown()
         {
-            // 핵심 로직을 처리합니다.
             if (GameView != null)
             {
                 GameView.Unsubscribe<MiniMapRenderTargetsUpdatedEvent>(OnMiniMapTargetsUpdated);

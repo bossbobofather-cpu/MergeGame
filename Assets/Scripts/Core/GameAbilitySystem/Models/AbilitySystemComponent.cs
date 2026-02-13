@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Noname.GameAbilitySystem
@@ -55,7 +55,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         public bool ConsumeAbilityDirty()
         {
-            // 핵심 로직을 처리합니다.
             lock (_modelLock)
             {
                 if (!_abilityDirty)
@@ -68,33 +67,30 @@ namespace Noname.GameAbilitySystem
             }
         }
         /// <summary>
-        /// MarkAbilityDirty 함수를 처리합니다.
+        /// MarkAbilityDirty 메서드입니다.
         /// </summary>
 
         private void MarkAbilityDirty()
         {
-            // 핵심 로직을 처리합니다.
             _abilityDirty = true;
         }
 
         public IAbilitySystemOwner Owner => _owner;
         /// <summary>
-        /// AbilitySystemComponent 함수를 처리합니다.
+        /// AbilitySystemComponent 메서드입니다.
         /// </summary>
 
         public AbilitySystemComponent()
         {
-            // 핵심 로직을 처리합니다.
             _attributes = new AttributeSet();
             _ownedTags = new GameplayTagContainer();
         }
         /// <summary>
-        /// this 함수를 처리합니다.
+        /// this 메서드입니다.
         /// </summary>
 
         public AbilitySystemComponent(AttributeSet attributeSet, List<GameplayAbility> abilities, GameplayTagContainer ownedTags) : this()
         {
-            // 핵심 로직을 처리합니다.
             _attributes = attributeSet;
             _abilities = abilities;
 
@@ -102,12 +98,11 @@ namespace Noname.GameAbilitySystem
             ApplyStartupTags(ownedTags);
         }
         /// <summary>
-        /// SetOwner 함수를 처리합니다.
+        /// SetOwner 메서드입니다.
         /// </summary>
 
         public void SetOwner(IAbilitySystemOwner owner)
         {
-            // 핵심 로직을 처리합니다.
             _owner = owner;
         }
 
@@ -130,7 +125,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         private void ApplyStartupAbilities()
         {
-            // 핵심 로직을 처리합니다.
             foreach (var ability in _abilities)
             {
                 if (ability == null) continue;
@@ -138,24 +132,22 @@ namespace Noname.GameAbilitySystem
             }
         }
         /// <summary>
-        /// ApplyStartupTags 함수를 처리합니다.
+        /// ApplyStartupTags 메서드입니다.
         /// </summary>
 
         private void ApplyStartupTags(GameplayTagContainer tagContainer)
         {
-            // 핵심 로직을 처리합니다.
             foreach (var tag in tagContainer.Tags)
             {
                 AddLooseTag(tag, out _);
             }
         }
         /// <summary>
-        /// Tick 함수를 처리합니다.
+        /// Tick 메서드입니다.
         /// </summary>
 
         public void Tick(float deltaSeconds)
         {
-            // 핵심 로직을 처리합니다.
             TickActiveEffectsInternal(deltaSeconds);
         }
 
@@ -164,7 +156,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         public float Get(AttributeId id)
         {
-            // 핵심 로직을 처리합니다.
             lock (_modelLock)
             {
                 return _attributes.Get(id);
@@ -176,7 +167,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         public void Set(AttributeId id, float value)
         {
-            // 핵심 로직을 처리합니다.
             lock (_modelLock)
             {
                 _attributes.Set(id, value);
@@ -188,7 +178,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         public void Add(AttributeId id, float delta)
         {
-            // 핵심 로직을 처리합니다.
             lock (_modelLock)
             {
                 var current = _attributes.Get(id);
@@ -202,7 +191,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         public void AddPercent(AttributeId id, float percent)
         {
-            // 핵심 로직을 처리합니다.
             if (percent == 0f)
             {
                 return;
@@ -232,7 +220,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         public FGameplayAbilitySpecHandle GiveAbility(GameplayAbility ability)
         {
-            // 핵심 로직을 처리합니다.
             lock (_modelLock)
             {
                 var spec = new GameplayAbilitySpec(ability, _nextAbilityHandleId++);
@@ -253,7 +240,6 @@ namespace Noname.GameAbilitySystem
         /// <returns>제거 성공 여부</returns>
         public bool RemoveAbility(FGameplayAbilitySpecHandle handle)
         {
-            // 핵심 로직을 처리합니다.
             lock (_modelLock)
             {
                 for (var i = _abilitySpecs.Count - 1; i >= 0; i--)
@@ -284,7 +270,6 @@ namespace Noname.GameAbilitySystem
         /// <returns>제거 성공 여부</returns>
         public bool RemoveAbility(GameplayAbility ability)
         {
-            // 핵심 로직을 처리합니다.
             lock (_modelLock)
             {
                 for (var i = _abilitySpecs.Count - 1; i >= 0; i--)
@@ -335,7 +320,6 @@ namespace Noname.GameAbilitySystem
         /// <returns>활성화 성공 여부</returns>
         public bool TryActivateAbility(GameplayAbilitySpec spec)
         {
-            // 핵심 로직을 처리합니다.
             return TryActivateAbility(spec, null, out _);
         }
 
@@ -347,7 +331,6 @@ namespace Noname.GameAbilitySystem
         /// <returns>활성화 성공 여부</returns>
         public bool TryActivateAbility(GameplayAbilitySpec spec, TargetContext targetContext)
         {
-            // 핵심 로직을 처리합니다.
             return TryActivateAbility(spec, targetContext, out _);
         }
 
@@ -360,7 +343,6 @@ namespace Noname.GameAbilitySystem
         /// <returns>활성화 성공 여부</returns>
         public bool TryActivateAbility(GameplayAbilitySpec spec, TargetContext targetContext, out TargetData targetData)
         {
-            // 핵심 로직을 처리합니다.
             return TryActivateAbility(spec, targetContext, out targetData, applyAppliedEffectsOnActivate: true);
         }
 
@@ -401,7 +383,7 @@ namespace Noname.GameAbilitySystem
             }
 
             // 능력 개별적으로도 능력 활성화 가능 여부를 판단해야 한다면 여기서
-            // ability.CanActivateAbility()
+            // ability.CanActivateAbility() 조건 확인
 
             // 타겟팅
             if (ability.TargetingStrategy != null && targetContext != null)
@@ -445,7 +427,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         private void ApplyEffectToSelf(GameplayEffect effect)
         {
-            // 핵심 로직을 처리합니다.
             if (effect == null) return;
             ApplyEffectToTarget(effect, this);
         }
@@ -455,7 +436,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         private void ApplyEffectToTargets(GameplayEffect effect, TargetData targetData)
         {
-            // 핵심 로직을 처리합니다.
             if (effect == null || targetData == null) return;
 
             foreach (var target in targetData.Targets)
@@ -471,7 +451,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         public void ApplyEffectsToTargets(IReadOnlyList<GameplayEffect> effects, TargetData targetData)
         {
-            // 핵심 로직을 처리합니다.
             if (effects == null || targetData == null)
             {
                 return;
@@ -494,7 +473,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         private void ApplyEffectToTarget(GameplayEffect effect, AbilitySystemComponent target)
         {
-            // 핵심 로직을 처리합니다.
             if (effect == null || target == null) return;
 
             // 효과의 태그 체크를 합니다.
@@ -546,7 +524,6 @@ namespace Noname.GameAbilitySystem
         /// <param name="modifier">적용할 수정자</param>
         private void ApplyModifier(AbilitySystemComponent source, AbilitySystemComponent target, AttributeModifier modifier)
         {
-            // 핵심 로직을 처리합니다.
             if (target == null) return;
 
             switch (modifier.ValueMode)
@@ -566,7 +543,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         private void ApplyStaticModifier(AbilitySystemComponent target, AttributeModifier modifier)
         {
-            // 핵심 로직을 처리합니다.
             var attrId = modifier.AttributeId;
             var value = modifier.Magnitude;
 
@@ -590,7 +566,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         private void ApplyCalculatedModifier(AbilitySystemComponent source, AbilitySystemComponent target, AttributeModifier modifier)
         {
-            // 핵심 로직을 처리합니다.
             var calculator = AttributeCalculatorFactory.Create(modifier.CalculatorType);
             if (calculator == null) return;
 
@@ -604,7 +579,6 @@ namespace Noname.GameAbilitySystem
         /// <returns>활성화 가능하면 true</returns>
         public bool CanActivateAbility(GameplayAbilitySpec spec)
         {
-            // 핵심 로직을 처리합니다.
             if (spec == null) return false;
 
             // 필수 태그 체크
@@ -628,7 +602,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         public void GetActivatableAbilities(List<GameplayAbilitySpec> results)
         {
-            // 핵심 로직을 처리합니다.
             if (results == null) return;
 
             lock (_modelLock)
@@ -653,7 +626,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         public IReadOnlyList<GameplayAbilitySpec> GetAbilitySpecs()
         {
-            // 핵심 로직을 처리합니다.
             lock (_modelLock)
             {
                 return new List<GameplayAbilitySpec>(_abilitySpecs);
@@ -665,7 +637,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         public bool AddLooseTag(FGameplayTag tag, out int totalCount)
         {
-            // 핵심 로직을 처리합니다.
             lock (_modelLock)
             {
                 return AddTagInternal(_looseTagCounts, tag, out totalCount);
@@ -677,7 +648,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         public bool RemoveLooseTag(FGameplayTag tag, out int totalCount)
         {
-            // 핵심 로직을 처리합니다.
             lock (_modelLock)
             {
                 return RemoveTagInternal(_looseTagCounts, tag, out totalCount);
@@ -689,7 +659,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         public bool AddEffectTag(FGameplayTag tag, out int totalCount)
         {
-            // 핵심 로직을 처리합니다.
             lock (_modelLock)
             {
                 return AddTagInternal(_effectTagCounts, tag, out totalCount);
@@ -701,7 +670,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         public bool RemoveEffectTag(FGameplayTag tag, out int totalCount)
         {
-            // 핵심 로직을 처리합니다.
             lock (_modelLock)
             {
                 return RemoveTagInternal(_effectTagCounts, tag, out totalCount);
@@ -713,7 +681,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         public int GetTotalTagCount(FGameplayTag tag)
         {
-            // 핵심 로직을 처리합니다.
             if (!tag.IsValid)
             {
                 return 0;
@@ -732,7 +699,6 @@ namespace Noname.GameAbilitySystem
         /// <param name="remainingDuration">남은 지속 시간 (초)</param>
         public long AddActiveEffect(GameplayEffect effect, float remainingDuration)
         {
-            // 핵심 로직을 처리합니다.
             lock (_modelLock)
             {
                 var uid = _nextEffectUid++;
@@ -762,7 +728,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         private void TickActiveEffectsInternal(float deltaTime, List<GameplayEffect> expired = null)
         {
-            // 핵심 로직을 처리합니다.
             lock (_modelLock)
             {
                 for (var i = _activeEffects.Count - 1; i >= 0; i--)
@@ -802,7 +767,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         private void RemoveActiveEffectAt(int index)
         {
-            // 핵심 로직을 처리합니다.
             var lastIndex = _activeEffects.Count - 1;
             if (index < lastIndex)
             {
@@ -817,7 +781,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         public bool RemoveActiveEffectByUid(long effectUid)
         {
-            // 핵심 로직을 처리합니다.
             lock (_modelLock)
             {
                 for (var i = _activeEffects.Count - 1; i >= 0; i--)
@@ -847,7 +810,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         public bool RemoveActiveEffect(FGameplayTag effectTag)
         {
-            // 핵심 로직을 처리합니다.
             if (!effectTag.IsValid)
             {
                 return false;
@@ -882,7 +844,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         public bool RemoveActiveEffect(string effectTag)
         {
-            // 핵심 로직을 처리합니다.
             if (string.IsNullOrEmpty(effectTag))
             {
                 return false;
@@ -897,7 +858,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         public void CollectExpiredEffects(float now, List<GameplayEffect> expired)
         {
-            // 핵심 로직을 처리합니다.
             if (expired == null)
             {
                 return;
@@ -940,7 +900,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         public List<GameplayEffect> GetActiveEffects()
         {
-            // 핵심 로직을 처리합니다.
             lock (_modelLock)
             {
                 var results = new List<GameplayEffect>(_activeEffects.Count);
@@ -961,7 +920,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         public void GetActiveEffects(List<GameplayEffect> results)
         {
-            // 핵심 로직을 처리합니다.
             if (results == null)
             {
                 return;
@@ -985,7 +943,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         internal IReadOnlyList<ActiveGameplayEffect> GetActiveEffectsUnsafe()
         {
-            // 핵심 로직을 처리합니다.
             return _activeEffects;
         }
 
@@ -994,7 +951,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         private bool AddTagInternal(Dictionary<int, int> counts, FGameplayTag tag, out int totalCount)
         {
-            // 핵심 로직을 처리합니다.
             totalCount = 0;
             if (!tag.IsValid)
             {
@@ -1026,7 +982,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         private bool RemoveTagInternal(Dictionary<int, int> counts, FGameplayTag tag, out int totalCount)
         {
-            // 핵심 로직을 처리합니다.
             totalCount = 0;
             if (!tag.IsValid)
             {
@@ -1067,7 +1022,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         private int GetTotalTagCount(int hash)
         {
-            // 핵심 로직을 처리합니다.
             _effectTagCounts.TryGetValue(hash, out var effectCount);
             _looseTagCounts.TryGetValue(hash, out var looseCount);
             return effectCount + looseCount;
@@ -1090,7 +1044,6 @@ namespace Noname.GameAbilitySystem
         /// </summary>
         public AbilitySystemSnapshot BuildSnapshot()
         {
-            // 핵심 로직을 처리합니다.
             lock (_modelLock)
             {
                 // 속성 값 복사
@@ -1125,12 +1078,11 @@ namespace Noname.GameAbilitySystem
             }
         }
         /// <summary>
-        /// Dispose 함수를 처리합니다.
+        /// Dispose 메서드입니다.
         /// </summary>
 
         public void Dispose()
         {
-            // 핵심 로직을 처리합니다.
             OnAddedAbility = null;
             OnChangedTags = null;
             OnActivateAbility = null;

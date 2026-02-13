@@ -1,19 +1,17 @@
-﻿namespace Noname.GameAbilitySystem
+namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// 二쇱꽍 ?뺣━
-    /// 二쇱꽍 ?뺣━
-    /// </summary>
+        /// 요약 설명입니다.
+        /// </summary>
     public sealed class AttributeValue
     {
         private float _currentValue;
         /// <summary>
-        /// AttributeValue 함수를 처리합니다.
+        /// AttributeValue 메서드입니다.
         /// </summary>
 
         public AttributeValue(AttributeId attributeId, float baseValue = 0f, float minValue = 0f, float maxValue = 0f)
         {
-            // 핵심 로직을 처리합니다.
             AttributeId = attributeId;
             BaseValue = baseValue;
             MinValue = minValue;
@@ -22,24 +20,23 @@
         }
 
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public AttributeId AttributeId { get; }
 
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public float BaseValue { get; set; }
 
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public float CurrentValue
         {
             get => _currentValue;
             set
             {
-                // 二쇱꽍 ?뺣━
                 if (MaxValue > 0f && value > MaxValue)
                 {
                     _currentValue = MaxValue;
@@ -56,12 +53,12 @@
         }
 
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public float MinValue { get; set; }
 
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public float MaxValue { get; set; }
     }

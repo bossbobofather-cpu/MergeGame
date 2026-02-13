@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Noname.GameAbilitySystem;
 using UnityEngine;
@@ -58,7 +58,6 @@ namespace Noname.GameCore.Helper
         /// <returns>정의 여부</returns>
         public bool IsTagDefined(string value, bool includeParents = true)
         {
-            // 핵심 로직을 처리합니다.
             if (string.IsNullOrWhiteSpace(value))
             {
                 return false;

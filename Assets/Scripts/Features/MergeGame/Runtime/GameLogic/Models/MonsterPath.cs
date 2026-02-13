@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Noname.GameAbilitySystem;
 
@@ -28,12 +28,11 @@ namespace MyProject.MergeGame.Models
         /// </summary>
         public float TotalLength => _totalLength;
         /// <summary>
-        /// MonsterPath 함수를 처리합니다.
+        /// MonsterPath 메서드입니다.
         /// </summary>
 
         public MonsterPath(int pathIndex, IEnumerable<Point3D> waypoints)
         {
-            // 핵심 로직을 처리합니다.
             PathIndex = pathIndex;
             _waypoints = new List<Point3D>(waypoints);
             _segmentLengths = new List<float>();
@@ -41,12 +40,11 @@ namespace MyProject.MergeGame.Models
             CalculateSegmentLengths();
         }
         /// <summary>
-        /// CalculateSegmentLengths 함수를 처리합니다.
+        /// CalculateSegmentLengths 메서드입니다.
         /// </summary>
 
         private void CalculateSegmentLengths()
         {
-            // 핵심 로직을 처리합니다.
             _totalLength = 0f;
             _segmentLengths.Clear();
 
@@ -57,7 +55,7 @@ namespace MyProject.MergeGame.Models
                 // 부분 길이는 WayPoint간 거리를 리스트로
                 // ex 첫번째 wayPoint와 두번째 wayPoin간 길이는 _segmentLengths[0] ..
                 // _segmentLengths 웨이포인트 간 거리 목록은 웨이포인트의 총 개수 - 1 이다
-                // _waypoints.Count - 1 == _segmentLengths.Count
+                // _waypoints.Count - 1 == _segmentLengths.Count 를 유지
                 _segmentLengths.Add(length);
 
                 //전체 길이는 WayPoint간의 거리의 합
@@ -96,8 +94,6 @@ namespace MyProject.MergeGame.Models
             for (var i = 0; i < _segmentLengths.Count; i++)
             {
                 var segmentLength = _segmentLengths[i];
-
-                // 현재 세그먼트에 목표 거리가 포함되는지?
                 if (accumulatedDistance + segmentLength >= targetDistance)
                 {
                     // 세그먼트 내부에서 남은 거리
@@ -130,7 +126,6 @@ namespace MyProject.MergeGame.Models
         /// </summary>
         public Point3D GetStartPosition()
         {
-            // 핵심 로직을 처리합니다.
             return _waypoints.Count > 0 ? _waypoints[0] : Point3D.zero;
         }
 
@@ -139,7 +134,6 @@ namespace MyProject.MergeGame.Models
         /// </summary>
         public Point3D GetEndPosition()
         {
-            // 핵심 로직을 처리합니다.
             return _waypoints.Count > 0 ? _waypoints[^1] : Point3D.zero;
         }
     }

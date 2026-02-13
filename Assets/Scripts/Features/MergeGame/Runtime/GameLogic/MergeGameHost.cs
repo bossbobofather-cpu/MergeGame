@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MyProject.MergeGame.AI;
 using System.Linq;
@@ -133,12 +133,11 @@ namespace MyProject.MergeGame
 
         #endregion
         /// <summary>
-        /// MergeGameHost 함수를 처리합니다.
+        /// MergeGameHost 메서드입니다.
         /// </summary>
 
         public MergeGameHost(MergeHostConfig config, ITowerDatabase towerDatabase)
         {
-            // 핵심 로직을 처리합니다.
             _config = config ?? throw new ArgumentNullException(nameof(config));
             _towerDatabase = towerDatabase ?? throw new ArgumentNullException(nameof(towerDatabase));
             _state = new MergeHostState();
@@ -157,7 +156,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public void InitializePlayers(int playerCount)
         {
-            // 핵심 로직을 처리합니다.
             _playerCount = playerCount;
             _state.InitializePlayers(playerCount);
             _killCountForOpponentInjection = new int[playerCount];
@@ -168,7 +166,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public void RegisterPlayer(long uid, int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             if (playerIndex < 0 || playerIndex >= _playerCount)
             {
                 return;
@@ -179,12 +176,11 @@ namespace MyProject.MergeGame
 
         #region GameHostBase Overrides
         /// <summary>
-        /// HandleCommand 함수를 처리합니다.
+        /// HandleCommand 메서드입니다.
         /// </summary>
 
         protected override GameCommandOutcome<MergeCommandResult, MergeGameEvent> HandleCommand(MergeGameCommand command)
         {
-            // 핵심 로직을 처리합니다.
             if (!_playerIndexByUid.TryGetValue(command.SenderUid, out var playerIndex))
             {
                 return default;
@@ -212,12 +208,11 @@ namespace MyProject.MergeGame
             }
         }
         /// <summary>
-        /// OnTick 함수를 처리합니다.
+        /// OnTick 메서드입니다.
         /// </summary>
 
         protected override void OnTick(float deltaTime)
         {
-            // 핵심 로직을 처리합니다.
             if (_state.SessionPhase != MergeSessionPhase.Playing)
             {
                 return;
@@ -276,12 +271,11 @@ namespace MyProject.MergeGame
             }
         }
         /// <summary>
-        /// BuildSnapshotInternal 함수를 처리합니다.
+        /// BuildSnapshotInternal 메서드입니다.
         /// </summary>
 
         protected override MergeHostSnapshot BuildSnapshotInternal()
         {
-            // 핵심 로직을 처리합니다.
             var snapshots = new MergeHostSnapshot[_playerCount];
             for (int i = 0; i < _playerCount; i++)
             {
@@ -296,19 +290,17 @@ namespace MyProject.MergeGame
         /// </summary>
         public MergeHostSnapshot GetPlayerSnapshot(int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             var snapshots = _playerSnapshots;
             if (snapshots == null || playerIndex < 0 || playerIndex >= snapshots.Length)
                 return null;
             return snapshots[playerIndex];
         }
         /// <summary>
-        /// BuildPlayerSnapshot 함수를 처리합니다.
+        /// BuildPlayerSnapshot 메서드입니다.
         /// </summary>
 
         private MergeHostSnapshot BuildPlayerSnapshot(int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             _tempSlotSnapshots.Clear();
             _tempTowerSnapshots.Clear();
             _tempMonsterSnapshots.Clear();
@@ -361,7 +353,7 @@ namespace MyProject.MergeGame
                 ));
             }
 
-            // Projectiles
+            // 투사체
             var activeProjectiles = _combatSystem.GetActiveProjectiles(playerIndex);
             for (var i = 0; i < activeProjectiles.Count; i++)
             {
@@ -404,12 +396,11 @@ namespace MyProject.MergeGame
 
         #region Command Handlers - Legacy
         /// <summary>
-        /// HandleReadyGame 함수를 처리합니다.
+        /// HandleReadyGame 메서드입니다.
         /// </summary>
 
         private GameCommandOutcome<MergeCommandResult, MergeGameEvent> HandleReadyGame(ReadyMergeGameCommand command)
         {
-            // 핵심 로직을 처리합니다.
             if (!_playerIndexByUid.TryGetValue(command.SenderUid, out var playerIndex))
             {
                 return default;
@@ -483,12 +474,11 @@ namespace MyProject.MergeGame
                 events);
         }
         /// <summary>
-        /// HandleEndGame 함수를 처리합니다.
+        /// HandleEndGame 메서드입니다.
         /// </summary>
 
         private GameCommandOutcome<MergeCommandResult, MergeGameEvent> HandleEndGame(ExitMergeGameCommand command)
         {
-            // 핵심 로직을 처리합니다.
             if (!_playerIndexByUid.TryGetValue(command.SenderUid, out var playerIndex))
             {
                 return default;
@@ -519,12 +509,11 @@ namespace MyProject.MergeGame
 
         #region Command Handlers
         /// <summary>
-        /// HandleSpawnTower 함수를 처리합니다.
+        /// HandleSpawnTower 메서드입니다.
         /// </summary>
 
         private GameCommandOutcome<MergeCommandResult, MergeGameEvent> HandleSpawnTower(int playerIndex, SpawnTowerCommand command)
         {
-            // 핵심 로직을 처리합니다.
             if (_state.SessionPhase != MergeSessionPhase.Playing)
             {
                 return new GameCommandOutcome<MergeCommandResult, MergeGameEvent>(
@@ -610,12 +599,11 @@ namespace MyProject.MergeGame
             );
         }
         /// <summary>
-        /// HandleMergeTower 함수를 처리합니다.
+        /// HandleMergeTower 메서드입니다.
         /// </summary>
 
         private GameCommandOutcome<MergeCommandResult, MergeGameEvent> HandleMergeTower(int playerIndex, MergeTowerCommand command)
         {
-            // 핵심 로직을 처리합니다.
             if (_state.SessionPhase != MergeSessionPhase.Playing)
             {
                 return new GameCommandOutcome<MergeCommandResult, MergeGameEvent>(
@@ -748,12 +736,11 @@ namespace MyProject.MergeGame
             );
         }
         /// <summary>
-        /// HandleInjectMonsters 함수를 처리합니다.
+        /// HandleInjectMonsters 메서드입니다.
         /// </summary>
 
         private GameCommandOutcome<MergeCommandResult, MergeGameEvent> HandleInjectMonsters(int playerIndex, InjectMonstersCommand command)
         {
-            // 핵심 로직을 처리합니다.
             if (_state.SessionPhase != MergeSessionPhase.Playing)
             {
                 return new GameCommandOutcome<MergeCommandResult, MergeGameEvent>(
@@ -846,11 +833,10 @@ namespace MyProject.MergeGame
 
         #region Tick Processing
         /// <summary>
-        /// ProcessDeadMonsters 함수를 처리합니다.
+        /// ProcessDeadMonsters 메서드입니다.
         /// </summary>
         private void ProcessDeadMonsters(int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             var deadMonsterUids = new List<long>();
 
             foreach (var monster in _state.GetMonsters(playerIndex).Values)
@@ -907,12 +893,11 @@ namespace MyProject.MergeGame
             }
         }
         /// <summary>
-        /// HandleGameOver 함수를 처리합니다.
+        /// HandleGameOver 메서드입니다.
         /// </summary>
 
         private void HandleGameOver(int playerIndex, bool isVictory)
         {
-            // 핵심 로직을 처리합니다.
             if (_state.IsPlayerGameOver(playerIndex))
             {
                 return;
@@ -931,12 +916,11 @@ namespace MyProject.MergeGame
             CheckGlobalGameOver();
         }
         /// <summary>
-        /// CheckGlobalGameOver 함수를 처리합니다.
+        /// CheckGlobalGameOver 메서드입니다.
         /// </summary>
 
         private void CheckGlobalGameOver()
         {
-            // 핵심 로직을 처리합니다.
             int activePlayerCount = 0;
             int lastActivePlayerIndex = -1;
 
@@ -963,7 +947,7 @@ namespace MyProject.MergeGame
 
         #region Helpers
         /// <summary>
-        /// CalculateMergeScore 함수를 처리합니다.
+        /// CalculateMergeScore 메서드입니다.
         /// </summary>
 
         private int CalculateMergeScore(int resultGrade)
@@ -972,22 +956,20 @@ namespace MyProject.MergeGame
             return resultGrade * _config.ScorePerGrade;
         }
         /// <summary>
-        /// GetCurrentDifficultyStep 함수를 처리합니다.
+        /// GetCurrentDifficultyStep 메서드입니다.
         /// </summary>
 
         private int GetCurrentDifficultyStep()
         {
-            // 핵심 로직을 처리합니다.
             var difficulty = GetModule<DifficultyModule>();
             return difficulty?.CurrentStep ?? 0;
         }
         /// <summary>
-        /// CreateMonsterSpawnedEvent 함수를 처리합니다.
+        /// CreateMonsterSpawnedEvent 메서드입니다.
         /// </summary>
 
         private MonsterSpawnedEvent CreateMonsterSpawnedEvent(int playerIndex, MergeMonster monster)
         {
-            // 핵심 로직을 처리합니다.
             return new MonsterSpawnedEvent(
                 Tick,
                 playerIndex,
@@ -1031,12 +1013,11 @@ namespace MyProject.MergeGame
                 targetSpawnZ);
         }
         /// <summary>
-        /// TryInjectOpponentMonsterByKill 함수를 처리합니다.
+        /// TryInjectOpponentMonsterByKill 메서드입니다.
         /// </summary>
 
         private void TryInjectOpponentMonsterByKill(int killerPlayerIndex, long sourceMonsterUid, long monsterId, int preferredPathIndex, float sourceX, float sourceY, float sourceZ)
         {
-            // 핵심 로직을 처리합니다.
             if (_state.SessionPhase != MergeSessionPhase.Playing)
             {
                 return;
@@ -1112,12 +1093,11 @@ namespace MyProject.MergeGame
             }
         }
         /// <summary>
-        /// TryPickRandomOpponentPlayerIndex 함수를 처리합니다.
+        /// TryPickRandomOpponentPlayerIndex 메서드입니다.
         /// </summary>
 
         private bool TryPickRandomOpponentPlayerIndex(int sourcePlayerIndex, out int targetPlayerIndex)
         {
-            // 핵심 로직을 처리합니다.
             targetPlayerIndex = -1;
             if (_playerCount <= 1)
             {
@@ -1148,7 +1128,6 @@ namespace MyProject.MergeGame
         /// </summary>
         private void ConfigureTowerCombat(MergeTower tower, TowerDefinition definition, int grade)
         {
-            // 핵심 로직을 처리합니다.
             if (tower == null || definition == null)
             {
                 return;
@@ -1165,12 +1144,11 @@ namespace MyProject.MergeGame
             tower.SetAI(_defaultTowerAI);
         }
         /// <summary>
-        /// BuildBaseAttackAbility 함수를 처리합니다.
+        /// BuildBaseAttackAbility 메서드입니다.
         /// </summary>
 
         private GameplayAbility BuildBaseAttackAbility(TowerDefinition definition, float range)
         {
-            // 핵심 로직을 처리합니다.
             var ability = new GameplayAbility
             {
                 AbilityTag = new FGameplayTag("Ability.BaseAttack"),
@@ -1209,23 +1187,21 @@ namespace MyProject.MergeGame
             return ability;
         }
         /// <summary>
-        /// BuildTagContainer 함수를 처리합니다.
+        /// BuildTagContainer 메서드입니다.
         /// </summary>
 
         private static GameplayTagContainer BuildTagContainer(string tag)
         {
-            // 핵심 로직을 처리합니다.
             var container = new GameplayTagContainer();
             container.AddTag(new FGameplayTag(tag));
             return container;
         }
         /// <summary>
-        /// CreateTargetingStrategy 함수를 처리합니다.
+        /// CreateTargetingStrategy 메서드입니다.
         /// </summary>
 
         private static ITargetingStrategy CreateTargetingStrategy(TowerTargetingType targetingType, float range)
         {
-            // 핵심 로직을 처리합니다.
             return targetingType switch
             {
                 TowerTargetingType.Nearest => TargetingStrategyFactory.Create(TargetingStrategyType.NearestEnemy, maxRange: range),
@@ -1237,12 +1213,11 @@ namespace MyProject.MergeGame
             };
         }
         /// <summary>
-        /// CreateFallbackDefinition 함수를 처리합니다.
+        /// CreateFallbackDefinition 메서드입니다.
         /// </summary>
 
         private static TowerDefinition CreateFallbackDefinition(MergeTower source, int grade)
         {
-            // 핵심 로직을 처리합니다.
             if (source == null)
             {
                 return null;
@@ -1277,7 +1252,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public void SetMonsterPath(int playerIndex, int pathIndex, MonsterPath path)
         {
-            // 핵심 로직을 처리합니다.
             _state.SetMonsterPath(playerIndex, pathIndex, path);
         }
 
@@ -1354,7 +1328,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public IHostModule GetModule(string moduleId)
         {
-            // 핵심 로직을 처리합니다.
             return _moduleMap.TryGetValue(moduleId, out var module) ? module : null;
         }
 
@@ -1364,7 +1337,6 @@ namespace MyProject.MergeGame
         /// </summary>
         public void InitializeModules()
         {
-            // 핵심 로직을 처리합니다.
             if (_modulesInitialized)
             {
                 return;
@@ -1391,7 +1363,6 @@ namespace MyProject.MergeGame
         /// </summary>
         private void TickModules(float deltaTime)
         {
-            // 핵심 로직을 처리합니다.
             foreach (var module in _modules)
             {
                 if (module.IsInitialized)
@@ -1406,7 +1377,6 @@ namespace MyProject.MergeGame
         /// </summary>
         private void DisposeModules()
         {
-            // 핵심 로직을 처리합니다.
             foreach (var module in _modules)
             {
                 module.Shutdown();
@@ -1428,7 +1398,6 @@ namespace MyProject.MergeGame
         /// </summary>
         private void OnMonsterSpawnRequest(MonsterSpawnRequestInnerEvent evt)
         {
-            // 핵심 로직을 처리합니다.
             int playerIndex = evt.PlayerIndex;
             var pathIndex = evt.PathIndex;
             var path = _state.GetMonsterPath(playerIndex, pathIndex);
@@ -1460,12 +1429,11 @@ namespace MyProject.MergeGame
 
         #endregion
         /// <summary>
-        /// Dispose 함수를 처리합니다.
+        /// Dispose 메서드입니다.
         /// </summary>
 
         public override void Dispose()
         {
-            // 핵심 로직을 처리합니다.
             DisposeModules();
             _innerEventBus.Unsubscribe<MonsterSpawnRequestInnerEvent>(OnMonsterSpawnRequest);
             base.Dispose();

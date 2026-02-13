@@ -6,13 +6,13 @@ using UnityEngine.SceneManagement;
 namespace MyProject.Common.Bootstrap
 {
     /// <summary>
-    /// 寃뚯엫 遺?몄뒪?몃옒?쇱쓽 湲곕낯 ?숈옉???뺤쓽?섎뒗 踰좎씠?ㅼ엯?덈떎.
-    /// ?고????대깽??諛붿씤?⑷낵 留ㅻ땲? ?앹꽦 ?먮쫫???대떦?⑸땲??
+    /// 게임 부트스트랩 공통 베이스입니다.
+    /// 매니저 생성과 전역 이벤트 버스 초기화를 담당합니다.
     /// </summary>
     public abstract class BootstrapperBase : MonoBehaviour
     {
         /// <summary>
-        /// 珥덇린?????앹꽦??留ㅻ땲? ?꾨━??紐⑸줉?낅땲??
+        /// 씬 시작 시 생성할 매니저 프리팹 목록입니다.
         /// </summary>
         [SerializeField] private List<MonoBehaviour> _managerPrefabs = new();
 
@@ -20,12 +20,11 @@ namespace MyProject.Common.Bootstrap
         private bool _didInit;
 
         /// <summary>
-        /// ?뺤쟻 ?곹깭? ?대깽??諛붿씤?⑹쓣 珥덇린?뷀빀?덈떎.
+        /// 도메인 리로드 시 정적 상태를 초기화합니다.
         /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetStatics()
         {
-            // 핵심 로직을 처리합니다.
             _initialized = false;
             Application.quitting -= OnQuit;
             SceneManager.sceneUnloaded -= OnSceneUnloaded;
@@ -34,74 +33,66 @@ namespace MyProject.Common.Bootstrap
         }
 
         /// <summary>
-        /// ?고????쒖옉 ?????대깽?몃? ?깅줉?⑸땲??
+        /// 씬 로드 직후 전역 이벤트 구독을 등록합니다.
         /// </summary>
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void Initialize()
         {
-            // 핵심 로직을 처리합니다.
             if (_initialized)
             {
                 return;
             }
 
             _initialized = true;
-
             Application.quitting += OnQuit;
             SceneManager.sceneUnloaded += OnSceneUnloaded;
             SceneManager.activeSceneChanged += OnActiveSceneChanged;
 
             GameEventBus.TrySetActiveScene(SceneManager.GetActiveScene().handle);
         }
-        /// <summary>
-        /// Start 함수를 처리합니다.
-        /// </summary>
 
+        /// <summary>
+        /// 부트스트랩 진입점입니다.
+        /// </summary>
         private void Start()
         {
-            // 핵심 로직을 처리합니다.
             if (_didInit)
             {
                 return;
             }
 
-            // ??濡쒕뱶 吏곹썑 ??踰덈쭔 珥덇린?붾? ?ㅽ뻾?⑸땲??
             _didInit = true;
             OnInit();
         }
 
         /// <summary>
-        /// ?먯떇 ?대옒??珥덇린??吏?먯엯?덈떎.
+        /// 매니저를 생성/초기화합니다.
         /// </summary>
         protected virtual void OnInit()
         {
-            // 핵심 로직을 처리합니다.
             for (var i = 0; i < _managerPrefabs.Count; i++)
             {
-                // ?깅줉??留ㅻ땲? ?꾨━?뱀쓣 ?쒖감?곸쑝濡??앹꽦?⑸땲??
                 var manager = CreateManager(_managerPrefabs[i]);
-                if(manager != null)
+                if (manager != null)
                 {
                     manager.Initialize();
                 }
             }
         }
-        /// <summary>
-        /// OnSceneUnloaded 함수를 처리합니다.
-        /// </summary>
 
+        /// <summary>
+        /// 씬 언로드 시 씬 스코프 이벤트 버스를 정리합니다.
+        /// </summary>
         private static void OnSceneUnloaded(Scene scene)
         {
-            // 핵심 로직을 처리합니다.
             GameEventBus.ClearScene(scene.handle);
         }
-        /// <summary>
-        /// OnActiveSceneChanged 함수를 처리합니다.
-        /// </summary>
 
+        /// <summary>
+        /// 활성 씬 변경 시 이벤트 버스 활성 씬 핸들을 갱신합니다.
+        /// </summary>
         private static void OnActiveSceneChanged(Scene oldScene, Scene newScene)
         {
-            // 핵심 로직을 처리합니다.
             if (oldScene.handle == newScene.handle)
             {
                 return;
@@ -109,26 +100,23 @@ namespace MyProject.Common.Bootstrap
 
             GameEventBus.SetActiveScene(newScene.handle);
         }
-        /// <summary>
-        /// OnQuit 함수를 처리합니다.
-        /// </summary>
 
+        /// <summary>
+        /// 앱 종료 시 정적 이벤트를 해제합니다.
+        /// </summary>
         private static void OnQuit()
         {
-            // 핵심 로직을 처리합니다.
             Application.quitting -= OnQuit;
             SceneManager.sceneUnloaded -= OnSceneUnloaded;
             SceneManager.activeSceneChanged -= OnActiveSceneChanged;
-
             GameEventBus.ResetAll();
         }
 
         /// <summary>
-        /// 留ㅻ땲? ?꾨━?뱀쓣 ?앹꽦?섍굅??湲곗〈 ?몄뒪?댁뒪瑜?諛섑솚?⑸땲??
+        /// 매니저 프리팹을 생성하거나 기존 인스턴스를 반환합니다.
         /// </summary>
         protected IManager CreateManager(MonoBehaviour prefab)
         {
-            // 핵심 로직을 처리합니다.
             if (prefab == null)
             {
                 return null;
@@ -136,7 +124,7 @@ namespace MyProject.Common.Bootstrap
 
             if (prefab is not IManager)
             {
-                Debug.LogWarning($"IManager瑜?援ы쁽?섏? ?딆? 留ㅻ땲? ?꾨━?뱀엯?덈떎: {prefab.name}");
+                Debug.LogWarning($"IManager를 구현하지 않은 매니저 프리팹입니다: {prefab.name}");
                 return null;
             }
 

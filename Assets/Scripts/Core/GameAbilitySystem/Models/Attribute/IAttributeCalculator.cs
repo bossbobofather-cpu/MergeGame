@@ -1,16 +1,13 @@
-﻿namespace Noname.GameAbilitySystem
+namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// 二쇱꽍 ?뺣━
-    /// 二쇱꽍 ?뺣━
-    /// </summary>
+        /// 요약 설명입니다.
+        /// </summary>
     public interface IAttributeCalculator
     {
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
-        /// 二쇱꽍 ?뺣━
-        /// 二쇱꽍 ?뺣━
         void Apply(AbilitySystemComponent source, AbilitySystemComponent target);
     }
 }

@@ -1,12 +1,12 @@
-﻿using System;
+using System;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
 namespace MyProject.MergeGame.Unity.Network
 {
     /// <summary>
-    /// ?좎? ?뺣낫 ?뺤쟻 ?대옒???대씪??
-    /// </summary>
+        /// 요약 설명입니다.
+        /// </summary>
     public static class User
     {
         public const long InvalidUserId = 0;
@@ -16,12 +16,11 @@ namespace MyProject.MergeGame.Unity.Network
 
         public static long UserId { get; private set; } = InvalidUserId;
         /// <summary>
-        /// InitializeFromRuntime 함수를 처리합니다.
+        /// InitializeFromRuntime 메서드입니다.
         /// </summary>
 
         public static void InitializeFromRuntime()
         {
-            // 핵심 로직을 처리합니다.
             UserId = ResolveRuntimeUserId(out bool isClone, out int cloneIndex, out string sourcePath);
             if (isClone)
             {
@@ -32,12 +31,11 @@ namespace MyProject.MergeGame.Unity.Network
             Debug.Log($"[MergeGameUser] Original runtime detected. UserId={UserId}");
         }
         /// <summary>
-        /// ResolveRuntimeUserId 함수를 처리합니다.
+        /// ResolveRuntimeUserId 메서드입니다.
         /// </summary>
 
         public static long ResolveRuntimeUserId()
         {
-            // 핵심 로직을 처리합니다.
             return ResolveRuntimeUserId(out _, out _, out _);
         }
 

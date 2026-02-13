@@ -1,30 +1,30 @@
-﻿using System;
+using System;
 
 namespace Noname.GameAbilitySystem.Json
 {
     /// <summary>
-    /// 二쇱꽍 ?뺣━
-    /// </summary>
+        /// 요약 설명입니다.
+        /// </summary>
     [Serializable]
     public class TargetingStrategyDto
     {
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public string Type;
 
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public float MaxRange;
 
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public int MaxTargets;
 
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public float Radius;
     }

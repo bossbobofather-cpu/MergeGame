@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 
 namespace Noname.GameHost.GameEvent
 {
     /// <summary>
-    /// ?꾩뿭/???대깽??踰꾩뒪?????媛꾨떒 ?묎렐?먯엯?덈떎.
-    /// </summary>
+        /// 요약 설명입니다.
+        /// </summary>
     public static class GameEventHub
     {
         public static GameEventBus.Scope Global => GameEventBus.Global;

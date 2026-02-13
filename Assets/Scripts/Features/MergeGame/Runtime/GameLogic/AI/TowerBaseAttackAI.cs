@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using MyProject.MergeGame.Events;
 using MyProject.MergeGame.Models;
 using MyProject.MergeGame.Systems;
@@ -14,12 +14,11 @@ namespace MyProject.MergeGame.AI
     {
         private readonly FGameplayTag _baseAttackTag;
         /// <summary>
-        /// TowerBaseAttackAI 함수를 처리합니다.
+        /// TowerBaseAttackAI 메서드입니다.
         /// </summary>
 
         public TowerBaseAttackAI(string baseAttackTag = "Ability.BaseAttack")
         {
-            // 핵심 로직을 처리합니다.
             _baseAttackTag = new FGameplayTag(baseAttackTag);
         }
 

@@ -1,17 +1,16 @@
-﻿    /// <summary>
-    /// 二쇱꽍 ?뺣━
-    /// </summary>
+    /// <summary>
+        /// 요약 설명입니다.
+        /// </summary>
     public enum AttributeModifierValueMode
     {
         None,
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         Static,
 
         /// <summary>
-        /// 二쇱꽍 ?뺣━
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         Calculated
     }

@@ -1,4 +1,4 @@
-﻿namespace Noname.GameAbilitySystem
+namespace Noname.GameAbilitySystem
 {
     /// <summary>
     /// 3차원 좌표를 표현합니다.
@@ -18,12 +18,11 @@
             Z = z;
         }
         /// <summary>
-        /// DistanceSquared 함수를 처리합니다.
+        /// DistanceSquared 메서드입니다.
         /// </summary>
 
         public static float DistanceSquared(in Point3D a, in Point3D b)
         {
-            // 핵심 로직을 처리합니다.
             var dx = a.X - b.X;
             var dy = a.Y - b.Y;
             var dz = a.Z - b.Z;

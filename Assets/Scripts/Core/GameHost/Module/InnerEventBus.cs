@@ -4,33 +4,33 @@ using System.Collections.Generic;
 namespace Noname.GameHost.Module
 {
     /// <summary>
-    /// ?대? ?대깽??踰꾩뒪 ?명꽣?섏씠?ㅼ엯?덈떎.
+    /// Host 내부 이벤트 버스 인터페이스입니다.
     /// </summary>
     public interface IInnerEventBus
     {
         /// <summary>
-        /// ?대깽?몃? 援щ룆?⑸땲??
+        /// 이벤트 핸들러를 등록합니다.
         /// </summary>
         void Subscribe<TEvent>(Action<TEvent> handler) where TEvent : IInnerEvent;
 
         /// <summary>
-        /// ?대깽??援щ룆???댁젣?⑸땲??
+        /// 이벤트 핸들러를 해제합니다.
         /// </summary>
         void Unsubscribe<TEvent>(Action<TEvent> handler) where TEvent : IInnerEvent;
 
         /// <summary>
-        /// ?대깽?몃? 諛쒗뻾?⑸땲??
+        /// 이벤트를 발행합니다.
         /// </summary>
         void Publish<TEvent>(TEvent eventData) where TEvent : IInnerEvent;
 
         /// <summary>
-        /// 紐⑤뱺 援щ룆???댁젣?⑸땲??
+        /// 등록된 모든 핸들러를 제거합니다.
         /// </summary>
         void Clear();
     }
 
     /// <summary>
-    /// Host ?대? 紐⑤뱢 媛??듭떊???꾪븳 ?대깽??踰꾩뒪?낅땲??
+    /// 단일 스레드/락 기반 내부 이벤트 버스 구현입니다.
     /// </summary>
     public sealed class InnerEventBus : IInnerEventBus
     {
@@ -39,7 +39,10 @@ namespace Noname.GameHost.Module
 
         public void Subscribe<TEvent>(Action<TEvent> handler) where TEvent : IInnerEvent
         {
-            if (handler == null) return;
+            if (handler == null)
+            {
+                return;
+            }
 
             lock (_lock)
             {
@@ -49,13 +52,17 @@ namespace Noname.GameHost.Module
                     list = new List<Delegate>();
                     _handlers[type] = list;
                 }
+
                 list.Add(handler);
             }
         }
 
         public void Unsubscribe<TEvent>(Action<TEvent> handler) where TEvent : IInnerEvent
         {
-            if (handler == null) return;
+            if (handler == null)
+            {
+                return;
+            }
 
             lock (_lock)
             {
@@ -69,7 +76,10 @@ namespace Noname.GameHost.Module
 
         public void Publish<TEvent>(TEvent eventData) where TEvent : IInnerEvent
         {
-            if (eventData == null) return;
+            if (eventData == null)
+            {
+                return;
+            }
 
             List<Delegate> handlersCopy;
             lock (_lock)
@@ -79,6 +89,7 @@ namespace Noname.GameHost.Module
                 {
                     return;
                 }
+
                 handlersCopy = new List<Delegate>(list);
             }
 
@@ -90,17 +101,16 @@ namespace Noname.GameHost.Module
                 }
                 catch (Exception ex)
                 {
-                    GameHostLog.LogError($"[InnerEventBus] ?대깽??泥섎━ ?ㅻ쪟 {typeof(TEvent).Name}: {ex}");
+                    GameHostLog.LogError($"[InnerEventBus] 이벤트 처리 오류 {typeof(TEvent).Name}: {ex}");
                 }
             }
         }
-        /// <summary>
-        /// Clear 함수를 처리합니다.
-        /// </summary>
 
+        /// <summary>
+        /// 등록된 핸들러를 모두 초기화합니다.
+        /// </summary>
         public void Clear()
         {
-            // 핵심 로직을 처리합니다.
             lock (_lock)
             {
                 _handlers.Clear();

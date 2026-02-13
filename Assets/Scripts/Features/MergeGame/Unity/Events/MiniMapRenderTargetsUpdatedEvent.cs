@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Noname.GameHost.GameEvent;
 using UnityEngine;
 
@@ -27,13 +27,12 @@ namespace MyProject.MergeGame.Unity.Events
         public IReadOnlyList<MiniMapRenderTargetInfo> Targets { get; }
         public int Version { get; }
         /// <summary>
-        /// MiniMapRenderTargetsUpdatedEvent 함수를 처리합니다.
+        /// MiniMapRenderTargetsUpdatedEvent 메서드입니다.
         /// </summary>
 
         public MiniMapRenderTargetsUpdatedEvent(object source, IReadOnlyList<MiniMapRenderTargetInfo> targets, int version)
             : base(source)
         {
-            // 핵심 로직을 처리합니다.
             Targets = targets;
             Version = version;
         }

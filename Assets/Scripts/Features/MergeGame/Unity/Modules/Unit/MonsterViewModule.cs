@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using MyProject.MergeGame.Events;
 using MyProject.MergeGame.Snapshots;
 using UnityEngine;
@@ -24,12 +24,11 @@ namespace MyProject.MergeGame.Unity
         private readonly HashSet<long> _seen = new();
         private readonly List<long> _removeBuffer = new();
         /// <summary>
-        /// OnEventMsg 함수를 처리합니다.
+        /// OnEventMsg 메서드입니다.
         /// </summary>
 
         public override void OnEventMsg(MergeGameEvent evt)
         {
-            // 핵심 로직을 처리합니다.
             switch (evt)
             {
                 case MonsterSpawnedEvent spawned:
@@ -46,12 +45,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// OnSnapshotMsg 함수를 처리합니다.
+        /// OnSnapshotMsg 메서드입니다.
         /// </summary>
 
         public override void OnSnapshotMsg(MergeHostSnapshot snapshot)
         {
-            // 핵심 로직을 처리합니다.
             if (snapshot == null)
             {
                 return;
@@ -60,12 +58,11 @@ namespace MyProject.MergeGame.Unity
             SyncMonsters(snapshot);
         }
         /// <summary>
-        /// SyncMonsters 함수를 처리합니다.
+        /// SyncMonsters 메서드입니다.
         /// </summary>
 
         private void SyncMonsters(MergeHostSnapshot snapshot)
         {
-            // 핵심 로직을 처리합니다.
             var monsterMap = GetOrCreateMonsterMap(snapshot.PlayerIndex);
             _seen.Clear();
 
@@ -104,12 +101,11 @@ namespace MyProject.MergeGame.Unity
             RemoveNotSeen(monsterMap);
         }
         /// <summary>
-        /// EnsureMonsterFromEvent 함수를 처리합니다.
+        /// EnsureMonsterFromEvent 메서드입니다.
         /// </summary>
 
         private void EnsureMonsterFromEvent(MonsterSpawnedEvent evt)
         {
-            // 핵심 로직을 처리합니다.
             if (evt == null)
             {
                 return;
@@ -134,12 +130,11 @@ namespace MyProject.MergeGame.Unity
             obj.name = $"Monster_P{evt.PlayerIndex}_{evt.MonsterUid}";
         }
         /// <summary>
-        /// HandleMonsterMoved 함수를 처리합니다.
+        /// HandleMonsterMoved 메서드입니다.
         /// </summary>
 
         private void HandleMonsterMoved(MonsterMovedEvent evt)
         {
-            // 핵심 로직을 처리합니다.
             if (evt == null)
             {
                 return;
@@ -155,12 +150,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// RemoveNotSeen 함수를 처리합니다.
+        /// RemoveNotSeen 메서드입니다.
         /// </summary>
 
         private void RemoveNotSeen(Dictionary<long, GameObject> dict)
         {
-            // 핵심 로직을 처리합니다.
             _removeBuffer.Clear();
 
             foreach (var kv in dict)
@@ -183,12 +177,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// CreateMonsterObject 함수를 처리합니다.
+        /// CreateMonsterObject 메서드입니다.
         /// </summary>
 
         private GameObject CreateMonsterObject()
         {
-            // 핵심 로직을 처리합니다.
             if (_monsterPrefab != null)
             {
                 return Instantiate(_monsterPrefab, transform);
@@ -206,12 +199,11 @@ namespace MyProject.MergeGame.Unity
             return obj;
         }
         /// <summary>
-        /// InitializeMonsterObject 함수를 처리합니다.
+        /// InitializeMonsterObject 메서드입니다.
         /// </summary>
 
         private void InitializeMonsterObject(GameObject obj)
         {
-            // 핵심 로직을 처리합니다.
             if (obj == null)
             {
                 return;
@@ -223,12 +215,11 @@ namespace MyProject.MergeGame.Unity
             state.SetBaseScale(_monsterScale);
         }
         /// <summary>
-        /// RemoveMonster 함수를 처리합니다.
+        /// RemoveMonster 메서드입니다.
         /// </summary>
 
         private void RemoveMonster(int playerIndex, long uid)
         {
-            // 핵심 로직을 처리합니다.
             if (!TryGetMonsterMap(playerIndex, out var monsterMap))
             {
                 return;
@@ -242,12 +233,11 @@ namespace MyProject.MergeGame.Unity
             monsterMap.Remove(uid);
         }
         /// <summary>
-        /// ApplyInjectedMonsterTint 함수를 처리합니다.
+        /// ApplyInjectedMonsterTint 메서드입니다.
         /// </summary>
 
         private static void ApplyInjectedMonsterTint(GameObject obj, Color color)
         {
-            // 핵심 로직을 처리합니다.
             var renderer = obj.GetComponentInChildren<Renderer>();
             if (renderer == null)
             {
@@ -263,12 +253,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// ApplyMonsterHpTint 함수를 처리합니다.
+        /// ApplyMonsterHpTint 메서드입니다.
         /// </summary>
 
         private static void ApplyMonsterHpTint(GameObject obj, float hpRatio)
         {
-            // 핵심 로직을 처리합니다.
             var renderer = obj.GetComponentInChildren<Renderer>();
             if (renderer == null)
             {
@@ -287,12 +276,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// GetOrCreateMonsterMap 함수를 처리합니다.
+        /// GetOrCreateMonsterMap 메서드입니다.
         /// </summary>
 
         private Dictionary<long, GameObject> GetOrCreateMonsterMap(int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             if (_monsterObjectsByPlayer.TryGetValue(playerIndex, out var monsterMap))
             {
                 return monsterMap;
@@ -303,21 +291,19 @@ namespace MyProject.MergeGame.Unity
             return monsterMap;
         }
         /// <summary>
-        /// TryGetMonsterMap 함수를 처리합니다.
+        /// TryGetMonsterMap 메서드입니다.
         /// </summary>
 
         private bool TryGetMonsterMap(int playerIndex, out Dictionary<long, GameObject> monsterMap)
         {
-            // 핵심 로직을 처리합니다.
             return _monsterObjectsByPlayer.TryGetValue(playerIndex, out monsterMap);
         }
         /// <summary>
-        /// TryGetMonsterWorldPosition 함수를 처리합니다.
+        /// TryGetMonsterWorldPosition 메서드입니다.
         /// </summary>
 
         public bool TryGetMonsterWorldPosition(int playerIndex, long monsterUid, out Vector3 worldPosition)
         {
-            // 핵심 로직을 처리합니다.
             worldPosition = Vector3.zero;
             if (!TryGetMonsterMap(playerIndex, out var monsterMap))
             {
@@ -333,12 +319,11 @@ namespace MyProject.MergeGame.Unity
             return true;
         }
         /// <summary>
-        /// TryGetAnyMonsterWorldPosition 함수를 처리합니다.
+        /// TryGetAnyMonsterWorldPosition 메서드입니다.
         /// </summary>
 
         public bool TryGetAnyMonsterWorldPosition(int playerIndex, out Vector3 worldPosition)
         {
-            // 핵심 로직을 처리합니다.
             worldPosition = Vector3.zero;
             if (!TryGetMonsterMap(playerIndex, out var monsterMap))
             {
@@ -360,22 +345,20 @@ namespace MyProject.MergeGame.Unity
             return false;
         }
         /// <summary>
-        /// ApplyOffset 함수를 처리합니다.
+        /// ApplyOffset 메서드입니다.
         /// </summary>
 
         private Vector3 ApplyOffset(int playerIndex, float x, float y, float z)
         {
-            // 핵심 로직을 처리합니다.
             var offset = GameView != null ? GameView.GetPlayerOffsetPosition(playerIndex) : Vector3.zero;
             return new Vector3(x, y, z) + offset;
         }
         /// <summary>
-        /// OnShutdown 함수를 처리합니다.
+        /// OnShutdown 메서드입니다.
         /// </summary>
 
         protected override void OnShutdown()
         {
-            // 핵심 로직을 처리합니다.
             base.OnShutdown();
 
             foreach (var playerMap in _monsterObjectsByPlayer.Values)

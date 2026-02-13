@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace MyProject.MergeGame.Unity
 {
@@ -25,18 +25,16 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         public void TriggerAttack(float? duration = null)
         {
-            // 핵심 로직을 처리합니다.
             _state = TowerVisualState.Attack;
             _attackTimer = duration ?? _attackDuration;
             transform.localScale = _baseScale * _attackScaleMultiplier;
         }
         /// <summary>
-        /// Update 함수를 처리합니다.
+        /// Update 메서드입니다.
         /// </summary>
 
         private void Update()
         {
-            // 핵심 로직을 처리합니다.
             if (_state != TowerVisualState.Attack)
             {
                 return;

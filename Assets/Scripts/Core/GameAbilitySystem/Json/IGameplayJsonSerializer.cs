@@ -1,8 +1,8 @@
-﻿namespace Noname.GameAbilitySystem.Json
+namespace Noname.GameAbilitySystem.Json
 {
     /// <summary>
-    /// 二쇱꽍 ?뺣━
-    /// </summary>
+        /// 요약 설명입니다.
+        /// </summary>
     public interface IGameplayJsonSerializer
     {
         string Serialize<T>(T value);

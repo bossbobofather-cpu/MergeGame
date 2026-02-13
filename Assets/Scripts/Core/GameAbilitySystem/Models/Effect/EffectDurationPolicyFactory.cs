@@ -1,16 +1,15 @@
-﻿namespace Noname.GameAbilitySystem
+namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// 二쇱꽍 ?뺣━
-    /// </summary>
+        /// 요약 설명입니다.
+        /// </summary>
     public static class EffectDurationPolicyFactory
     {
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public static IEffectDurationPolicy Create(EffectDurationPolicyType type)
         {
-            // 핵심 로직을 처리합니다.
             return type switch
             {
                 EffectDurationPolicyType.BaseAttackCooldown => BaseAttackCooldownDurationPlicy.Instance,
@@ -19,11 +18,10 @@
         }
 
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public static IEffectDurationPolicy Create(string typeName)
         {
-            // 핵심 로직을 처리합니다.
             if (string.IsNullOrEmpty(typeName)) return null;
 
             return typeName switch
@@ -34,11 +32,10 @@
         }
 
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public static EffectDurationPolicyType GetPolicyType(IEffectDurationPolicy policy)
         {
-            // 핵심 로직을 처리합니다.
             return policy switch
             {
                 BaseAttackCooldownDurationPlicy => EffectDurationPolicyType.BaseAttackCooldown,
@@ -47,11 +44,10 @@
         }
 
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public static string GetTypeName(IEffectDurationPolicy policy)
         {
-            // 핵심 로직을 처리합니다.
             return policy switch
             {
                 BaseAttackCooldownDurationPlicy => "BaseAttackCooldown",

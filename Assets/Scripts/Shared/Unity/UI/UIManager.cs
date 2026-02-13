@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MyProject.Common.Bootstrap;
 using UnityEngine;
@@ -46,7 +46,6 @@ namespace MyProject.Common.UI
         /// </summary>
         public void Initialize()
         {
-            // 핵심 로직을 처리합니다.
             if (_initialized)
             {
                 return;
@@ -71,7 +70,7 @@ namespace MyProject.Common.UI
             EnsureRoot();
         }
         /// <summary>
-        /// OnDestroy 함수를 처리합니다.
+        /// OnDestroy 메서드입니다.
         /// </summary>
 
         private void OnDestroy()
@@ -174,7 +173,6 @@ namespace MyProject.Common.UI
         /// </summary>
         public void Close(UIBase instance)
         {
-            // 핵심 로직을 처리합니다.
             if (instance == null)
             {
                 return;
@@ -196,7 +194,6 @@ namespace MyProject.Common.UI
         /// </summary>
         public void ClosePopup()
         {
-            // 핵심 로직을 처리합니다.
             if (_activePopup == null)
             {
                 return;
@@ -227,12 +224,11 @@ namespace MyProject.Common.UI
             return Open(prefab, layer) as T;
         }
         /// <summary>
-        /// Open 함수를 처리합니다.
+        /// Open 메서드입니다.
         /// </summary>
 
         private UIBase Open(UIBase prefab, UILayer layer)
         {
-            // 핵심 로직을 처리합니다.
             if (prefab == null)
             {
                 return null;
@@ -281,12 +277,11 @@ namespace MyProject.Common.UI
             return instance;
         }
         /// <summary>
-        /// EnsureRoot 함수를 처리합니다.
+        /// EnsureRoot 메서드입니다.
         /// </summary>
 
         private void EnsureRoot()
         {
-            // 핵심 로직을 처리합니다.
             if (_rootInstance != null)
             {
                 return;
@@ -306,12 +301,11 @@ namespace MyProject.Common.UI
             }
         }
         /// <summary>
-        /// ResolveRoot 함수를 처리합니다.
+        /// ResolveRoot 메서드입니다.
         /// </summary>
 
         private RectTransform ResolveRoot(UILayer layer)
         {
-            // 핵심 로직을 처리합니다.
             if (_rootInstance == null)
             {
                 return null;
@@ -326,12 +320,11 @@ namespace MyProject.Common.UI
             };
         }
         /// <summary>
-        /// ResolveCanvas 함수를 처리합니다.
+        /// ResolveCanvas 메서드입니다.
         /// </summary>
 
         private Canvas ResolveCanvas(UILayer layer)
         {
-            // 핵심 로직을 처리합니다.
             if (_rootInstance == null)
             {
                 return null;
@@ -346,12 +339,11 @@ namespace MyProject.Common.UI
             };
         }
         /// <summary>
-        /// ApplySorting 함수를 처리합니다.
+        /// ApplySorting 메서드입니다.
         /// </summary>
 
         private void ApplySorting(UIBase instance, UILayer layer)
         {
-            // 핵심 로직을 처리합니다.
             var canvas = instance.GetComponent<Canvas>();
             if (canvas == null)
             {
@@ -367,12 +359,11 @@ namespace MyProject.Common.UI
             canvas.sortingOrder = baseOrder + order;
         }
         /// <summary>
-        /// NextOrder 함수를 처리합니다.
+        /// NextOrder 메서드입니다.
         /// </summary>
 
         private int NextOrder(UILayer layer)
         {
-            // 핵심 로직을 처리합니다.
             return layer switch
             {
                 UILayer.Page => ++_pageOrder,
@@ -382,12 +373,11 @@ namespace MyProject.Common.UI
             };
         }
         /// <summary>
-        /// ValidateLayer 함수를 처리합니다.
+        /// ValidateLayer 메서드입니다.
         /// </summary>
 
         private bool ValidateLayer(UIBase prefab, UILayer layer)
         {
-            // 핵심 로직을 처리합니다.
             var isPage = prefab is UIPageBase;
             var isPopup = prefab is UIPopupBase;
             var isSystem = prefab is UISystemBase;
@@ -447,12 +437,11 @@ namespace MyProject.Common.UI
             return false;
         }
         /// <summary>
-        /// RegisterCachedType 함수를 처리합니다.
+        /// RegisterCachedType 메서드입니다.
         /// </summary>
 
         private void RegisterCachedType(UIBase instance)
         {
-            // 핵심 로직을 처리합니다.
             if (instance == null)
             {
                 return;

@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using Noname.GameHost;
@@ -12,42 +12,38 @@ namespace MyProject.MergeGame.Events
     {
         public int PlayerIndex { get; }
         /// <summary>
-        /// base 함수를 처리합니다.
+        /// base 메서드입니다.
         /// </summary>
 
         protected MergeGameEvent(long tick, int playerIndex) : base(tick)
         {
-            // 핵심 로직을 처리합니다.
             PlayerIndex = playerIndex;
         }
         /// <summary>
-        /// GetPayloadSize 함수를 처리합니다.
+        /// GetPayloadSize 메서드입니다.
         /// </summary>
 
         protected override int GetPayloadSize()
         {
-            // 핵심 로직을 처리합니다.
             return sizeof(int); // PlayerIndex
         }
         /// <summary>
-        /// WritePayload 함수를 처리합니다.
+        /// WritePayload 메서드입니다.
         /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
-            // 핵심 로직을 처리합니다.
             var offset = 0;
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset, sizeof(int)), PlayerIndex);
             offset += sizeof(int);
             return offset;
         }
         /// <summary>
-        /// ReadMergeHeader 함수를 처리합니다.
+        /// ReadMergeHeader 메서드입니다.
         /// </summary>
 
         public static (long tick, int playerIndex, int bytesRead) ReadMergeHeader(ReadOnlySpan<byte> src)
         {
-            // 핵심 로직을 처리합니다.
             var (tick, offset) = GameEventBase.ReadHeader(src);
 
             int playerIndex = BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(int)));
@@ -60,37 +56,33 @@ namespace MyProject.MergeGame.Events
     public sealed class ConnectedInfoEvent : MergeGameEvent
     {
         /// <summary>
-        /// base 함수를 처리합니다.
+        /// base 메서드입니다.
         /// </summary>
         public ConnectedInfoEvent(long tick, int playerIndex) : base(tick, playerIndex)
         {
-            // 핵심 로직을 처리합니다.
         }
         /// <summary>
-        /// GetPayloadSize 함수를 처리합니다.
+        /// GetPayloadSize 메서드입니다.
         /// </summary>
 
         protected override int GetPayloadSize()
         {
-            // 핵심 로직을 처리합니다.
             return base.GetPayloadSize();
         }
         /// <summary>
-        /// WritePayload 함수를 처리합니다.
+        /// WritePayload 메서드입니다.
         /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
-            // 핵심 로직을 처리합니다.
             return base.WritePayload(dst);
         }
         /// <summary>
-        /// ReadFrom 함수를 처리합니다.
+        /// ReadFrom 메서드입니다.
         /// </summary>
 
         public static ConnectedInfoEvent ReadFrom(ReadOnlySpan<byte> src)
         {
-            // 핵심 로직을 처리합니다.
             var (tick, playerIndex, _) = ReadMergeHeader(src);
             return new ConnectedInfoEvent(tick, playerIndex);
         }
@@ -102,38 +94,33 @@ namespace MyProject.MergeGame.Events
     public sealed class GameStartedEvent : MergeGameEvent
     {
         /// <summary>
-        /// base 함수를 처리합니다.
+        /// base 메서드입니다.
         /// </summary>
         public GameStartedEvent(long tick, int playerIndex) : base(tick, playerIndex)
         {
-            // 핵심 로직을 처리합니다.
-
         }
         /// <summary>
-        /// GetPayloadSize 함수를 처리합니다.
+        /// GetPayloadSize 메서드입니다.
         /// </summary>
 
         protected override int GetPayloadSize()
         {
-            // 핵심 로직을 처리합니다.
             return base.GetPayloadSize();
         }
         /// <summary>
-        /// WritePayload 함수를 처리합니다.
+        /// WritePayload 메서드입니다.
         /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
-            // 핵심 로직을 처리합니다.
             return base.WritePayload(dst);
         }
         /// <summary>
-        /// ReadFrom 함수를 처리합니다.
+        /// ReadFrom 메서드입니다.
         /// </summary>
 
         public static GameStartedEvent ReadFrom(ReadOnlySpan<byte> src)
         {
-            // 핵심 로직을 처리합니다.
             var (tick, playerIndex, _) = ReadMergeHeader(src);
 
             return new GameStartedEvent(tick, playerIndex);
@@ -180,12 +167,11 @@ namespace MyProject.MergeGame.Events
         /// </summary>
         public float PositionZ { get; }
         /// <summary>
-        /// base 함수를 처리합니다.
+        /// base 메서드입니다.
         /// </summary>
 
         public TowerSpawnedEvent(long tick, int playerIndex, long towerUid, long towerId, int grade, int slotIndex, float positionX, float positionY, float positionZ) : base(tick, playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             TowerUid = towerUid;
             TowerId = towerId;
             Grade = grade;
@@ -195,12 +181,11 @@ namespace MyProject.MergeGame.Events
             PositionZ = positionZ;
         }
         /// <summary>
-        /// GetPayloadSize 함수를 처리합니다.
+        /// GetPayloadSize 메서드입니다.
         /// </summary>
 
         protected override int GetPayloadSize()
         {
-            // 핵심 로직을 처리합니다.
             return base.GetPayloadSize()
                 + sizeof(long)  // TowerUid
                 + sizeof(long)  // TowerId
@@ -211,12 +196,11 @@ namespace MyProject.MergeGame.Events
                 + sizeof(float); // PositionZ
         }
         /// <summary>
-        /// WritePayload 함수를 처리합니다.
+        /// WritePayload 메서드입니다.
         /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
-            // 핵심 로직을 처리합니다.
             var offset = base.WritePayload(dst);
 
             BinaryPrimitives.WriteInt64LittleEndian(dst.Slice(offset, sizeof(long)), TowerUid);
@@ -245,12 +229,11 @@ namespace MyProject.MergeGame.Events
             return GetPayloadSize();
         }
         /// <summary>
-        /// ReadFrom 함수를 처리합니다.
+        /// ReadFrom 메서드입니다.
         /// </summary>
 
         public static TowerSpawnedEvent ReadFrom(ReadOnlySpan<byte> src)
         {
-            // 핵심 로직을 처리합니다.
             var (tick, playerIndex, offset) = ReadMergeHeader(src);
 
             long towerUid = BinaryPrimitives.ReadInt64LittleEndian(src.Slice(offset, sizeof(long)));
@@ -335,12 +318,11 @@ namespace MyProject.MergeGame.Events
             SlotIndex = slotIndex;
         }
         /// <summary>
-        /// GetPayloadSize 함수를 처리합니다.
+        /// GetPayloadSize 메서드입니다.
         /// </summary>
 
         protected override int GetPayloadSize()
         {
-            // 핵심 로직을 처리합니다.
             return base.GetPayloadSize()
                 + sizeof(long)  // SourceTowerUid
                 + sizeof(long)  // TargetTowerUid
@@ -350,12 +332,11 @@ namespace MyProject.MergeGame.Events
                 + sizeof(int);  // SlotIndex
         }
         /// <summary>
-        /// WritePayload 함수를 처리합니다.
+        /// WritePayload 메서드입니다.
         /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
-            // 핵심 로직을 처리합니다.
             var offset = base.WritePayload(dst);
 
             BinaryPrimitives.WriteInt64LittleEndian(dst.Slice(offset, sizeof(long)), SourceTowerUid);
@@ -378,12 +359,11 @@ namespace MyProject.MergeGame.Events
             return GetPayloadSize();
         }
         /// <summary>
-        /// ReadFrom 함수를 처리합니다.
+        /// ReadFrom 메서드입니다.
         /// </summary>
 
         public static TowerMergedEvent ReadFrom(ReadOnlySpan<byte> src)
         {
-            // 핵심 로직을 처리합니다.
             var (tick, playerIndex, offset) = ReadMergeHeader(src);
 
             long sourceTowerUid = BinaryPrimitives.ReadInt64LittleEndian(src.Slice(offset, sizeof(long)));
@@ -422,33 +402,30 @@ namespace MyProject.MergeGame.Events
         /// </summary>
         public int SlotIndex { get; }
         /// <summary>
-        /// base 함수를 처리합니다.
+        /// base 메서드입니다.
         /// </summary>
 
         public TowerRemovedEvent(long tick, int playerIndex, long unitUid, int slotIndex) : base(tick, playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             TowerUid = unitUid;
             SlotIndex = slotIndex;
         }
         /// <summary>
-        /// GetPayloadSize 함수를 처리합니다.
+        /// GetPayloadSize 메서드입니다.
         /// </summary>
 
         protected override int GetPayloadSize()
         {
-            // 핵심 로직을 처리합니다.
             return base.GetPayloadSize()
                 + sizeof(long)  // TowerUid
                 + sizeof(int);  // SlotIndex
         }
         /// <summary>
-        /// WritePayload 함수를 처리합니다.
+        /// WritePayload 메서드입니다.
         /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
-            // 핵심 로직을 처리합니다.
             var offset = base.WritePayload(dst);
 
             BinaryPrimitives.WriteInt64LittleEndian(dst.Slice(offset, sizeof(long)), TowerUid);
@@ -459,12 +436,11 @@ namespace MyProject.MergeGame.Events
             return GetPayloadSize();
         }
         /// <summary>
-        /// ReadFrom 함수를 처리합니다.
+        /// ReadFrom 메서드입니다.
         /// </summary>
 
         public static TowerRemovedEvent ReadFrom(ReadOnlySpan<byte> src)
         {
-            // 핵심 로직을 처리합니다.
             var (tick, playerIndex, offset) = ReadMergeHeader(src);
 
             long towerUid = BinaryPrimitives.ReadInt64LittleEndian(src.Slice(offset, sizeof(long)));
@@ -496,35 +472,32 @@ namespace MyProject.MergeGame.Events
         /// </summary>
         public int MaxGradeReached { get; }
         /// <summary>
-        /// base 함수를 처리합니다.
+        /// base 메서드입니다.
         /// </summary>
 
         public GameOverEvent(long tick, int playerIndex, bool isVictory, int finalScore, int maxGradeReached) : base(tick, playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             IsVictory = isVictory;
             FinalScore = finalScore;
             MaxGradeReached = maxGradeReached;
         }
         /// <summary>
-        /// GetPayloadSize 함수를 처리합니다.
+        /// GetPayloadSize 메서드입니다.
         /// </summary>
 
         protected override int GetPayloadSize()
         {
-            // 핵심 로직을 처리합니다.
             return base.GetPayloadSize()
                 + sizeof(byte)  // IsVictory
                 + sizeof(int)   // FinalScore
                 + sizeof(int);  // MaxGradeReached
         }
         /// <summary>
-        /// WritePayload 함수를 처리합니다.
+        /// WritePayload 메서드입니다.
         /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
-            // 핵심 로직을 처리합니다.
             var offset = base.WritePayload(dst);
 
             dst[offset] = IsVictory ? (byte)1 : (byte)0;
@@ -538,12 +511,11 @@ namespace MyProject.MergeGame.Events
             return GetPayloadSize();
         }
         /// <summary>
-        /// ReadFrom 함수를 처리합니다.
+        /// ReadFrom 메서드입니다.
         /// </summary>
 
         public static GameOverEvent ReadFrom(ReadOnlySpan<byte> src)
         {
-            // 핵심 로직을 처리합니다.
             var (tick, playerIndex, offset) = ReadMergeHeader(src);
 
             bool isVictory = src[offset] != 0;
@@ -573,33 +545,30 @@ namespace MyProject.MergeGame.Events
         /// </summary>
         public int ScoreDelta { get; }
         /// <summary>
-        /// base 함수를 처리합니다.
+        /// base 메서드입니다.
         /// </summary>
 
         public ScoreChangedEvent(long tick, int playerIndex, int currentScore, int scoreDelta) : base(tick, playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             CurrentScore = currentScore;
             ScoreDelta = scoreDelta;
         }
         /// <summary>
-        /// GetPayloadSize 함수를 처리합니다.
+        /// GetPayloadSize 메서드입니다.
         /// </summary>
 
         protected override int GetPayloadSize()
         {
-            // 핵심 로직을 처리합니다.
             return base.GetPayloadSize()
                 + sizeof(int)   // CurrentScore
                 + sizeof(int);  // ScoreDelta
         }
         /// <summary>
-        /// WritePayload 함수를 처리합니다.
+        /// WritePayload 메서드입니다.
         /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
-            // 핵심 로직을 처리합니다.
             var offset = base.WritePayload(dst);
 
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset, sizeof(int)), CurrentScore);
@@ -610,12 +579,11 @@ namespace MyProject.MergeGame.Events
             return GetPayloadSize();
         }
         /// <summary>
-        /// ReadFrom 함수를 처리합니다.
+        /// ReadFrom 메서드입니다.
         /// </summary>
 
         public static ScoreChangedEvent ReadFrom(ReadOnlySpan<byte> src)
         {
-            // 핵심 로직을 처리합니다.
             var (tick, playerIndex, offset) = ReadMergeHeader(src);
 
             int currentScore = BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(int)));
@@ -720,12 +688,11 @@ namespace MyProject.MergeGame.Events
             ProjectileUid = projectileUid;
         }
         /// <summary>
-        /// GetPayloadSize 함수를 처리합니다.
+        /// GetPayloadSize 메서드입니다.
         /// </summary>
 
         protected override int GetPayloadSize()
         {
-            // 핵심 로직을 처리합니다.
             return base.GetPayloadSize()
                 + sizeof(long)  // AttackerUid
                 + sizeof(long)  // TargetUid
@@ -743,12 +710,11 @@ namespace MyProject.MergeGame.Events
                 + sizeof(long); // ProjectileUid
         }
         /// <summary>
-        /// WritePayload 함수를 처리합니다.
+        /// WritePayload 메서드입니다.
         /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
-            // 핵심 로직을 처리합니다.
             var offset = base.WritePayload(dst);
 
             BinaryPrimitives.WriteInt64LittleEndian(dst.Slice(offset, sizeof(long)), AttackerUid);
@@ -805,12 +771,11 @@ namespace MyProject.MergeGame.Events
             return GetPayloadSize();
         }
         /// <summary>
-        /// ReadFrom 함수를 처리합니다.
+        /// ReadFrom 메서드입니다.
         /// </summary>
 
         public static TowerAttackedEvent ReadFrom(ReadOnlySpan<byte> src)
         {
-            // 핵심 로직을 처리합니다.
             var (tick, playerIndex, offset) = ReadMergeHeader(src);
 
             long attackerUid = BinaryPrimitives.ReadInt64LittleEndian(src.Slice(offset, sizeof(long)));
@@ -933,12 +898,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
             ResultTowerUid = resultTowerUid;
         }
         /// <summary>
-        /// GetPayloadSize 함수를 처리합니다.
+        /// GetPayloadSize 메서드입니다.
         /// </summary>
 
         protected override int GetPayloadSize()
         {
-            // 핵심 로직을 처리합니다.
             return base.GetPayloadSize()
                 + sizeof(long)  // EffectId
                 + sizeof(float)  // PositionX
@@ -950,12 +914,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
                 + sizeof(long); // ResultTowerUid
         }
         /// <summary>
-        /// WritePayload 함수를 처리합니다.
+        /// WritePayload 메서드입니다.
         /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
-            // 핵심 로직을 처리합니다.
             var offset = base.WritePayload(dst);
 
             BinaryPrimitives.WriteInt64LittleEndian(dst.Slice(offset, sizeof(long)), EffectId);
@@ -987,12 +950,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
             return GetPayloadSize();
         }
         /// <summary>
-        /// ReadFrom 함수를 처리합니다.
+        /// ReadFrom 메서드입니다.
         /// </summary>
 
         public static EffectTriggeredEvent ReadFrom(ReadOnlySpan<byte> src)
         {
-            // 핵심 로직을 처리합니다.
             var (tick, playerIndex, offset) = ReadMergeHeader(src);
 
             long effectId = BinaryPrimitives.ReadInt64LittleEndian(src.Slice(offset, sizeof(long)));
@@ -1083,12 +1045,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
             MaxHealth = maxHealth;
         }
         /// <summary>
-        /// GetPayloadSize 함수를 처리합니다.
+        /// GetPayloadSize 메서드입니다.
         /// </summary>
 
         protected override int GetPayloadSize()
         {
-            // 핵심 로직을 처리합니다.
             return base.GetPayloadSize()
                 + sizeof(long)  // MonsterUid
                 + sizeof(long)  // MonsterId
@@ -1099,12 +1060,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
                 + sizeof(float); // MaxHealth
         }
         /// <summary>
-        /// WritePayload 함수를 처리합니다.
+        /// WritePayload 메서드입니다.
         /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
-            // 핵심 로직을 처리합니다.
             var offset = base.WritePayload(dst);
 
             BinaryPrimitives.WriteInt64LittleEndian(dst.Slice(offset, sizeof(long)), MonsterUid);
@@ -1135,12 +1095,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
             return GetPayloadSize();
         }
         /// <summary>
-        /// ReadFrom 함수를 처리합니다.
+        /// ReadFrom 메서드입니다.
         /// </summary>
 
         public static MonsterSpawnedEvent ReadFrom(ReadOnlySpan<byte> src)
         {
-            // 핵심 로직을 처리합니다.
             var (tick, playerIndex, offset) = ReadMergeHeader(src);
 
             long monsterUid = BinaryPrimitives.ReadInt64LittleEndian(src.Slice(offset, sizeof(long)));
@@ -1210,12 +1169,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
             AttackerUid = attackerUid;
         }
         /// <summary>
-        /// GetPayloadSize 함수를 처리합니다.
+        /// GetPayloadSize 메서드입니다.
         /// </summary>
 
         protected override int GetPayloadSize()
         {
-            // 핵심 로직을 처리합니다.
             return base.GetPayloadSize()
                 + sizeof(long)  // MonsterUid
                 + sizeof(float)  // Damage
@@ -1223,12 +1181,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
                 + sizeof(long); // AttackerUid
         }
         /// <summary>
-        /// WritePayload 함수를 처리합니다.
+        /// WritePayload 메서드입니다.
         /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
-            // 핵심 로직을 처리합니다.
             var offset = base.WritePayload(dst);
 
             BinaryPrimitives.WriteInt64LittleEndian(dst.Slice(offset, sizeof(long)), MonsterUid);
@@ -1247,12 +1204,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
             return GetPayloadSize();
         }
         /// <summary>
-        /// ReadFrom 함수를 처리합니다.
+        /// ReadFrom 메서드입니다.
         /// </summary>
 
         public static MonsterDamagedEvent ReadFrom(ReadOnlySpan<byte> src)
         {
-            // 핵심 로직을 처리합니다.
             var (tick, playerIndex, offset) = ReadMergeHeader(src);
 
             long monsterUid = BinaryPrimitives.ReadInt64LittleEndian(src.Slice(offset, sizeof(long)));
@@ -1317,12 +1273,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
             KillerUid = killerUid;
         }
         /// <summary>
-        /// GetPayloadSize 함수를 처리합니다.
+        /// GetPayloadSize 메서드입니다.
         /// </summary>
 
         protected override int GetPayloadSize()
         {
-            // 핵심 로직을 처리합니다.
             return base.GetPayloadSize()
                 + sizeof(long)  // MonsterUid
                 + sizeof(float)  // PositionX
@@ -1332,12 +1287,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
                 + sizeof(long); // KillerUid
         }
         /// <summary>
-        /// WritePayload 함수를 처리합니다.
+        /// WritePayload 메서드입니다.
         /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
-            // 핵심 로직을 처리합니다.
             var offset = base.WritePayload(dst);
 
             BinaryPrimitives.WriteInt64LittleEndian(dst.Slice(offset, sizeof(long)), MonsterUid);
@@ -1363,12 +1317,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
             return GetPayloadSize();
         }
         /// <summary>
-        /// ReadFrom 함수를 처리합니다.
+        /// ReadFrom 메서드입니다.
         /// </summary>
 
         public static MonsterDiedEvent ReadFrom(ReadOnlySpan<byte> src)
         {
-            // 핵심 로직을 처리합니다.
             var (tick, playerIndex, offset) = ReadMergeHeader(src);
 
             long monsterUid = BinaryPrimitives.ReadInt64LittleEndian(src.Slice(offset, sizeof(long)));
@@ -1433,12 +1386,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
             PathProgress = pathProgress;
         }
         /// <summary>
-        /// GetPayloadSize 함수를 처리합니다.
+        /// GetPayloadSize 메서드입니다.
         /// </summary>
 
         protected override int GetPayloadSize()
         {
-            // 핵심 로직을 처리합니다.
             return base.GetPayloadSize()
                 + sizeof(long)  // MonsterUid
                 + sizeof(float)  // PositionX
@@ -1447,12 +1399,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
                 + sizeof(float); // PathProgress
         }
         /// <summary>
-        /// WritePayload 함수를 처리합니다.
+        /// WritePayload 메서드입니다.
         /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
-            // 핵심 로직을 처리합니다.
             var offset = base.WritePayload(dst);
 
             BinaryPrimitives.WriteInt64LittleEndian(dst.Slice(offset, sizeof(long)), MonsterUid);
@@ -1476,12 +1427,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
             return GetPayloadSize();
         }
         /// <summary>
-        /// ReadFrom 함수를 처리합니다.
+        /// ReadFrom 메서드입니다.
         /// </summary>
 
         public static MonsterMovedEvent ReadFrom(ReadOnlySpan<byte> src)
         {
-            // 핵심 로직을 처리합니다.
             var (tick, playerIndex, offset) = ReadMergeHeader(src);
 
             long monsterUid = BinaryPrimitives.ReadInt64LittleEndian(src.Slice(offset, sizeof(long)));
@@ -1581,12 +1531,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
             TargetSpawnZ = targetSpawnZ;
         }
         /// <summary>
-        /// GetPayloadSize 함수를 처리합니다.
+        /// GetPayloadSize 메서드입니다.
         /// </summary>
 
         protected override int GetPayloadSize()
         {
-            // 핵심 로직을 처리합니다.
             return base.GetPayloadSize()
                    + sizeof(int)   // TargetPlayerIndex
                    + sizeof(long)  // MonsterId
@@ -1601,12 +1550,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
                    + sizeof(float);// TargetSpawnZ
         }
         /// <summary>
-        /// WritePayload 함수를 처리합니다.
+        /// WritePayload 메서드입니다.
         /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
-            // 핵심 로직을 처리합니다.
             var offset = base.WritePayload(dst);
 
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset, sizeof(int)), TargetPlayerIndex);
@@ -1644,12 +1592,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
             return GetPayloadSize();
         }
         /// <summary>
-        /// ReadFrom 함수를 처리합니다.
+        /// ReadFrom 메서드입니다.
         /// </summary>
 
         public static MonsterInjectionTriggeredEvent ReadFrom(ReadOnlySpan<byte> src)
         {
-            // 핵심 로직을 처리합니다.
             var (tick, sourcePlayerIndex, offset) = ReadMergeHeader(src);
 
             int targetPlayerIndex = BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(int)));
@@ -1724,12 +1671,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
             SpawnInterval = spawnInterval;
         }
         /// <summary>
-        /// GetPayloadSize 함수를 처리합니다.
+        /// GetPayloadSize 메서드입니다.
         /// </summary>
 
         protected override int GetPayloadSize()
         {
-            // 핵심 로직을 처리합니다.
             return base.GetPayloadSize()
                 + sizeof(int)    // Step
                 + sizeof(int)    // SpawnCount
@@ -1737,12 +1683,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
                 + sizeof(float); // SpawnInterval
         }
         /// <summary>
-        /// WritePayload 함수를 처리합니다.
+        /// WritePayload 메서드입니다.
         /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
-            // 핵심 로직을 처리합니다.
             var offset = base.WritePayload(dst);
 
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset, sizeof(int)), Step);
@@ -1759,12 +1704,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
             return GetPayloadSize();
         }
         /// <summary>
-        /// ReadFrom 함수를 처리합니다.
+        /// ReadFrom 메서드입니다.
         /// </summary>
 
         public static DifficultyStepChangedEvent ReadFrom(ReadOnlySpan<byte> src)
         {
-            // 핵심 로직을 처리합니다.
             var (tick, playerIndex, offset) = ReadMergeHeader(src);
 
             int step = BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(int)));
@@ -1801,33 +1745,30 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
         /// </summary>
         public int GoldDelta { get; }
         /// <summary>
-        /// base 함수를 처리합니다.
+        /// base 메서드입니다.
         /// </summary>
 
         public PlayerGoldChangedEvent(long tick, int playerIndex, int currentGold, int goldDelta) : base(tick, playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             CurrentGold = currentGold;
             GoldDelta = goldDelta;
         }
         /// <summary>
-        /// GetPayloadSize 함수를 처리합니다.
+        /// GetPayloadSize 메서드입니다.
         /// </summary>
 
         protected override int GetPayloadSize()
         {
-            // 핵심 로직을 처리합니다.
             return base.GetPayloadSize()
                 + sizeof(int)   // CurrentGold
                 + sizeof(int);  // GoldDelta
         }
         /// <summary>
-        /// WritePayload 함수를 처리합니다.
+        /// WritePayload 메서드입니다.
         /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
-            // 핵심 로직을 처리합니다.
             var offset = base.WritePayload(dst);
 
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset, sizeof(int)), CurrentGold);
@@ -1838,12 +1779,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
             return GetPayloadSize();
         }
         /// <summary>
-        /// ReadFrom 함수를 처리합니다.
+        /// ReadFrom 메서드입니다.
         /// </summary>
 
         public static PlayerGoldChangedEvent ReadFrom(ReadOnlySpan<byte> src)
         {
-            // 핵심 로직을 처리합니다.
             var (tick, playerIndex, offset) = ReadMergeHeader(src);
 
             int currentGold = BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(int)));
@@ -1950,12 +1890,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
             Paths = paths;
         }
         /// <summary>
-        /// GetPayloadSize 함수를 처리합니다.
+        /// GetPayloadSize 메서드입니다.
         /// </summary>
 
         protected override int GetPayloadSize()
         {
-            // 핵심 로직을 처리합니다.
             var size = base.GetPayloadSize()
                 + sizeof(int)   // MapId
                 + sizeof(int)   // SlotPositions.Count
@@ -1972,12 +1911,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
             return size;
         }
         /// <summary>
-        /// WritePayload 함수를 처리합니다.
+        /// WritePayload 메서드입니다.
         /// </summary>
 
         protected override int WritePayload(Span<byte> dst)
         {
-            // 핵심 로직을 처리합니다.
             var offset = base.WritePayload(dst);
 
             BinaryPrimitives.WriteInt32LittleEndian(dst.Slice(offset, sizeof(int)), MapId);
@@ -2033,12 +1971,11 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
             return GetPayloadSize();
         }
         /// <summary>
-        /// ReadFrom 함수를 처리합니다.
+        /// ReadFrom 메서드입니다.
         /// </summary>
 
         public static MapInitializedEvent ReadFrom(ReadOnlySpan<byte> src)
         {
-            // 핵심 로직을 처리합니다.
             var (tick, playerIndex, offset) = ReadMergeHeader(src);
 
             int mapId = BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(int)));

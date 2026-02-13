@@ -1,4 +1,4 @@
-﻿using Noname.GameCore.Helper;
+using Noname.GameCore.Helper;
 using UnityEditor;
 using UnityEngine;
 
@@ -97,12 +97,12 @@ namespace Noname.GameCore.Helper.Editor
             int lineCount;
             if (valueMode == AttributeModifierValueMode.Static)
             {
-                // Foldout + ValueMode + AttributeId + Operation + Magnitude
+                // Foldout + ValueMode + AttributeId + Operation + Magnitude 구성
                 lineCount = 5;
             }
             else
             {
-                // Foldout + ValueMode + CalculatorType + Coefficient
+                // Foldout + ValueMode + CalculatorType + Coefficient 구성
                 lineCount = 4;
             }
 

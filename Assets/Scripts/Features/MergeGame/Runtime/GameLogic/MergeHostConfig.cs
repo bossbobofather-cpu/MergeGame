@@ -1,4 +1,4 @@
-﻿namespace MyProject.MergeGame
+namespace MyProject.MergeGame
 {
     /// <summary>
     /// MergeGame 호스트 설정값입니다.
@@ -42,42 +42,38 @@
         /// </summary>
         public int MaxMonsterStack => _maxMonsterStack;
         /// <summary>
-        /// WithStartGold 함수를 처리합니다.
+        /// WithStartGold 메서드입니다.
         /// </summary>
 
         public MergeHostConfig WithStartGold(int gold)
         {
-            // 핵심 로직을 처리합니다.
             _playerStartGold = gold;
             return this;
         }
         /// <summary>
-        /// WithMaxMonsterStack 함수를 처리합니다.
+        /// WithMaxMonsterStack 메서드입니다.
         /// </summary>
 
         public MergeHostConfig WithMaxMonsterStack(int maxMonsterStack)
         {
-            // 핵심 로직을 처리합니다.
             _maxMonsterStack = maxMonsterStack;
             return this;
         }
         /// <summary>
-        /// WithMaxGrade 함수를 처리합니다.
+        /// WithMaxGrade 메서드입니다.
         /// </summary>
 
         public MergeHostConfig WithMaxGrade(int maxGrade)
         {
-            // 핵심 로직을 처리합니다.
             _maxTowerGrade = maxGrade;
             return this;
         }
         /// <summary>
-        /// WithInitialGrade 함수를 처리합니다.
+        /// WithInitialGrade 메서드입니다.
         /// </summary>
 
         public MergeHostConfig WithInitialGrade(int initialGrade)
         {
-            // 핵심 로직을 처리합니다.
             _initialTowerGrade = initialGrade;
             return this;
         }

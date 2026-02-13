@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using MyProject.Common.UI;
 using MyProject.MergeGame.Events;
 using UnityEngine;
@@ -6,9 +6,8 @@ using UnityEngine;
 namespace MyProject.MergeGame.Unity
 {
     /// <summary>
-    /// Handles visual effects for combat/interaction.
-    /// Currently renders curved trails for monster injection events.
-    /// </summary>
+    /// 전투/상호작용 이펙트를 담당하는 View 모듈입니다.
+    /// 현재는 몬스터 주입 이벤트의 곡선 트레일 연출을 렌더링합니다.
     [DisallowMultipleComponent]
     public sealed class EffectViewModule : MergeViewModuleBase
     {
@@ -36,22 +35,20 @@ namespace MyProject.MergeGame.Unity
 
         private bool _loggedUiPipelineWarning;
         /// <summary>
-        /// OnInit 함수를 처리합니다.
+        /// OnInit 메서드입니다.
         /// </summary>
 
         protected override void OnInit()
         {
-            // 핵심 로직을 처리합니다.
             base.OnInit();
             RefreshCache();
         }
         /// <summary>
-        /// OnEventMsg 함수를 처리합니다.
+        /// OnEventMsg 메서드입니다.
         /// </summary>
 
         public override void OnEventMsg(MergeGameEvent evt)
         {
-            // 핵심 로직을 처리합니다.
             if (evt is not MonsterInjectionTriggeredEvent injectionEvent)
             {
                 return;
@@ -60,12 +57,11 @@ namespace MyProject.MergeGame.Unity
             HandleMonsterInjectionTrail(injectionEvent);
         }
         /// <summary>
-        /// HandleMonsterInjectionTrail 함수를 처리합니다.
+        /// HandleMonsterInjectionTrail 메서드입니다.
         /// </summary>
 
         private void HandleMonsterInjectionTrail(MonsterInjectionTriggeredEvent evt)
         {
-            // 핵심 로직을 처리합니다.
             if (GameView == null)
             {
                 return;
@@ -93,12 +89,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// TryResolveTrailPoints 함수를 처리합니다.
+        /// TryResolveTrailPoints 메서드입니다.
         /// </summary>
 
         private bool TryResolveTrailPoints(MonsterInjectionTriggeredEvent evt, out Vector3 start, out Vector3 end)
         {
-            // 핵심 로직을 처리합니다.
             start = default;
             end = default;
 
@@ -122,12 +117,11 @@ namespace MyProject.MergeGame.Unity
             return true;
         }
         /// <summary>
-        /// TryResolveTrailScreenPoints 함수를 처리합니다.
+        /// TryResolveTrailScreenPoints 메서드입니다.
         /// </summary>
 
         private bool TryResolveTrailScreenPoints(MonsterInjectionTriggeredEvent evt, out Vector2 startScreen, out Vector2 endScreen)
         {
-            // 핵심 로직을 처리합니다.
             RefreshCache();
 
             startScreen = default;
@@ -142,7 +136,7 @@ namespace MyProject.MergeGame.Unity
             var isLocalSource = localPlayerIndex >= 0 && evt.SourcePlayerIndex == localPlayerIndex;
             var isLocalTarget = localPlayerIndex >= 0 && evt.TargetPlayerIndex == localPlayerIndex;
 
-            // Local source: Source world position to target mini-map center.
+            // 로컬 주입자: 월드 시작점에서 대상 미니맵 중심으로 이동
             if (isLocalSource)
             {
                 if (!evt.HasSourcePosition)
@@ -164,7 +158,7 @@ namespace MyProject.MergeGame.Unity
                 return true;
             }
 
-            // Local target: source mini-map center to target spawn world position.
+            // 로컬 피격자: 소스 미니맵 중심에서 로컬 스폰 지점으로 이동
             if (isLocalTarget)
             {
                 if (!TryResolveMiniMapCenterScreenPosition(evt.SourcePlayerIndex, out startScreen))
@@ -181,7 +175,7 @@ namespace MyProject.MergeGame.Unity
                 return true;
             }
 
-            // Unrelated injection (B -> C): mini-map center to mini-map center.
+            // 제3자 주입(B->C): 미니맵 중심에서 미니맵 중심으로 이동
             if (!TryResolveMiniMapCenterScreenPosition(evt.SourcePlayerIndex, out startScreen))
             {
                 return false;
@@ -195,12 +189,11 @@ namespace MyProject.MergeGame.Unity
             return true;
         }
         /// <summary>
-        /// TryResolveMiniMapCenterScreenPosition 함수를 처리합니다.
+        /// TryResolveMiniMapCenterScreenPosition 메서드입니다.
         /// </summary>
 
         private bool TryResolveMiniMapCenterScreenPosition(int playerIndex, out Vector2 screenPosition)
         {
-            // 핵심 로직을 처리합니다.
             screenPosition = default;
 
             if (playerIndex < 0)
@@ -216,12 +209,11 @@ namespace MyProject.MergeGame.Unity
             return hud.TryGetObserverMiniMapCenterScreenPosition(playerIndex, out screenPosition);
         }
         /// <summary>
-        /// TryWorldToScreen 함수를 처리합니다.
+        /// TryWorldToScreen 메서드입니다.
         /// </summary>
 
         private bool TryWorldToScreen(Vector3 worldPosition, out Vector2 screenPosition)
         {
-            // 핵심 로직을 처리합니다.
             screenPosition = default;
             if (!TryResolveWorldCamera(out var cam))
             {
@@ -238,12 +230,11 @@ namespace MyProject.MergeGame.Unity
             return true;
         }
         /// <summary>
-        /// TryScreenToUiWorld 함수를 처리합니다.
+        /// TryScreenToUiWorld 메서드입니다.
         /// </summary>
 
         private bool TryScreenToUiWorld(Vector2 screenPosition, out Vector3 worldPosition)
         {
-            // 핵심 로직을 처리합니다.
             worldPosition = default;
 
             if (!_useUiCameraSpace)
@@ -272,12 +263,11 @@ namespace MyProject.MergeGame.Unity
             return true;
         }
         /// <summary>
-        /// TryResolveMainHud 함수를 처리합니다.
+        /// TryResolveMainHud 메서드입니다.
         /// </summary>
 
         private bool TryResolveMainHud(out Page_MainHud hud)
         {
-            // 핵심 로직을 처리합니다.
             if ((_mainHud == null || !_mainHud) && UIManager.Instance != null)
             {
                 UIManager.Instance.TryGetCachedPage(out _mainHud);
@@ -287,12 +277,11 @@ namespace MyProject.MergeGame.Unity
             return hud != null;
         }
         /// <summary>
-        /// TryResolveWorldCamera 함수를 처리합니다.
+        /// TryResolveWorldCamera 메서드입니다.
         /// </summary>
 
         private bool TryResolveWorldCamera(out Camera cam)
         {
-            // 핵심 로직을 처리합니다.
             if (_worldCamera == null)
             {
                 _worldCamera = Camera.main;
@@ -302,12 +291,11 @@ namespace MyProject.MergeGame.Unity
             return cam != null;
         }
         /// <summary>
-        /// TryResolveUiCameraSpace 함수를 처리합니다.
+        /// TryResolveUiCameraSpace 메서드입니다.
         /// </summary>
 
         private bool TryResolveUiCameraSpace(out RectTransform uiRoot, out Camera uiCamera)
         {
-            // 핵심 로직을 처리합니다.
             uiRoot = null;
             uiCamera = null;
 
@@ -333,12 +321,11 @@ namespace MyProject.MergeGame.Unity
             return uiRoot != null && uiCamera != null;
         }
         /// <summary>
-        /// LogUiPipelineWarningOnce 함수를 처리합니다.
+        /// LogUiPipelineWarningOnce 메서드입니다.
         /// </summary>
 
         private void LogUiPipelineWarningOnce()
         {
-            // 핵심 로직을 처리합니다.
             if (_loggedUiPipelineWarning)
             {
                 return;
@@ -348,12 +335,11 @@ namespace MyProject.MergeGame.Unity
             Debug.LogWarning("[EffectViewModule] UI camera/SystemRoot is not ready. Injection trail is skipped.");
         }
         /// <summary>
-        /// RefreshCache 함수를 처리합니다.
+        /// RefreshCache 메서드입니다.
         /// </summary>
 
         private void RefreshCache()
         {
-            // 핵심 로직을 처리합니다.
             if (_worldCamera == null)
             {
                 _worldCamera = Camera.main;
@@ -378,22 +364,20 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// ApplyPlayerOffset 함수를 처리합니다.
+        /// ApplyPlayerOffset 메서드입니다.
         /// </summary>
 
         private Vector3 ApplyPlayerOffset(int playerIndex, float x, float y, float z)
         {
-            // 핵심 로직을 처리합니다.
             var offset = GameView != null ? GameView.GetPlayerOffsetPosition(playerIndex) : Vector3.zero;
             return new Vector3(x, y, z) + offset;
         }
         /// <summary>
-        /// SpawnInjectionTrail 함수를 처리합니다.
+        /// SpawnInjectionTrail 메서드입니다.
         /// </summary>
 
         private void SpawnInjectionTrail(Vector3 start, Vector3 end, bool isMyOwnerTrail)
         {
-            // 핵심 로직을 처리합니다.
             var trailObject = CreateTrailObject();
             if (trailObject == null)
             {
@@ -411,12 +395,11 @@ namespace MyProject.MergeGame.Unity
             StartCoroutine(AnimateTrail(trailObject.transform, start, end));
         }
         /// <summary>
-        /// ApplyTrailRenderOverrides 함수를 처리합니다.
+        /// ApplyTrailRenderOverrides 메서드입니다.
         /// </summary>
 
         private void ApplyTrailRenderOverrides(GameObject obj, bool isMyOwnerTrail)
         {
-            // 핵심 로직을 처리합니다.
             if (obj == null)
             {
                 return;
@@ -467,12 +450,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// SetLayerRecursively 함수를 처리합니다.
+        /// SetLayerRecursively 메서드입니다.
         /// </summary>
 
         private static void SetLayerRecursively(GameObject obj, int layer)
         {
-            // 핵심 로직을 처리합니다.
             if (obj == null)
             {
                 return;
@@ -491,12 +473,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// CreateTrailObject 함수를 처리합니다.
+        /// CreateTrailObject 메서드입니다.
         /// </summary>
 
         private GameObject CreateTrailObject()
         {
-            // 핵심 로직을 처리합니다.
             if (_injectionTrailPrefab != null)
             {
                 return Instantiate(_injectionTrailPrefab);
@@ -515,12 +496,11 @@ namespace MyProject.MergeGame.Unity
             return fallback;
         }
         /// <summary>
-        /// ApplyTrailColor 함수를 처리합니다.
+        /// ApplyTrailColor 메서드입니다.
         /// </summary>
 
         private static void ApplyTrailColor(GameObject obj, Color color)
         {
-            // 핵심 로직을 처리합니다.
             if (obj == null)
             {
                 return;
@@ -568,12 +548,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// AnimateTrail 함수를 처리합니다.
+        /// AnimateTrail 메서드입니다.
         /// </summary>
 
         private IEnumerator AnimateTrail(Transform trailTransform, Vector3 start, Vector3 end)
         {
-            // 핵심 로직을 처리합니다.
             if (trailTransform == null)
             {
                 yield break;
@@ -622,12 +601,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// EvaluateQuadraticBezier 함수를 처리합니다.
+        /// EvaluateQuadraticBezier 메서드입니다.
         /// </summary>
 
         private static Vector3 EvaluateQuadraticBezier(Vector3 p0, Vector3 p1, Vector3 p2, float t)
         {
-            // 핵심 로직을 처리합니다.
             var oneMinusT = 1f - t;
             return oneMinusT * oneMinusT * p0
                    + 2f * oneMinusT * t * p1

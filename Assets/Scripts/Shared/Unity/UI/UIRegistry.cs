@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -32,7 +32,6 @@ namespace MyProject.Common.UI
         /// </summary>
         public bool TryGetPrefab(Type type, out UIBase prefab)
         {
-            // 핵심 로직을 처리합니다.
             if (type == null)
             {
                 prefab = null;
@@ -65,12 +64,11 @@ namespace MyProject.Common.UI
 
             public UIBase Prefab => _prefab;
             /// <summary>
-            /// Matches 함수를 처리합니다.
+            /// Matches 메서드입니다.
             /// </summary>
 
             public bool Matches(Type type)
             {
-                // 핵심 로직을 처리합니다.
                 if (type == null || _prefab == null)
                 {
                     return false;
@@ -81,22 +79,20 @@ namespace MyProject.Common.UI
             }
         }
         /// <summary>
-        /// OnValidate 함수를 처리합니다.
+        /// OnValidate 메서드입니다.
         /// </summary>
 
         private void OnValidate()
         {
-            // 핵심 로직을 처리합니다.
             RemoveNullEntries();
             RemoveDuplicateTypes();
         }
         /// <summary>
-        /// RemoveNullEntries 함수를 처리합니다.
+        /// RemoveNullEntries 메서드입니다.
         /// </summary>
 
         private void RemoveNullEntries()
         {
-            // 핵심 로직을 처리합니다.
             for (var i = _entries.Count - 1; i >= 0; i--)
             {
                 if (_entries[i] == null)
@@ -106,12 +102,11 @@ namespace MyProject.Common.UI
             }
         }
         /// <summary>
-        /// RemoveDuplicateTypes 함수를 처리합니다.
+        /// RemoveDuplicateTypes 메서드입니다.
         /// </summary>
 
         private void RemoveDuplicateTypes()
         {
-            // 핵심 로직을 처리합니다.
             var seen = new HashSet<string>();
             for (var i = _entries.Count - 1; i >= 0; i--)
             {

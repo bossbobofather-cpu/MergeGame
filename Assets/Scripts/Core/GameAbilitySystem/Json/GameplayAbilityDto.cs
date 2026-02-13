@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Noname.GameAbilitySystem.Json
 {
     /// <summary>
-    /// GameplayAbility JSON DTO
+    /// GameplayAbility 설정 JSON DTO입니다.
     /// </summary>
     [Serializable]
     public class GameplayAbilityDto
@@ -24,4 +24,3 @@ namespace Noname.GameAbilitySystem.Json
         public TargetingStrategyDto TargetingStrategy;
     }
 }
-

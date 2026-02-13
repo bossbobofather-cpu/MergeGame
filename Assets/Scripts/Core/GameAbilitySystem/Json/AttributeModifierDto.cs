@@ -1,39 +1,33 @@
-﻿using System;
+using System;
 
 namespace Noname.GameAbilitySystem.Json
 {
     /// <summary>
-    /// 二쇱꽍 ?뺣━
-    /// </summary>
+        /// 요약 설명입니다.
+        /// </summary>
     [Serializable]
     public class AttributeModifierDto
     {
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public string ValueMode;
-
-        // 二쇱꽍 ?뺣━
-
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public string AttributeId;
 
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public string Operation;
 
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public float Magnitude;
-
-        // 二쇱꽍 ?뺣━
-
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public AttributeCalculatorType CalculatorType;
     }

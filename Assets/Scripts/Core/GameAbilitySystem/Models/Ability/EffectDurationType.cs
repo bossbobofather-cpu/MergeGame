@@ -1,15 +1,12 @@
-﻿namespace Noname.GameAbilitySystem
+namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// 二쇱꽍 ?뺣━
-    /// </summary>
+        /// 요약 설명입니다.
+        /// </summary>
     public enum EffectDurationType
     {
-        /// 二쇱꽍 ?뺣━
         Instant,
-        /// 二쇱꽍 ?뺣━
         Infinite,
-        /// 二쇱꽍 ?뺣━
         HasDuration
     }
 }

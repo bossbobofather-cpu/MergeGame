@@ -1,21 +1,20 @@
-﻿using Noname.GameAbilitySystem;
+using Noname.GameAbilitySystem;
 using Noname.GameCore.Helper;
 using UnityEditor;
 
 namespace Noname.GameCore.Helper.Editor
 {
     /// <summary>
-    /// GameplayEffectConfig ?몄뒪?숉꽣瑜??ъ슜???뺤쓽濡??쒖떆?⑸땲??
-    /// </summary>
+        /// 요약 설명입니다.
+        /// </summary>
     [CustomEditor(typeof(GameplayEffectConfig))]
     public sealed class GameplayEffectConfigEditor : UnityEditor.Editor
     {
         /// <summary>
-        /// ?듭뀡???곕씪 ?몄뒪?숉꽣 ?꾨뱶瑜??쇱퀜?낅땲??
+        /// 요약 설명입니다.
         /// </summary>
         public override void OnInspectorGUI()
         {
-            // 핵심 로직을 처리합니다.
             serializedObject.Update();
 
             var displayNameProp = serializedObject.FindProperty("_displayName");
@@ -46,12 +45,8 @@ namespace Noname.GameCore.Helper.Editor
                 serializedObject.ApplyModifiedProperties();
                 return;
             }
-
-            // 湲곕낯 ?뺣낫
             EditorGUILayout.PropertyField(displayNameProp);
             EditorGUILayout.PropertyField(descriptionProp);
-
-            // 吏???쒓컙
             EditorGUILayout.PropertyField(durationTypeProp);
             EditorGUILayout.PropertyField(durationPolicyTypeProp);
 
@@ -67,8 +62,6 @@ namespace Noname.GameCore.Helper.Editor
             }
 
             EditorGUILayout.PropertyField(maxStackProp);
-
-            // ?쒓렇 諛??섏젙??            EditorGUILayout.PropertyField(grantedTagsProp, true);
             EditorGUILayout.PropertyField(requiredTagsProp, true);
             EditorGUILayout.PropertyField(blockedTagsProp, true);
             EditorGUILayout.PropertyField(modifiersProp, true);

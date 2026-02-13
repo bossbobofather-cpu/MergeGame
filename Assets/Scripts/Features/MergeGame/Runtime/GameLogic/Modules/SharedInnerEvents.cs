@@ -1,4 +1,4 @@
-﻿using Noname.GameAbilitySystem;
+using Noname.GameAbilitySystem;
 using Noname.GameHost.Module;
 
 namespace MyProject.MergeGame.Modules
@@ -20,12 +20,11 @@ namespace MyProject.MergeGame.Modules
         public Point3D Position { get; set; }
         public bool Found { get; set; }
         /// <summary>
-        /// base 함수를 처리합니다.
+        /// base 메서드입니다.
         /// </summary>
 
         public GetSlotPositionRequest(long tick, int slotIndex) : base(tick)
         {
-            // 핵심 로직을 처리합니다.
             SlotIndex = slotIndex;
         }
     }
@@ -39,12 +38,11 @@ namespace MyProject.MergeGame.Modules
         public int SlotIndex { get; set; } = -1;
         public bool Found => SlotIndex >= 0;
         /// <summary>
-        /// base 함수를 처리합니다.
+        /// base 메서드입니다.
         /// </summary>
 
         public GetEmptySlotRequest(long tick) : base(tick)
         {
-            // 핵심 로직을 처리합니다.
         }
     }
 
@@ -60,12 +58,11 @@ namespace MyProject.MergeGame.Modules
     {
         public int Cost { get; set; }
         /// <summary>
-        /// base 함수를 처리합니다.
+        /// base 메서드입니다.
         /// </summary>
 
         public GetSpawnCostRequest(long tick) : base(tick)
         {
-            // 핵심 로직을 처리합니다.
         }
     }
 
@@ -107,12 +104,11 @@ namespace MyProject.MergeGame.Modules
         public MapPath Path { get; set; }
         public bool Found => Path != null;
         /// <summary>
-        /// base 함수를 처리합니다.
+        /// base 메서드입니다.
         /// </summary>
 
         public GetPathRequest(long tick, int pathIndex) : base(tick)
         {
-            // 핵심 로직을 처리합니다.
             PathIndex = pathIndex;
         }
     }
@@ -128,12 +124,11 @@ namespace MyProject.MergeGame.Modules
         public Point3D Position { get; set; }
         public bool Found { get; set; }
         /// <summary>
-        /// base 함수를 처리합니다.
+        /// base 메서드입니다.
         /// </summary>
 
         public GetPathPositionRequest(long tick, int pathIndex, float progress) : base(tick)
         {
-            // 핵심 로직을 처리합니다.
             PathIndex = pathIndex;
             Progress = progress;
         }
@@ -179,12 +174,11 @@ namespace MyProject.MergeGame.Modules
         public int GoldReward { get; set; }
         public int ScoreReward { get; set; }
         /// <summary>
-        /// base 함수를 처리합니다.
+        /// base 메서드입니다.
         /// </summary>
 
         public CalculateRewardRequest(long tick, RewardType type, int value) : base(tick)
         {
-            // 핵심 로직을 처리합니다.
             Type = type;
             Value = value;
         }
@@ -205,12 +199,11 @@ namespace MyProject.MergeGame.Modules
         public float HealthMultiplier { get; set; }
         public float SpawnInterval { get; set; }
         /// <summary>
-        /// base 함수를 처리합니다.
+        /// base 메서드입니다.
         /// </summary>
 
         public GetDifficultyStatusRequest(long tick) : base(tick)
         {
-            // 핵심 로직을 처리합니다.
         }
     }
 

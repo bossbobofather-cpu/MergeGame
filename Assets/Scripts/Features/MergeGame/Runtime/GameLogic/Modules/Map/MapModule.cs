@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Noname.GameAbilitySystem;
 using Noname.GameHost.Module;
@@ -52,12 +52,11 @@ namespace MyProject.MergeGame.Modules
         /// </summary>
         public float EffectValue { get; set; }
         /// <summary>
-        /// MapSlot 함수를 처리합니다.
+        /// MapSlot 메서드입니다.
         /// </summary>
 
         public MapSlot(int index, Point3D position)
         {
-            // 핵심 로직을 처리합니다.
             Index = index;
             Position = position;
         }
@@ -106,12 +105,11 @@ namespace MyProject.MergeGame.Modules
             CalculateSegmentLengths();
         }
         /// <summary>
-        /// CalculateSegmentLengths 함수를 처리합니다.
+        /// CalculateSegmentLengths 메서드입니다.
         /// </summary>
 
         private void CalculateSegmentLengths()
         {
-            // 핵심 로직을 처리합니다.
             _totalLength = 0f;
             _segmentLengths.Clear();
 
@@ -129,7 +127,6 @@ namespace MyProject.MergeGame.Modules
         /// <param name="progress">0.0 ~ 1.0 사이의 진행도</param>
         public Point3D GetPositionAtProgress(float progress)
         {
-            // 핵심 로직을 처리합니다.
             if (_waypoints.Count == 0) return Point3D.zero;
             if (_waypoints.Count == 1) return _waypoints[0];
 
@@ -210,7 +207,6 @@ namespace MyProject.MergeGame.Modules
         /// <inheritdoc />
         protected override void OnConfigure(MapModuleConfig config)
         {
-            // 핵심 로직을 처리합니다.
             InitializeSlots();
             InitializePaths();
         }
@@ -247,12 +243,11 @@ namespace MyProject.MergeGame.Modules
             UnsubscribeInnerEvent<GetPathPositionRequest>(OnGetPathPositionRequest);
         }
         /// <summary>
-        /// InitializeSlots 함수를 처리합니다.
+        /// InitializeSlots 메서드입니다.
         /// </summary>
 
         private void InitializeSlots()
         {
-            // 핵심 로직을 처리합니다.
             var definitions = Config.SlotDefinitions;
             _slots = new MapSlot[definitions.Count];
 
@@ -263,12 +258,11 @@ namespace MyProject.MergeGame.Modules
             }
         }
         /// <summary>
-        /// InitializePaths 함수를 처리합니다.
+        /// InitializePaths 메서드입니다.
         /// </summary>
 
         private void InitializePaths()
         {
-            // 핵심 로직을 처리합니다.
             _paths.Clear();
 
             foreach (var pathDef in Config.PathDefinitions)
@@ -284,7 +278,6 @@ namespace MyProject.MergeGame.Modules
         /// </summary>
         public MapSlot GetSlot(int index)
         {
-            // 핵심 로직을 처리합니다.
             if (index < 0 || index >= _slots.Length)
             {
                 return null;
@@ -298,7 +291,6 @@ namespace MyProject.MergeGame.Modules
         /// </summary>
         public void SetSlotOccupied(int index, bool occupied)
         {
-            // 핵심 로직을 처리합니다.
             var slot = GetSlot(index);
             if (slot != null)
             {
@@ -311,7 +303,6 @@ namespace MyProject.MergeGame.Modules
         /// </summary>
         public void SetSlotAvailable(int index, bool available)
         {
-            // 핵심 로직을 처리합니다.
             var slot = GetSlot(index);
             if (slot != null)
             {
@@ -324,7 +315,6 @@ namespace MyProject.MergeGame.Modules
         /// </summary>
         public void SetSlotEffect(int index, SlotEffectType effect, float value = 0f)
         {
-            // 핵심 로직을 처리합니다.
             var slot = GetSlot(index);
             if (slot != null)
             {
@@ -339,7 +329,6 @@ namespace MyProject.MergeGame.Modules
         /// <returns>빈 슬롯 인덱스. 없으면 -1</returns>
         public int FindEmptySlot()
         {
-            // 핵심 로직을 처리합니다.
             for (var i = 0; i < _slots.Length; i++)
             {
                 var slot = _slots[i];
@@ -357,7 +346,6 @@ namespace MyProject.MergeGame.Modules
         /// </summary>
         public List<int> FindAllEmptySlots()
         {
-            // 핵심 로직을 처리합니다.
             var result = new List<int>();
 
             for (var i = 0; i < _slots.Length; i++)
@@ -377,7 +365,6 @@ namespace MyProject.MergeGame.Modules
         /// </summary>
         public int CountOccupiedSlots()
         {
-            // 핵심 로직을 처리합니다.
             var count = 0;
             for (var i = 0; i < _slots.Length; i++)
             {
@@ -398,7 +385,6 @@ namespace MyProject.MergeGame.Modules
         /// </summary>
         public void AddPath(IEnumerable<Point3D> waypoints)
         {
-            // 핵심 로직을 처리합니다.
             var pathIndex = _paths.Count;
             var path = new MapPath(pathIndex, waypoints);
             _paths.Add(path);
@@ -409,7 +395,6 @@ namespace MyProject.MergeGame.Modules
         /// </summary>
         public MapPath GetPath(int pathIndex)
         {
-            // 핵심 로직을 처리합니다.
             if (pathIndex < 0 || pathIndex >= _paths.Count)
             {
                 return null;
@@ -423,7 +408,6 @@ namespace MyProject.MergeGame.Modules
         /// </summary>
         public MapPath GetDefaultPath()
         {
-            // 핵심 로직을 처리합니다.
             return _paths.Count > 0 ? _paths[0] : null;
         }
 
@@ -432,7 +416,6 @@ namespace MyProject.MergeGame.Modules
         /// </summary>
         public void ClearPaths()
         {
-            // 핵심 로직을 처리합니다.
             _paths.Clear();
         }
 
@@ -440,21 +423,19 @@ namespace MyProject.MergeGame.Modules
 
         #region 내부 이벤트 핸들러
         /// <summary>
-        /// OnSlotStateChanged 함수를 처리합니다.
+        /// OnSlotStateChanged 메서드입니다.
         /// </summary>
 
         private void OnSlotStateChanged(SlotStateChangedInnerEvent evt)
         {
-            // 핵심 로직을 처리합니다.
             SetSlotOccupied(evt.SlotIndex, evt.IsOccupied);
         }
         /// <summary>
-        /// OnSlotPositionRequest 함수를 처리합니다.
+        /// OnSlotPositionRequest 메서드입니다.
         /// </summary>
 
         private void OnSlotPositionRequest(SlotPositionRequestInnerEvent evt)
         {
-            // 핵심 로직을 처리합니다.
             var slot = GetSlot(evt.SlotIndex);
             if (slot != null)
             {
@@ -462,21 +443,19 @@ namespace MyProject.MergeGame.Modules
             }
         }
         /// <summary>
-        /// OnPathRequest 함수를 처리합니다.
+        /// OnPathRequest 메서드입니다.
         /// </summary>
 
         private void OnPathRequest(PathRequestInnerEvent evt)
         {
-            // 핵심 로직을 처리합니다.
             evt.Path = GetPath(evt.PathIndex);
         }
         /// <summary>
-        /// OnEmptySlotRequest 함수를 처리합니다.
+        /// OnEmptySlotRequest 메서드입니다.
         /// </summary>
 
         private void OnEmptySlotRequest(EmptySlotRequestInnerEvent evt)
         {
-            // 핵심 로직을 처리합니다.
             evt.ResultSlotIndex = FindEmptySlot();
         }
 
@@ -484,12 +463,11 @@ namespace MyProject.MergeGame.Modules
 
         #region 공유 내부 이벤트 핸들러
         /// <summary>
-        /// OnGetSlotPositionRequest 함수를 처리합니다.
+        /// OnGetSlotPositionRequest 메서드입니다.
         /// </summary>
 
         private void OnGetSlotPositionRequest(GetSlotPositionRequest evt)
         {
-            // 핵심 로직을 처리합니다.
             var slot = GetSlot(evt.SlotIndex);
             if (slot != null)
             {
@@ -498,30 +476,27 @@ namespace MyProject.MergeGame.Modules
             }
         }
         /// <summary>
-        /// OnGetEmptySlotRequest 함수를 처리합니다.
+        /// OnGetEmptySlotRequest 메서드입니다.
         /// </summary>
 
         private void OnGetEmptySlotRequest(GetEmptySlotRequest evt)
         {
-            // 핵심 로직을 처리합니다.
             evt.SlotIndex = FindEmptySlot();
         }
         /// <summary>
-        /// OnGetPathRequest 함수를 처리합니다.
+        /// OnGetPathRequest 메서드입니다.
         /// </summary>
 
         private void OnGetPathRequest(GetPathRequest evt)
         {
-            // 핵심 로직을 처리합니다.
             evt.Path = GetPath(evt.PathIndex);
         }
         /// <summary>
-        /// OnGetPathPositionRequest 함수를 처리합니다.
+        /// OnGetPathPositionRequest 메서드입니다.
         /// </summary>
 
         private void OnGetPathPositionRequest(GetPathPositionRequest evt)
         {
-            // 핵심 로직을 처리합니다.
             var path = GetPath(evt.PathIndex);
             if (path != null)
             {

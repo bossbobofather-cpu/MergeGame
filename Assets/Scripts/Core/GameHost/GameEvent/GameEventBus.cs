@@ -1,12 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Noname.GameHost.GameEvent
 {
     /// <summary>
-    /// ?꾩뿭/???ㅼ퐫?꾨? ?④퍡 吏?먰븯???뺤쟻 ?대깽??踰꾩뒪?낅땲??
-    /// Unity ?섍꼍 ?놁씠 Scene Handle(int) 湲곕컲?쇰줈 ?숈옉?⑸땲??
-    /// </summary>
+        /// 요약 설명입니다.
+        /// </summary>
     public static class GameEventBus
     {
         private static readonly Scope GlobalScope = new();
@@ -18,7 +17,7 @@ namespace Noname.GameHost.GameEvent
         public static Scope Global => GlobalScope;
 
         /// <summary>
-        /// ?꾩옱 Active Scene Handle???대떦?섎뒗 ?ㅼ퐫?꾨? 諛섑솚?⑸땲??
+        /// 요약 설명입니다.
         /// </summary>
         public static Scope Scene
         {
@@ -35,7 +34,7 @@ namespace Noname.GameHost.GameEvent
         }
 
         /// <summary>
-        /// ?대깽????낆뿉 留욌뒗 ?ㅼ퐫?꾩뿉 ?몃뱾?щ? ?깅줉?⑸땲??
+        /// 요약 설명입니다.
         /// </summary>
         public static void Subscribe<TEvent>(Action<TEvent> handler) where TEvent : GameEventContext
         {
@@ -44,7 +43,7 @@ namespace Noname.GameHost.GameEvent
         }
 
         /// <summary>
-        /// ?대깽????낆뿉 留욌뒗 ?ㅼ퐫?꾩뿉???몃뱾?щ? ?댁젣?⑸땲??
+        /// 요약 설명입니다.
         /// </summary>
         public static void Unsubscribe<TEvent>(Action<TEvent> handler) where TEvent : GameEventContext
         {
@@ -53,7 +52,7 @@ namespace Noname.GameHost.GameEvent
         }
 
         /// <summary>
-        /// ?대깽????낆뿉 留욌뒗 ?ㅼ퐫?꾩뿉 ?대깽?몃? 諛쒗뻾?⑸땲??
+        /// 요약 설명입니다.
         /// </summary>
         public static void Publish<TEvent>(TEvent context) where TEvent : GameEventContext
         {
@@ -66,12 +65,11 @@ namespace Noname.GameHost.GameEvent
             scope?.Publish(context);
         }
         /// <summary>
-        /// ForScene 함수를 처리합니다.
+        /// ForScene 메서드입니다.
         /// </summary>
 
         public static Scope ForScene(int handle)
         {
-            // 핵심 로직을 처리합니다.
             if (!IsValidHandle(handle))
             {
                 LogMissingActiveScene();
@@ -87,12 +85,11 @@ namespace Noname.GameHost.GameEvent
             return scope;
         }
         /// <summary>
-        /// SetActiveScene 함수를 처리합니다.
+        /// SetActiveScene 메서드입니다.
         /// </summary>
 
         public static void SetActiveScene(int handle)
         {
-            // 핵심 로직을 처리합니다.
             if (!IsValidHandle(handle))
             {
                 _activeSceneHandle = 0;
@@ -105,11 +102,10 @@ namespace Noname.GameHost.GameEvent
         }
 
         /// <summary>
-        /// Active Scene Handle???꾩쭅 ?ㅼ젙?섏? ?딆븯???뚮쭔 ?ㅼ젙?⑸땲??
+        /// 요약 설명입니다.
         /// </summary>
         public static bool TrySetActiveScene(int handle)
         {
-            // 핵심 로직을 처리합니다.
             if (IsValidHandle(_activeSceneHandle))
             {
                 return false;
@@ -124,21 +120,19 @@ namespace Noname.GameHost.GameEvent
             return true;
         }
         /// <summary>
-        /// ClearGlobal 함수를 처리합니다.
+        /// ClearGlobal 메서드입니다.
         /// </summary>
 
         public static void ClearGlobal()
         {
-            // 핵심 로직을 처리합니다.
             GlobalScope.Clear();
         }
         /// <summary>
-        /// ResetAll 함수를 처리합니다.
+        /// ResetAll 메서드입니다.
         /// </summary>
 
         public static void ResetAll()
         {
-            // 핵심 로직을 처리합니다.
             GlobalScope.Clear();
             SceneScopes.Clear();
             _activeSceneHandle = 0;
@@ -146,12 +140,11 @@ namespace Noname.GameHost.GameEvent
             UnknownScopeLogged.Clear();
         }
         /// <summary>
-        /// ClearScene 함수를 처리합니다.
+        /// ClearScene 메서드입니다.
         /// </summary>
 
         public static void ClearScene(int handle)
         {
-            // 핵심 로직을 처리합니다.
             if (!IsValidHandle(handle))
             {
                 return;
@@ -169,36 +162,33 @@ namespace Noname.GameHost.GameEvent
             }
         }
         /// <summary>
-        /// IsValidHandle 함수를 처리합니다.
+        /// IsValidHandle 메서드입니다.
         /// </summary>
 
         private static bool IsValidHandle(int handle)
         {
-            // 핵심 로직을 처리합니다.
             return handle != 0;
         }
         /// <summary>
-        /// LogMissingActiveScene 함수를 처리합니다.
+        /// LogMissingActiveScene 메서드입니다.
         /// </summary>
 
         private static void LogMissingActiveScene()
         {
-            // 핵심 로직을 처리합니다.
             if (_missingActiveSceneLogged)
             {
                 return;
             }
 
             _missingActiveSceneLogged = true;
-            GameHostLog.LogWarning("Active Scene???ㅼ젙?섏? ?딆븘 Scene Event Bus瑜??ъ슜?????놁뒿?덈떎.");
+            GameHostLog.LogWarning("Active Scene이 설정되지 않아 Scene Event Bus를 사용할 수 없습니다.");
         }
         /// <summary>
-        /// ResolveScope 함수를 처리합니다.
+        /// ResolveScope 메서드입니다.
         /// </summary>
 
         private static Scope ResolveScope(Type eventType)
         {
-            // 핵심 로직을 처리합니다.
             if (eventType == null)
             {
                 return null;
@@ -218,19 +208,18 @@ namespace Noname.GameHost.GameEvent
             return Scene;
         }
         /// <summary>
-        /// LogUnknownScope 함수를 처리합니다.
+        /// LogUnknownScope 메서드입니다.
         /// </summary>
 
         private static void LogUnknownScope(Type eventType)
         {
-            // 핵심 로직을 처리합니다.
             if (!UnknownScopeLogged.Add(eventType))
             {
                 return;
             }
 
             GameHostLog.LogWarning(
-                $"{eventType.Name} ?대깽?몄쓽 ?ㅼ퐫?꾧? ?뺤쓽?섏? ?딆븯?듬땲?? SceneGameEventContext ?먮뒗 GlobalGameEventContext瑜??ъ슜?섏꽭??");
+                $"{eventType.Name} 이벤트의 스코프가 정의되지 않았습니다. SceneGameEventContext 또는 GlobalGameEventContext를 사용하세요.");
         }
 
         public sealed class Scope : IEventBus<GameEventContext>
@@ -300,12 +289,11 @@ namespace Noname.GameHost.GameEvent
                 }
             }
             /// <summary>
-            /// Clear 함수를 처리합니다.
+            /// Clear 메서드입니다.
             /// </summary>
 
             public void Clear()
             {
-                // 핵심 로직을 처리합니다.
                 _handlers.Clear();
             }
         }

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 
 namespace MyProject.MergeGame.Unity
 {
@@ -21,7 +21,6 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         public void SetSlotIndex(int slotIndex)
         {
-            // 핵심 로직을 처리합니다.
             _slotIndex = slotIndex;
         }
     }

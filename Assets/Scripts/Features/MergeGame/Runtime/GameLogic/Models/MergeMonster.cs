@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MyProject.MergeGame.AI;
 using Noname.GameAbilitySystem;
 
@@ -96,7 +96,6 @@ namespace MyProject.MergeGame.Models
         /// </summary>
         public void SetAI(IMergeMonsterAI ai)
         {
-            // 핵심 로직을 처리합니다.
             AI = ai;
         }
 
@@ -105,16 +104,14 @@ namespace MyProject.MergeGame.Models
         /// </summary>
         public void TakeDamage(float damage)
         {
-            // 핵심 로직을 처리합니다.
             ASC.Add(AttributeId.Health, -damage);
         }
         /// <summary>
-        /// Dispose 함수를 처리합니다.
+        /// Dispose 메서드입니다.
         /// </summary>
 
         public void Dispose()
         {
-            // 핵심 로직을 처리합니다.
             ASC?.Dispose();
         }
     }

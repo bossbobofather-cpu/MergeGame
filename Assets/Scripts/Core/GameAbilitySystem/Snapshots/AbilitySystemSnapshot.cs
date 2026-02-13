@@ -1,31 +1,29 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// 二쇱꽍 ?뺣━
-    /// 二쇱꽍 ?뺣━
-    /// 二쇱꽍 ?뺣━
-    /// </summary>
+        /// 요약 설명입니다.
+        /// </summary>
     public sealed class AbilitySystemSnapshot
     {
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public IReadOnlyDictionary<AttributeId, float> Attributes { get; }
 
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public IReadOnlyList<FGameplayTag> OwnedTags { get; }
 
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public IReadOnlyList<GameplayAbility> Abilities { get; }
 
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public IReadOnlyList<ActiveGameplayEffectSnapshot> ActiveEffects { get; }
 
@@ -43,8 +41,8 @@ namespace Noname.GameAbilitySystem
     }
 
     /// <summary>
-    /// 二쇱꽍 ?뺣━
-    /// </summary>
+        /// 요약 설명입니다.
+        /// </summary>
     public struct ActiveGameplayEffectSnapshot
     {
         public long EffectUid { get; }

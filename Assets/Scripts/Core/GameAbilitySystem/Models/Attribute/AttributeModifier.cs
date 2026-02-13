@@ -1,39 +1,33 @@
-﻿using System;
+using System;
 
 namespace Noname.GameAbilitySystem
 {
     /// <summary>
-    /// 二쇱꽍 ?뺣━
-    /// </summary>
+        /// 요약 설명입니다.
+        /// </summary>
     [Serializable]
     public struct AttributeModifier
     {
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public AttributeModifierValueMode ValueMode;
-
-        // 二쇱꽍 ?뺣━
-
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public AttributeId AttributeId;
 
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public AttributeModifierOperationType Operation;
 
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public float Magnitude;
-
-        // 二쇱꽍 ?뺣━
-
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 요약 설명입니다.
         /// </summary>
         public AttributeCalculatorType CalculatorType;
     }

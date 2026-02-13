@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using MyProject.Common.UI;
 using UnityEngine;
 using UnityEngine.UI;
@@ -39,84 +39,75 @@ namespace MyProject.MergeGame.Unity
 
         public int ObserverMiniMapSlotCount => _observerMiniMapImages?.Count ?? 0;
         /// <summary>
-        /// SetActiveSpawnButton 함수를 처리합니다.
+        /// SetActiveSpawnButton 메서드입니다.
         /// </summary>
 
         public void SetActiveSpawnButton(bool active)
         {
-            // 핵심 로직을 처리합니다.
             SpawnTowerButton?.gameObject.SetActive(active);
         }
         /// <summary>
-        /// SetActiveReadyButton 함수를 처리합니다.
+        /// SetActiveReadyButton 메서드입니다.
         /// </summary>
 
         public void SetActiveReadyButton(bool active)
         {
-            // 핵심 로직을 처리합니다.
             ReadyButton?.gameObject.SetActive(active);
         }
         /// <summary>
-        /// SetActiveResultText 함수를 처리합니다.
+        /// SetActiveResultText 메서드입니다.
         /// </summary>
 
         public void SetActiveResultText(bool active)
         {
-            // 핵심 로직을 처리합니다.
             _resultText?.gameObject.SetActive(active);
         }
         /// <summary>
-        /// SetActiveMonsterNumText 함수를 처리합니다.
+        /// SetActiveMonsterNumText 메서드입니다.
         /// </summary>
 
         public void SetActiveMonsterNumText(bool active)
         {
-            // 핵심 로직을 처리합니다.
             _monsterNumText?.gameObject.SetActive(active);
         }
         /// <summary>
-        /// SetActiveDifficultyStepText 함수를 처리합니다.
+        /// SetActiveDifficultyStepText 메서드입니다.
         /// </summary>
 
         public void SetActiveDifficultyStepText(bool active)
         {
-            // 핵심 로직을 처리합니다.
             _difficultyStepText?.gameObject.SetActive(active);
         }
         /// <summary>
-        /// SetActiveGoldText 함수를 처리합니다.
+        /// SetActiveGoldText 메서드입니다.
         /// </summary>
 
         public void SetActiveGoldText(bool active)
         {
-            // 핵심 로직을 처리합니다.
             _goldText?.gameObject.SetActive(active);
         }
         /// <summary>
-        /// SetActiveLoadingText 함수를 처리합니다.
+        /// SetActiveLoadingText 메서드입니다.
         /// </summary>
 
         public void SetActiveLoadingText(bool active)
         {
-            // 핵심 로직을 처리합니다.
             _loadingText?.gameObject.SetActive(active);
         }
         /// <summary>
-        /// SetObserverMiniMapTexture 함수를 처리합니다.
+        /// SetObserverMiniMapTexture 메서드입니다.
         /// </summary>
 
         public void SetObserverMiniMapTexture(int slotIndex, Texture texture)
         {
-            // 핵심 로직을 처리합니다.
             SetObserverMiniMapTexture(slotIndex, -1, texture);
         }
         /// <summary>
-        /// SetObserverMiniMapTexture 함수를 처리합니다.
+        /// SetObserverMiniMapTexture 메서드입니다.
         /// </summary>
 
         public void SetObserverMiniMapTexture(int slotIndex, int playerIndex, Texture texture)
         {
-            // 핵심 로직을 처리합니다.
             if (_observerMiniMapImages == null || slotIndex < 0 || slotIndex >= _observerMiniMapImages.Count)
             {
                 return;
@@ -141,12 +132,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// TryGetObserverMiniMapCenterScreenPosition 함수를 처리합니다.
+        /// TryGetObserverMiniMapCenterScreenPosition 메서드입니다.
         /// </summary>
 
         public bool TryGetObserverMiniMapCenterScreenPosition(int playerIndex, out Vector2 screenPosition)
         {
-            // 핵심 로직을 처리합니다.
             screenPosition = default;
             if (_observerMiniMapImages == null || playerIndex < 0)
             {
@@ -186,12 +176,11 @@ namespace MyProject.MergeGame.Unity
             return false;
         }
         /// <summary>
-        /// ClearObserverMiniMaps 함수를 처리합니다.
+        /// ClearObserverMiniMaps 메서드입니다.
         /// </summary>
 
         public void ClearObserverMiniMaps()
         {
-            // 핵심 로직을 처리합니다.
             _observerMiniMapPlayerIndexBySlot.Clear();
 
             if (_observerMiniMapImages == null)
@@ -212,48 +201,43 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// SetResultText 함수를 처리합니다.
+        /// SetResultText 메서드입니다.
         /// </summary>
 
         public void SetResultText(string text)
         {
-            // 핵심 로직을 처리합니다.
             if (_resultText != null) _resultText.text = text;
         }
         /// <summary>
-        /// SetMonsterNumText 함수를 처리합니다.
+        /// SetMonsterNumText 메서드입니다.
         /// </summary>
 
         public void SetMonsterNumText(string text)
         {
-            // 핵심 로직을 처리합니다.
             if (_monsterNumText != null) _monsterNumText.text = text;
         }
         /// <summary>
-        /// SetDifficultyText 함수를 처리합니다.
+        /// SetDifficultyText 메서드입니다.
         /// </summary>
 
         public void SetDifficultyText(string text)
         {
-            // 핵심 로직을 처리합니다.
             if (_difficultyStepText != null) _difficultyStepText.text = text;
         }
         /// <summary>
-        /// SetGoldText 함수를 처리합니다.
+        /// SetGoldText 메서드입니다.
         /// </summary>
 
         public void SetGoldText(string text)
         {
-            // 핵심 로직을 처리합니다.
             if (_goldText != null) _goldText.text = text;
         }
         /// <summary>
-        /// SetLoadingText 함수를 처리합니다.
+        /// SetLoadingText 메서드입니다.
         /// </summary>
 
         public void SetLoadingText(string text)
         {
-            // 핵심 로직을 처리합니다.
             if (_loadingText != null) _loadingText.text = text;
         }
     }

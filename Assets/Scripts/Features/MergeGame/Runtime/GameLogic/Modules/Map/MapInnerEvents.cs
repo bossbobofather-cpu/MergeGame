@@ -1,4 +1,4 @@
-﻿using Noname.GameAbilitySystem;
+using Noname.GameAbilitySystem;
 using Noname.GameHost.Module;
 
 namespace MyProject.MergeGame.Modules
@@ -11,13 +11,12 @@ namespace MyProject.MergeGame.Modules
         public int SlotIndex { get; }
         public bool IsOccupied { get; }
         /// <summary>
-        /// SlotStateChangedInnerEvent 함수를 처리합니다.
+        /// SlotStateChangedInnerEvent 메서드입니다.
         /// </summary>
 
         public SlotStateChangedInnerEvent(long tick, int slotIndex, bool isOccupied)
             : base(tick)
         {
-            // 핵심 로직을 처리합니다.
             SlotIndex = slotIndex;
             IsOccupied = isOccupied;
         }

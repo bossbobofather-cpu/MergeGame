@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using MyProject.MergeGame.Events;
 using MyProject.MergeGame.Unity.Events;
@@ -105,7 +105,6 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         public GameObject GetSlotObject(int slotIndex)
         {
-            // 핵심 로직을 처리합니다.
             var localPlayer = GameView != null ? GameView.AssignedPlayerIndex : -1;
             return GetSlotObject(localPlayer, slotIndex);
         }
@@ -115,7 +114,6 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         public GameObject GetSlotObject(int playerIndex, int slotIndex)
         {
-            // 핵심 로직을 처리합니다.
             if (!_slotObjectsByPlayer.TryGetValue(playerIndex, out var slotMap))
             {
                 return null;
@@ -143,7 +141,6 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         public bool TryGetSlotWorldPosition(int playerIndex, int slotIndex, out Vector3 worldPosition)
         {
-            // 핵심 로직을 처리합니다.
             worldPosition = Vector3.zero;
             var slotObj = GetSlotObject(playerIndex, slotIndex);
             if (slotObj == null)
@@ -155,12 +152,11 @@ namespace MyProject.MergeGame.Unity
             return true;
         }
         /// <summary>
-        /// OnEventMsg 함수를 처리합니다.
+        /// OnEventMsg 메서드입니다.
         /// </summary>
 
         public override void OnEventMsg(MergeGameEvent evt)
         {
-            // 핵심 로직을 처리합니다.
             if (evt is not MapInitializedEvent mapEvt)
             {
                 return;
@@ -169,23 +165,21 @@ namespace MyProject.MergeGame.Unity
             BuildMap(mapEvt);
         }
         /// <summary>
-        /// OnDisconnectedEvent 함수를 처리합니다.
+        /// OnDisconnectedEvent 메서드입니다.
         /// </summary>
 
         public override void OnDisconnectedEvent()
         {
-            // 핵심 로직을 처리합니다.
             ClearAllMaps();
             MarkMiniMapDirty();
             PublishMiniMapTargets();
         }
         /// <summary>
-        /// Update 함수를 처리합니다.
+        /// Update 메서드입니다.
         /// </summary>
 
         private void Update()
         {
-            // 핵심 로직을 처리합니다.
             if (GameView == null)
             {
                 return;
@@ -202,12 +196,11 @@ namespace MyProject.MergeGame.Unity
             PublishMiniMapTargets();
         }
         /// <summary>
-        /// BuildMap 함수를 처리합니다.
+        /// BuildMap 메서드입니다.
         /// </summary>
 
         private void BuildMap(MapInitializedEvent evt)
         {
-            // 핵심 로직을 처리합니다.
             var playerIndex = evt.PlayerIndex;
             ClearMap(playerIndex);
 
@@ -246,12 +239,11 @@ namespace MyProject.MergeGame.Unity
             TryPublishMiniMapTargetsImmediately();
         }
         /// <summary>
-        /// ConfigureMapCamera 함수를 처리합니다.
+        /// ConfigureMapCamera 메서드입니다.
         /// </summary>
 
         private void ConfigureMapCamera(int playerIndex, Transform mapRoot)
         {
-            // 핵심 로직을 처리합니다.
             if (IsLocalPlayer(playerIndex))
             {
                 ReleaseObserverCamera(playerIndex);
@@ -270,12 +262,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// ConfigureMainCamera 함수를 처리합니다.
+        /// ConfigureMainCamera 메서드입니다.
         /// </summary>
 
         private void ConfigureMainCamera(Transform mapRoot)
         {
-            // 핵심 로직을 처리합니다.
             var cam = Camera.main;
             if (cam == null)
             {
@@ -296,12 +287,11 @@ namespace MyProject.MergeGame.Unity
             cam.targetTexture = null;
         }
         /// <summary>
-        /// ConfigureObserverCamera 함수를 처리합니다.
+        /// ConfigureObserverCamera 메서드입니다.
         /// </summary>
 
         private void ConfigureObserverCamera(int playerIndex, Transform mapRoot)
         {
-            // 핵심 로직을 처리합니다.
             if (!_observerCamerasByPlayer.TryGetValue(playerIndex, out var cam) || cam == null)
             {
                 var camObj = new GameObject($"ObserverCamera_P{playerIndex}");
@@ -324,12 +314,11 @@ namespace MyProject.MergeGame.Unity
             cam.targetTexture = rt;
         }
         /// <summary>
-        /// GetOrCreateObserverRenderTexture 함수를 처리합니다.
+        /// GetOrCreateObserverRenderTexture 메서드입니다.
         /// </summary>
 
         private RenderTexture GetOrCreateObserverRenderTexture(int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             if (_observerRenderTexturesByPlayer.TryGetValue(playerIndex, out var existing)
                 && existing != null
                 && existing.width == _observerRenderTextureSettings.Width
@@ -362,12 +351,11 @@ namespace MyProject.MergeGame.Unity
             return rt;
         }
         /// <summary>
-        /// ApplyCameraComponentSettings 함수를 처리합니다.
+        /// ApplyCameraComponentSettings 메서드입니다.
         /// </summary>
 
         private static void ApplyCameraComponentSettings(Camera cam, CameraRigSettings settings)
         {
-            // 핵심 로직을 처리합니다.
             cam.orthographic = settings.Orthographic;
             cam.orthographicSize = settings.OrthographicSize;
             cam.fieldOfView = settings.FieldOfView;
@@ -379,23 +367,21 @@ namespace MyProject.MergeGame.Unity
             cam.depth = settings.Depth;
         }
         /// <summary>
-        /// IsLocalPlayer 함수를 처리합니다.
+        /// IsLocalPlayer 메서드입니다.
         /// </summary>
 
         private bool IsLocalPlayer(int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             return GameView != null
                    && GameView.AssignedPlayerIndex >= 0
                    && GameView.AssignedPlayerIndex == playerIndex;
         }
         /// <summary>
-        /// BuildPath 함수를 처리합니다.
+        /// BuildPath 메서드입니다.
         /// </summary>
 
         private void BuildPath(PathData pathData, Transform parent, List<GameObject> pathObjects, int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             if (pathData.Waypoints == null || pathData.Waypoints.Count == 0)
             {
                 return;
@@ -435,12 +421,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// BuildBackground 함수를 처리합니다.
+        /// BuildBackground 메서드입니다.
         /// </summary>
 
         private void BuildBackground(int playerIndex, int mapId, Transform parent)
         {
-            // 핵심 로직을 처리합니다.
             var prefab = ResolveBackgroundPrefab(mapId);
             if (prefab == null)
             {
@@ -455,12 +440,11 @@ namespace MyProject.MergeGame.Unity
             _backgroundByPlayer[playerIndex] = background;
         }
         /// <summary>
-        /// ResolveBackgroundPrefab 함수를 처리합니다.
+        /// ResolveBackgroundPrefab 메서드입니다.
         /// </summary>
 
         private GameObject ResolveBackgroundPrefab(int mapId)
         {
-            // 핵심 로직을 처리합니다.
             for (var i = 0; i < _backgroundPrefabs.Count; i++)
             {
                 var entry = _backgroundPrefabs[i];
@@ -473,12 +457,11 @@ namespace MyProject.MergeGame.Unity
             return _defaultBackgroundPrefab;
         }
         /// <summary>
-        /// GetOrCreateMapRoot 함수를 처리합니다.
+        /// GetOrCreateMapRoot 메서드입니다.
         /// </summary>
 
         private GameObject GetOrCreateMapRoot(int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             if (_mapRootsByPlayer.TryGetValue(playerIndex, out var root) && root != null)
             {
                 return root;
@@ -494,12 +477,11 @@ namespace MyProject.MergeGame.Unity
             return root;
         }
         /// <summary>
-        /// GetOrCreateSlotMap 함수를 처리합니다.
+        /// GetOrCreateSlotMap 메서드입니다.
         /// </summary>
 
         private Dictionary<int, GameObject> GetOrCreateSlotMap(int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             if (_slotObjectsByPlayer.TryGetValue(playerIndex, out var slotMap))
             {
                 return slotMap;
@@ -510,12 +492,11 @@ namespace MyProject.MergeGame.Unity
             return slotMap;
         }
         /// <summary>
-        /// GetOrCreatePathObjectList 함수를 처리합니다.
+        /// GetOrCreatePathObjectList 메서드입니다.
         /// </summary>
 
         private List<GameObject> GetOrCreatePathObjectList(int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             if (_pathObjectsByPlayer.TryGetValue(playerIndex, out var pathObjects))
             {
                 return pathObjects;
@@ -526,12 +507,11 @@ namespace MyProject.MergeGame.Unity
             return pathObjects;
         }
         /// <summary>
-        /// GetMapRootName 함수를 처리합니다.
+        /// GetMapRootName 메서드입니다.
         /// </summary>
 
         private string GetMapRootName(int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             if (IsLocalPlayer(playerIndex))
             {
                 return "MapRoot_Player_Mine";
@@ -540,23 +520,21 @@ namespace MyProject.MergeGame.Unity
             return $"MapRoot_Player_{playerIndex}";
         }
         /// <summary>
-        /// GetPlayerOffset 함수를 처리합니다.
+        /// GetPlayerOffset 메서드입니다.
         /// </summary>
 
         private Vector3 GetPlayerOffset(int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             return GameView != null
                 ? GameView.GetPlayerOffsetPosition(playerIndex)
                 : Vector3.zero;
         }
         /// <summary>
-        /// ReleaseObserverCamera 함수를 처리합니다.
+        /// ReleaseObserverCamera 메서드입니다.
         /// </summary>
 
         private void ReleaseObserverCamera(int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             if (_observerCamerasByPlayer.TryGetValue(playerIndex, out var cam) && cam != null)
             {
                 Destroy(cam.gameObject);
@@ -575,12 +553,11 @@ namespace MyProject.MergeGame.Unity
             _observerRenderTexturesByPlayer.Remove(playerIndex);
         }
         /// <summary>
-        /// ClearMap 함수를 처리합니다.
+        /// ClearMap 메서드입니다.
         /// </summary>
 
         private void ClearMap(int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             ReleaseObserverCamera(playerIndex);
 
             if (_mapRootsByPlayer.TryGetValue(playerIndex, out var root) && root != null)
@@ -595,12 +572,11 @@ namespace MyProject.MergeGame.Unity
             MarkMiniMapDirty();
         }
         /// <summary>
-        /// ClearAllMaps 함수를 처리합니다.
+        /// ClearAllMaps 메서드입니다.
         /// </summary>
 
         private void ClearAllMaps()
         {
-            // 핵심 로직을 처리합니다.
             foreach (var pair in _mapRootsByPlayer)
             {
                 if (pair.Value != null)
@@ -635,21 +611,19 @@ namespace MyProject.MergeGame.Unity
             MarkMiniMapDirty();
         }
         /// <summary>
-        /// MarkMiniMapDirty 함수를 처리합니다.
+        /// MarkMiniMapDirty 메서드입니다.
         /// </summary>
 
         private void MarkMiniMapDirty()
         {
-            // 핵심 로직을 처리합니다.
             _miniMapDirty = true;
         }
         /// <summary>
-        /// TryPublishMiniMapTargetsImmediately 함수를 처리합니다.
+        /// TryPublishMiniMapTargetsImmediately 메서드입니다.
         /// </summary>
 
         private void TryPublishMiniMapTargetsImmediately()
         {
-            // 핵심 로직을 처리합니다.
             if (!_broadcastImmediatelyOnChange)
             {
                 return;
@@ -658,12 +632,11 @@ namespace MyProject.MergeGame.Unity
             PublishMiniMapTargets();
         }
         /// <summary>
-        /// PublishMiniMapTargets 함수를 처리합니다.
+        /// PublishMiniMapTargets 메서드입니다.
         /// </summary>
 
         private void PublishMiniMapTargets()
         {
-            // 핵심 로직을 처리합니다.
             if (GameView == null)
             {
                 return;
@@ -700,12 +673,11 @@ namespace MyProject.MergeGame.Unity
             GameView.Publish(new MiniMapRenderTargetsUpdatedEvent(this, snapshot, _miniMapVersion));
         }
         /// <summary>
-        /// OnShutdown 함수를 처리합니다.
+        /// OnShutdown 메서드입니다.
         /// </summary>
 
         protected override void OnShutdown()
         {
-            // 핵심 로직을 처리합니다.
             ClearAllMaps();
             base.OnShutdown();
         }

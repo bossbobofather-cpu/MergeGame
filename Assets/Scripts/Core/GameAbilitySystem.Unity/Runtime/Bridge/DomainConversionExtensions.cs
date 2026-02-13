@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Noname.GameAbilitySystem;
 
@@ -14,7 +14,6 @@ namespace Noname.GameCore.Helper
         /// </summary>
         public static GameplayTagContainer ToDomain(this GameplayTagContainerView container)
         {
-            // 핵심 로직을 처리합니다.
             var model = new GameplayTagContainer();
             if (container != null)
             {
@@ -26,12 +25,11 @@ namespace Noname.GameCore.Helper
             return model;
         }
         /// <summary>
-        /// ToDomain 함수를 처리합니다.
+        /// ToDomain 메서드입니다.
         /// </summary>
 
         public static AttributeSet ToDomain(this AttributeConfig definition)
         {
-            // 핵심 로직을 처리합니다.
             if(definition == null) return null;
 
             var attributeSet = new AttributeSet();
@@ -50,7 +48,6 @@ namespace Noname.GameCore.Helper
         /// </summary>
         public static AttributeSet ToDomain(this List<AttributeConfig> definitions)
         {
-            // 핵심 로직을 처리합니다.
             if(definitions == null) return null;
 
             var attributeSet = new AttributeSet();
@@ -69,12 +66,11 @@ namespace Noname.GameCore.Helper
             return attributeSet;
         }
         /// <summary>
-        /// ToDomain 함수를 처리합니다.
+        /// ToDomain 메서드입니다.
         /// </summary>
 
         public static GameplayAbility ToDomain(this GameplayAbilityConfig config)
         {
-            // 핵심 로직을 처리합니다.
             if(config == null) return null;
 
             var ability = new GameplayAbility
@@ -91,12 +87,11 @@ namespace Noname.GameCore.Helper
             return ability;
         }
         /// <summary>
-        /// ToDomain 함수를 처리합니다.
+        /// ToDomain 메서드입니다.
         /// </summary>
 
         public static List<GameplayAbility> ToDomain(this List<GameplayAbilityConfig> config)
         {
-            // 핵심 로직을 처리합니다.
             if(config == null) return null;
 
             var abilities = new List<GameplayAbility>();
@@ -115,7 +110,6 @@ namespace Noname.GameCore.Helper
         /// </summary>
         public static GameplayEffect ToDomain(this GameplayEffectConfig config)
         {
-            // 핵심 로직을 처리합니다.
             if (config == null) return null;
 
             var effect = new GameplayEffect
@@ -141,7 +135,6 @@ namespace Noname.GameCore.Helper
         /// </summary>
         public static List<GameplayEffect> ToDomain(this List<GameplayEffectConfig> config)
         {
-            // 핵심 로직을 처리합니다.
             if (config == null) return null;
 
             var effects = new List<GameplayEffect>();
@@ -155,12 +148,11 @@ namespace Noname.GameCore.Helper
             return effects;
         }
         /// <summary>
-        /// ToDomain 함수를 처리합니다.
+        /// ToDomain 메서드입니다.
         /// </summary>
 
         public static List<AttributeModifier> ToDomain(this List<AttributeModifierView> config)
         {
-            // 핵심 로직을 처리합니다.
             if (config == null) return null;
 
             var modifiers = new List<AttributeModifier>();

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Mirror;
 using MyProject.Common.Bootstrap;
 using MyProject.Common.GameView;
@@ -49,12 +49,11 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         public float PlayerOffsetStepX => _playerOffsetStepX;
         /// <summary>
-        /// OnInitialize 함수를 처리합니다.
+        /// OnInitialize 메서드입니다.
         /// </summary>
 
         protected override void OnInitialize()
         {
-            // 핵심 로직을 처리합니다.
             base.OnInitialize();
 
             NetworkClient.UnregisterHandler<NetCommandResultMessage>();
@@ -79,12 +78,11 @@ namespace MyProject.MergeGame.Unity
             NetworkClient.OnDisconnectedEvent += HandleDisconnected;
         }
         /// <summary>
-        /// OnDestroy 함수를 처리합니다.
+        /// OnDestroy 메서드입니다.
         /// </summary>
 
         protected override void OnDestroy()
         {
-            // 핵심 로직을 처리합니다.
             if (NetworkManager.singleton != null && NetworkManager.singleton.authenticator != null)
             {
                 NetworkManager.singleton.authenticator.OnClientAuthenticated.RemoveListener(HandleConnected);
@@ -97,12 +95,11 @@ namespace MyProject.MergeGame.Unity
             base.OnDestroy();
         }
         /// <summary>
-        /// Update 함수를 처리합니다.
+        /// Update 메서드입니다.
         /// </summary>
 
         protected override void Update()
         {
-            // 핵심 로직을 처리합니다.
             base.Update();
         }
 
@@ -112,7 +109,6 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         public int GetPlayerOffsetIndex(int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             if (playerIndex < 0)
             {
                 return 0;
@@ -131,7 +127,6 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         public Vector3 GetPlayerOffsetPosition(int playerIndex)
         {
-            // 핵심 로직을 처리합니다.
             var step = Mathf.Max(0f, _playerOffsetStepX);
             var offsetIndex = GetPlayerOffsetIndex(playerIndex);
             return new Vector3(offsetIndex * step, 0f, 0f);
@@ -142,7 +137,6 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         public void SendCommand(NetCommandMessage msg)
         {
-            // 핵심 로직을 처리합니다.
             if (!NetworkClient.isConnected)
             {
                 Debug.LogWarning("[MergeGameView] 서버에 연결되어 있지 않습니다.");
@@ -158,7 +152,6 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         public void SendReady()
         {
-            // 핵심 로직을 처리합니다.
             if (_readySent)
             {
                 return;
@@ -183,12 +176,11 @@ namespace MyProject.MergeGame.Unity
             pooled.Dispose();
         }
         /// <summary>
-        /// HandleConnected 함수를 처리합니다.
+        /// HandleConnected 메서드입니다.
         /// </summary>
 
         private void HandleConnected()
         {
-            // 핵심 로직을 처리합니다.
             Debug.Log("[MergeGameView] Connected");
 
             foreach (var module in Modules)
@@ -200,12 +192,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// HandleDisconnected 함수를 처리합니다.
+        /// HandleDisconnected 메서드입니다.
         /// </summary>
 
         private void HandleDisconnected()
         {
-            // 핵심 로직을 처리합니다.
             Debug.Log("[MergeGameView] Disconnected");
 
             _readySent = false;
@@ -225,7 +216,6 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         public void SendCommand(MergeGameCommand command, MergeNetCommandType commandType)
         {
-            // 핵심 로직을 처리합니다.
             if (!NetworkClient.isConnected)
             {
                 Debug.LogWarning("[MergeGameView] 서버에 연결되어 있지 않습니다.");
@@ -248,7 +238,6 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         private void OnCommandResultMsg(NetCommandResultMessage msg)
         {
-            // 핵심 로직을 처리합니다.
             MergeCommandResult result = msg.CommandType switch
             {
                 MergeNetCommandType.ReadyGame => ReadyMergeGameResult.ReadFrom(msg.Payload),
@@ -275,7 +264,6 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         private void OnEventMsg(NetEventMessage msg)
         {
-            // 핵심 로직을 처리합니다.
             MergeGameEvent evt = DeserializeEvent(msg);
             if (evt == null) return;
 
@@ -293,12 +281,11 @@ namespace MyProject.MergeGame.Unity
             }
         }
         /// <summary>
-        /// DeserializeEvent 함수를 처리합니다.
+        /// DeserializeEvent 메서드입니다.
         /// </summary>
 
         private static MergeGameEvent DeserializeEvent(NetEventMessage msg)
         {
-            // 핵심 로직을 처리합니다.
             return msg.EventType switch
             {
                 MergeNetEventType.PlayerAssigned => ConnectedInfoEvent.ReadFrom(msg.Payload),
@@ -328,7 +315,6 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         private void OnSnapshotMsg(NetSnapshotMessage msg)
         {
-            // 핵심 로직을 처리합니다.
             var snapshot = MergeHostSnapshot.ReadFrom(msg.Payload);
             if (snapshot == null) return;
 

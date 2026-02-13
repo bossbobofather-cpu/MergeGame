@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 
 namespace Noname.GameHost.GameEvent
 {
     /// <summary>
-    /// ?대깽??踰꾩뒪 怨듭슜 ?명꽣?섏씠?ㅼ엯?덈떎.
-    /// </summary>
+        /// 요약 설명입니다.
+        /// </summary>
     public interface IEventBus<TEventBase>
         where TEventBase : class
     {

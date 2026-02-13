@@ -1,24 +1,24 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Noname.GameAbilitySystem.Json
 {
     /// <summary>
-    /// GameplayEffect JSON DTO
+    /// GameplayEffect 설정 JSON DTO입니다.
     /// </summary>
     [Serializable]
     public class GameplayEffectDto
     {
         public string EffectTag;
 
-        // Legacy field for backward compatibility with old exported json.
+        // 이전에 내보낸 JSON과의 호환을 위한 레거시 필드입니다.
         public string EffectId;
 
         public string DisplayName;
         public string Description;
 
         /// <summary>
-        /// 二쇱꽍 ?뺣━
+        /// 지속시간 타입 문자열입니다.
         /// </summary>
         public string DurationType;
 

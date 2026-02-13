@@ -5,33 +5,33 @@ using MyProject.MergeGame.Snapshots;
 namespace MyProject.MergeGame.Unity
 {
     /// <summary>
-    /// MergeGame View 紐⑤뱢 ?명꽣?섏씠?ㅼ엯?덈떎.
-    /// ?쒕쾭 ?곌껐 諛??댁젣, ?몄뒪???대깽?몄? ?ㅻ깄?룹쓣 ?섏떊?????덉뒿?덈떎.
+    /// MergeGame View 모듈 공통 인터페이스입니다.
+    /// 네트워크 연결 상태와 Host 메시지를 모듈에 전달합니다.
     /// </summary>
     public interface IMergeViewModule
     {
         /// <summary>
-        /// ?쒕쾭 ?곌껐 ???몄텧 ?⑸땲??
+        /// 서버 연결 완료 시 호출됩니다.
         /// </summary>
         void OnConnectedEvent();
 
         /// <summary>
-        /// ?쒕쾭 ?곌껐 ?댁젣 ???몄텧?⑸땲??
+        /// 서버 연결 해제 시 호출됩니다.
         /// </summary>
         void OnDisconnectedEvent();
 
         /// <summary>
-        /// ?몄뒪???대깽???섏떊 ???몄텧?⑸땲??
+        /// Host 이벤트 수신 시 호출됩니다.
         /// </summary>
         void OnEventMsg(MergeGameEvent evt);
 
         /// <summary>
-        /// 而ㅻ㎤??寃곌낵 ?섏떊 ???몄텧?⑸땲??
+        /// 커맨드 결과 수신 시 호출됩니다.
         /// </summary>
         void OnCommandResultMsg(MergeCommandResult result);
 
         /// <summary>
-        /// ?ㅻ깄??媛깆떊 ???몄텧?⑸땲??
+        /// 스냅샷 수신 시 호출됩니다.
         /// </summary>
         void OnSnapshotMsg(MergeHostSnapshot snapshot);
     }
