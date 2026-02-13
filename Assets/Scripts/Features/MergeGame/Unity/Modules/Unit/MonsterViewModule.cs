@@ -18,7 +18,7 @@ namespace MyProject.MergeGame.Unity
         [Header("Fallback Visual")]
         [SerializeField] private bool _usePrimitiveFallback = true;
         [SerializeField] private Vector3 _monsterScale = new Vector3(0.8f, 0.8f, 0.8f);
-        [SerializeField] private Color _injectedMonsterColor = new Color(0.02f, 0.02f, 0.02f, 1f);
+        [SerializeField] private Color _injectedMonsterColor = new Color(1f, 0.00f, 0.00f, 1f);
 
         private readonly Dictionary<int, Dictionary<long, GameObject>> _monsterObjectsByPlayer = new();
         private readonly HashSet<long> _seen = new();

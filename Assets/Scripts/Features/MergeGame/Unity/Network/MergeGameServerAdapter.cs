@@ -21,7 +21,7 @@ namespace MyProject.MergeGame.Unity.Network
     /// </summary>
     public sealed class MergeGameServerAdapter : MonoBehaviour
     {
-        private const int MaxSupportedPlayers = 2;
+        private const int MaxSupportedPlayers = 3;
 
         [Header("Connection Mapping")]
         [SerializeField] private bool _reserveSlot0ForLocalHost = true;
@@ -755,11 +755,11 @@ namespace MyProject.MergeGame.Unity.Network
                         TowerId = DevHelperSet.DevIdHelper.DEV_TOWER_ID_BLUE,
                         InitialGrade = 1,
                         BaseAttackDamage = 20f,
-                        BaseAttackSpeed = 0.5f,
-                        BaseAttackRange = 8f,
+                        BaseAttackSpeed = 0.1f,
+                        BaseAttackRange = 6f,
                         AttackType = TowerAttackType.Projectile,
                         ProjectileType = ProjectileType.Throw,
-                        ProjectileSpeed = 20f,
+                        ProjectileSpeed = 10f,
                         ThrowRadius = 2.5f,
                         TrapDelay = 0.5f,
                         TargetingType = TowerTargetingType.None,

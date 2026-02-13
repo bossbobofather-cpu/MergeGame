@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using MyProject.MergeGame.Events;
 using MyProject.MergeGame.Snapshots;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace MyProject.MergeGame.Unity
 {
@@ -29,10 +30,13 @@ namespace MyProject.MergeGame.Unity
         [SerializeField] private Color _trapActiveColor = new Color(1f, 0.2f, 0.2f, 0.8f);
         [SerializeField] private Color _trapRangeColor = new Color(1f, 0.2f, 0.2f, 0.25f);
         [SerializeField] private float _trapPulseSpeed = 6f;
+        [SerializeField] private float _trapRangeHeightOffset = 0.05f;
+        [SerializeField] private float _trapRangeThickness = 0.02f;
 
         private readonly Dictionary<int, Dictionary<long, ProjectileInstance>> _projectileMapByPlayer = new();
         private readonly List<long> _removeBuffer = new();
         private readonly HashSet<long> _snapshotUids = new();
+        private Material _trapRangeMaterial;
         /// <summary>
         /// OnEventMsg 메서드입니다.
         /// </summary>
@@ -324,18 +328,63 @@ namespace MyProject.MergeGame.Unity
             indicator.transform.SetParent(transform, false);
 
             var diameter = radius * 2f;
-            indicator.transform.position = position;
-            indicator.transform.localScale = new Vector3(diameter, 0.01f, diameter);
+            indicator.transform.position = position + new Vector3(0f, Mathf.Max(0f, _trapRangeHeightOffset), 0f);
+            indicator.transform.localScale = new Vector3(diameter, Mathf.Max(0.001f, _trapRangeThickness), diameter);
             indicator.name = "TrapRange";
 
             var renderer = indicator.GetComponent<Renderer>();
             if (renderer != null)
             {
-                var mat = renderer.material;
-                mat.color = _trapRangeColor;
+                renderer.shadowCastingMode = ShadowCastingMode.Off;
+                renderer.receiveShadows = false;
+                renderer.sharedMaterial = GetOrCreateTrapRangeMaterial();
             }
 
             return indicator;
+        }
+        /// <summary>
+        /// GetOrCreateTrapRangeMaterial 메서드입니다.
+        /// </summary>
+
+        private Material GetOrCreateTrapRangeMaterial()
+        {
+            if (_trapRangeMaterial != null)
+            {
+                _trapRangeMaterial.color = _trapRangeColor;
+                return _trapRangeMaterial;
+            }
+
+            var shader = Shader.Find("Universal Render Pipeline/Unlit")
+                         ?? Shader.Find("Unlit/Color")
+                         ?? Shader.Find("Sprites/Default")
+                         ?? Shader.Find("Standard");
+
+            _trapRangeMaterial = shader != null
+                ? new Material(shader)
+                : new Material(Shader.Find("Sprites/Default"));
+
+            _trapRangeMaterial.name = "TrapRangeMaterial(Runtime)";
+            _trapRangeMaterial.color = _trapRangeColor;
+            _trapRangeMaterial.renderQueue = (int)RenderQueue.Transparent;
+
+            if (_trapRangeMaterial.HasProperty("_Surface"))
+            {
+                _trapRangeMaterial.SetFloat("_Surface", 1f);
+            }
+            if (_trapRangeMaterial.HasProperty("_ZWrite"))
+            {
+                _trapRangeMaterial.SetFloat("_ZWrite", 0f);
+            }
+            if (_trapRangeMaterial.HasProperty("_SrcBlend"))
+            {
+                _trapRangeMaterial.SetFloat("_SrcBlend", (float)BlendMode.SrcAlpha);
+            }
+            if (_trapRangeMaterial.HasProperty("_DstBlend"))
+            {
+                _trapRangeMaterial.SetFloat("_DstBlend", (float)BlendMode.OneMinusSrcAlpha);
+            }
+
+            return _trapRangeMaterial;
         }
         /// <summary>
         /// ApplyColor 메서드입니다.
@@ -410,6 +459,12 @@ namespace MyProject.MergeGame.Unity
             }
 
             _projectileMapByPlayer.Clear();
+
+            if (_trapRangeMaterial != null)
+            {
+                Destroy(_trapRangeMaterial);
+                _trapRangeMaterial = null;
+            }
         }
 
         private sealed class ProjectileInstance
