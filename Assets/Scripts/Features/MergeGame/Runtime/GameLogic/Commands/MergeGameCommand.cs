@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Buffers.Binary;
 using Noname.GameHost;
 
@@ -29,6 +29,9 @@ namespace MyProject.MergeGame.Commands
     /// </summary>
     public abstract class MergeCommandResult : GameCommandResultBase
     {
+        /// <summary>
+        /// MergeCommandResult 생성자입니다.
+        /// </summary>
         protected MergeCommandResult(long tick, long senderUid, bool success, string reason)
             : base(tick, senderUid, success, reason)
         {
@@ -297,8 +300,17 @@ namespace MyProject.MergeGame.Commands
         /// </summary>
         public int SlotIndex { get; }
 
+        /// <summary>
+        /// PositionX 속성입니다.
+        /// </summary>
         public float PositionX { get; }
+        /// <summary>
+        /// PositionY 속성입니다.
+        /// </summary>
         public float PositionY { get; }
+        /// <summary>
+        /// PositionZ 속성입니다.
+        /// </summary>
         public float PositionZ { get; }
 
 
@@ -325,6 +337,9 @@ namespace MyProject.MergeGame.Commands
             PositionZ = positionZ;
         }
 
+        /// <summary>
+        /// 타워 스폰 성공 결과를 생성합니다.
+        /// </summary>
         public static SpawnTowerResult Ok(
             long tick,
             long senderUid,
@@ -551,6 +566,9 @@ namespace MyProject.MergeGame.Commands
             SlotIndex = slotIndex;
         }
 
+        /// <summary>
+        /// 타워 머지 성공 결과를 생성합니다.
+        /// </summary>
         public static MergeTowerResult Ok(
             long tick,
             long senderUid,
@@ -670,6 +688,9 @@ namespace MyProject.MergeGame.Commands
         /// </summary>
         public int PathIndex { get; }
 
+        /// <summary>
+        /// InjectMonstersCommand 생성자입니다.
+        /// </summary>
         public InjectMonstersCommand(long senderUid, int targetPlayerIndex, long monsterId, int count, int pathIndex = 0) : base(senderUid)
         {
             TargetPlayerIndex = targetPlayerIndex;

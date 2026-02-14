@@ -1,7 +1,10 @@
-﻿using System;
+using System;
 
 namespace MyProject.MergeGame.Unity.Network
 {
+    /// <summary>
+    /// MergeGamePlayerState 열거형입니다.
+    /// </summary>
     public enum MergeGamePlayerState : ushort
     {
         None,
@@ -19,8 +22,17 @@ namespace MyProject.MergeGame.Unity.Network
         private int _index;
         private MergeGamePlayerState _state;
 
+        /// <summary>
+        /// Uid 속성입니다.
+        /// </summary>
         public long Uid => _uid;
+        /// <summary>
+        /// Index 속성입니다.
+        /// </summary>
         public int Index => _index;
+        /// <summary>
+        /// State 속성입니다.
+        /// </summary>
         public MergeGamePlayerState State => _state;
 
         /// <summary>

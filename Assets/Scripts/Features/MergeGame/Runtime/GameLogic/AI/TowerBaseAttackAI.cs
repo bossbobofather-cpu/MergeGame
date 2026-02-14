@@ -22,6 +22,9 @@ namespace MyProject.MergeGame.AI
             _baseAttackTag = new FGameplayTag(baseAttackTag);
         }
 
+        /// <summary>
+        /// 타워 기본 공격 가능 여부를 검사하고 공격 이벤트를 생성합니다.
+        /// </summary>
         public void Tick(
             long tick,
             int playerIndex,

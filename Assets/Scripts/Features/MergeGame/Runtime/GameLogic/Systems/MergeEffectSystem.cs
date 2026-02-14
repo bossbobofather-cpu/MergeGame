@@ -40,6 +40,9 @@ namespace MyProject.MergeGame.Systems
     {
         private readonly List<GameplayEffect> _singleEffectBuffer = new(1);
 
+        /// <summary>
+        /// MergeEffectSystem 생성자입니다.
+        /// </summary>
         public MergeEffectSystem()
         {
         }

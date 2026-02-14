@@ -127,16 +127,25 @@ namespace MyProject.Common.GameView
             return null;
         }
 
+        /// <summary>
+        /// 게임 이벤트 핸들러를 구독합니다.
+        /// </summary>
         public void Subscribe<TEventContext>(Action<TEventContext> handler) where TEventContext : GameEventContext
         {
             GameEventBus.Subscribe(handler);
         }
 
+        /// <summary>
+        /// 게임 이벤트 핸들러 구독을 해제합니다.
+        /// </summary>
         public void Unsubscribe<TEventContext>(Action<TEventContext> handler) where TEventContext : GameEventContext
         {
             GameEventBus.Unsubscribe(handler);
         }
 
+        /// <summary>
+        /// 게임 이벤트를 발행합니다.
+        /// </summary>
         public void Publish<TEventContext>(TEventContext context) where TEventContext : GameEventContext
         {
             GameEventBus.Publish(context);

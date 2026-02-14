@@ -12,6 +12,9 @@ namespace MyProject.MergeGame.AI
     /// </summary>
     public sealed class MonsterPathMoveAI : IMergeMonsterAI
     {
+        /// <summary>
+        /// 몬스터를 현재 경로 진행도 기준으로 이동시키고 이동 이벤트를 생성합니다.
+        /// </summary>
         public void Tick(
             long tick,
             int playerIndex,

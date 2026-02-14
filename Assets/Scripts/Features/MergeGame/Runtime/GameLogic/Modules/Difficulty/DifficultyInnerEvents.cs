@@ -3,40 +3,43 @@ using Noname.GameHost.Module;
 namespace MyProject.MergeGame.Modules
 {
     /// <summary>
-        /// 요약 설명입니다.
+        /// MonsterSpawnRequestInnerEvent 클래스입니다.
         /// </summary>
     public sealed class MonsterSpawnRequestInnerEvent : InnerEventBase
     {
         /// <summary>
-        /// 요약 설명입니다.
+        /// PlayerIndex 속성입니다.
         /// </summary>
         public int PlayerIndex { get; }
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// MonsterId 속성입니다.
         /// </summary>
         public long MonsterId { get; }
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// PathIndex 속성입니다.
         /// </summary>
         public int PathIndex { get; }
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// DifficultyStep 속성입니다.
         /// </summary>
         public int DifficultyStep { get; }
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// HealthMultiplier 속성입니다.
         /// </summary>
         public float HealthMultiplier { get; }
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// Handled 속성입니다.
         /// </summary>
         public bool Handled { get; set; }
 
+        /// <summary>
+        /// MonsterSpawnRequestInnerEvent 생성자입니다.
+        /// </summary>
         public MonsterSpawnRequestInnerEvent(
             long tick, int playerIndex, long monsterId, int pathIndex,
             int difficultyStep, float healthMultiplier)
@@ -51,30 +54,33 @@ namespace MyProject.MergeGame.Modules
     }
 
     /// <summary>
-        /// 요약 설명입니다.
+        /// DifficultyStepChangedInnerEvent 클래스입니다.
         /// </summary>
     public sealed class DifficultyStepChangedInnerEvent : InnerEventBase
     {
         /// <summary>
-        /// 요약 설명입니다.
+        /// Step 속성입니다.
         /// </summary>
         public int Step { get; }
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// SpawnCount 속성입니다.
         /// </summary>
         public int SpawnCount { get; }
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// HealthMultiplier 속성입니다.
         /// </summary>
         public float HealthMultiplier { get; }
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// SpawnInterval 속성입니다.
         /// </summary>
         public float SpawnInterval { get; }
 
+        /// <summary>
+        /// DifficultyStepChangedInnerEvent 생성자입니다.
+        /// </summary>
         public DifficultyStepChangedInnerEvent(
             long tick, int step, int spawnCount, float healthMultiplier, float spawnInterval)
             : base(tick)
@@ -87,19 +93,22 @@ namespace MyProject.MergeGame.Modules
     }
 
     /// <summary>
-        /// 요약 설명입니다.
+        /// MonsterDiedInnerEvent 클래스입니다.
         /// </summary>
     public sealed class MonsterDiedInnerEvent : InnerEventBase
     {
         /// <summary>
-        /// 요약 설명입니다.
+        /// PlayerIndex 속성입니다.
         /// </summary>
         public int PlayerIndex { get; }
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// MonsterUid 속성입니다.
         /// </summary>
         public long MonsterUid { get; }
+        /// <summary>
+        /// MonsterDiedInnerEvent 생성자입니다.
+        /// </summary>
         public MonsterDiedInnerEvent(long tick, int playerIndex, long monsterUid)
             : base(tick)
         {

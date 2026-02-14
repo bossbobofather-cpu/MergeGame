@@ -69,6 +69,9 @@ namespace MyProject.MergeGame.Models
         /// </summary>
         public bool ReachedGoal => PathProgress >= 1f;
 
+        /// <summary>
+        /// MergeMonster 생성자입니다.
+        /// </summary>
         public MergeMonster(
             long uid,
             long monsterId,
@@ -116,4 +119,3 @@ namespace MyProject.MergeGame.Models
         }
     }
 }
-

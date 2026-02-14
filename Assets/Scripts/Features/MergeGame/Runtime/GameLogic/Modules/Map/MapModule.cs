@@ -97,6 +97,9 @@ namespace MyProject.MergeGame.Modules
         /// </summary>
         public Point3D EndPosition => _waypoints.Count > 0 ? _waypoints[^1] : Point3D.zero;
 
+        /// <summary>
+        /// MapPath 생성자입니다.
+        /// </summary>
         public MapPath(int pathIndex, IEnumerable<Point3D> waypoints)
         {
             PathIndex = pathIndex;
@@ -170,6 +173,9 @@ namespace MyProject.MergeGame.Modules
     /// </summary>
     public sealed class MapModule : HostModuleBase<MapModuleConfig>
     {
+        /// <summary>
+        /// MODULE_ID 필드입니다.
+        /// </summary>
         public const string MODULE_ID = "map";
 
         private MapSlot[] _slots;
@@ -508,6 +514,5 @@ namespace MyProject.MergeGame.Modules
         #endregion
     }
 }
-
 
 

@@ -8,7 +8,13 @@ namespace MyProject.MergeGame.Modules
     /// </summary>
     public sealed class SlotStateChangedInnerEvent : InnerEventBase
     {
+        /// <summary>
+        /// SlotIndex 속성입니다.
+        /// </summary>
         public int SlotIndex { get; }
+        /// <summary>
+        /// IsOccupied 속성입니다.
+        /// </summary>
         public bool IsOccupied { get; }
         /// <summary>
         /// SlotStateChangedInnerEvent 메서드입니다.
@@ -27,9 +33,18 @@ namespace MyProject.MergeGame.Modules
     /// </summary>
     public sealed class SlotPositionRequestInnerEvent : InnerEventBase
     {
+        /// <summary>
+        /// SlotIndex 속성입니다.
+        /// </summary>
         public int SlotIndex { get; }
+        /// <summary>
+        /// Position 속성입니다.
+        /// </summary>
         public Point3D Position { get; set; }
 
+        /// <summary>
+        /// SlotPositionRequestInnerEvent 생성자입니다.
+        /// </summary>
         public SlotPositionRequestInnerEvent(long tick, int slotIndex)
             : base(tick)
         {
@@ -42,9 +57,18 @@ namespace MyProject.MergeGame.Modules
     /// </summary>
     public sealed class PathRequestInnerEvent : InnerEventBase
     {
+        /// <summary>
+        /// PathIndex 속성입니다.
+        /// </summary>
         public int PathIndex { get; }
+        /// <summary>
+        /// Path 속성입니다.
+        /// </summary>
         public MapPath Path { get; set; }
 
+        /// <summary>
+        /// PathRequestInnerEvent 생성자입니다.
+        /// </summary>
         public PathRequestInnerEvent(long tick, int pathIndex)
             : base(tick)
         {
@@ -57,12 +81,17 @@ namespace MyProject.MergeGame.Modules
     /// </summary>
     public sealed class EmptySlotRequestInnerEvent : InnerEventBase
     {
+        /// <summary>
+        /// ResultSlotIndex 속성입니다.
+        /// </summary>
         public int ResultSlotIndex { get; set; } = -1;
 
+        /// <summary>
+        /// EmptySlotRequestInnerEvent 생성자입니다.
+        /// </summary>
         public EmptySlotRequestInnerEvent(long tick)
             : base(tick)
         {
         }
     }
 }
-

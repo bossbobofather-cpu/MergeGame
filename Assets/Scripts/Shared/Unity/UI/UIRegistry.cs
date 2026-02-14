@@ -62,6 +62,9 @@ namespace MyProject.Common.UI
         {
             [SerializeField] private UIBase _prefab;
 
+            /// <summary>
+            /// Prefab 속성입니다.
+            /// </summary>
             public UIBase Prefab => _prefab;
             /// <summary>
             /// Matches 메서드입니다.

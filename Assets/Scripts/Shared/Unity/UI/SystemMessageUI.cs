@@ -69,9 +69,21 @@ namespace MyProject.Common.UI
 
         private sealed class MessageRow
         {
+            /// <summary>
+            /// Root 필드입니다.
+            /// </summary>
             public GameObject Root;
+            /// <summary>
+            /// Label 필드입니다.
+            /// </summary>
             public Text Label;
+            /// <summary>
+            /// Background 필드입니다.
+            /// </summary>
             public Image Background;
+            /// <summary>
+            /// Group 필드입니다.
+            /// </summary>
             public CanvasGroup Group;
         }
         /// <summary>

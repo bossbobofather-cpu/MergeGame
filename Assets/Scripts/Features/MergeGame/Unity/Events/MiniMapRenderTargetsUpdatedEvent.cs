@@ -9,9 +9,18 @@ namespace MyProject.MergeGame.Unity.Events
     /// </summary>
     public readonly struct MiniMapRenderTargetInfo
     {
+        /// <summary>
+        /// PlayerIndex 속성입니다.
+        /// </summary>
         public int PlayerIndex { get; }
+        /// <summary>
+        /// Texture 속성입니다.
+        /// </summary>
         public Texture Texture { get; }
 
+        /// <summary>
+        /// MiniMapRenderTargetInfo 생성자입니다.
+        /// </summary>
         public MiniMapRenderTargetInfo(int playerIndex, Texture texture)
         {
             PlayerIndex = playerIndex;
@@ -24,7 +33,13 @@ namespace MyProject.MergeGame.Unity.Events
     /// </summary>
     public sealed class MiniMapRenderTargetsUpdatedEvent : SceneGameEventContext
     {
+        /// <summary>
+        /// Targets 속성입니다.
+        /// </summary>
         public IReadOnlyList<MiniMapRenderTargetInfo> Targets { get; }
+        /// <summary>
+        /// Version 속성입니다.
+        /// </summary>
         public int Version { get; }
         /// <summary>
         /// MiniMapRenderTargetsUpdatedEvent 메서드입니다.

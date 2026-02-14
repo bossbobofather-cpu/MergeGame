@@ -37,6 +37,9 @@ namespace MyProject.MergeGame.Unity
         /// </summary>
         public Button ReadyButton => _readyButton;
 
+        /// <summary>
+        /// ObserverMiniMapSlotCount 속성입니다.
+        /// </summary>
         public int ObserverMiniMapSlotCount => _observerMiniMapImages?.Count ?? 0;
         /// <summary>
         /// SetActiveSpawnButton 메서드입니다.
@@ -242,5 +245,4 @@ namespace MyProject.MergeGame.Unity
         }
     }
 }
-
 

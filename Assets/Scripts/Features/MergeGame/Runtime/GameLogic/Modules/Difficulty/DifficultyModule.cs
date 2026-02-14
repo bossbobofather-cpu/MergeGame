@@ -3,10 +3,13 @@ using Noname.GameHost.Module;
 namespace MyProject.MergeGame.Modules
 {
     /// <summary>
-        /// 요약 설명입니다.
+        /// DifficultyModule 클래스입니다.
         /// </summary>
     public sealed class DifficultyModule : HostModuleBase<DifficultyModuleConfig>
     {
+        /// <summary>
+        /// MODULE_ID 필드입니다.
+        /// </summary>
         public const string MODULE_ID = "difficulty";
 
         private float _elapsedTime;
@@ -26,22 +29,22 @@ namespace MyProject.MergeGame.Modules
         public override int Priority => 80;
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// CurrentStep 속성입니다.
         /// </summary>
         public int CurrentStep => _currentStep;
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// SpawnCount 속성입니다.
         /// </summary>
         public int SpawnCount => _spawnCount;
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// HealthMultiplier 속성입니다.
         /// </summary>
         public float HealthMultiplier => _healthMultiplier;
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// SpawnInterval 속성입니다.
         /// </summary>
         public float SpawnInterval => _spawnInterval;
 
@@ -138,7 +141,7 @@ namespace MyProject.MergeGame.Modules
         }
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// Reset 메서드입니다.
         /// </summary>
         public void Reset()
         {

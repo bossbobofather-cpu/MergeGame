@@ -12,7 +12,13 @@ namespace MyProject.MergeGame.Unity
         [SerializeField] private int _pathIndex = -1;
         [SerializeField] private int _waypointIndex = -1;
 
+        /// <summary>
+        /// PathIndex 속성입니다.
+        /// </summary>
         public int PathIndex => _pathIndex;
+        /// <summary>
+        /// WaypointIndex 속성입니다.
+        /// </summary>
         public int WaypointIndex => _waypointIndex;
         /// <summary>
         /// SetIndices 메서드입니다.

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Noname.GameAbilitySystem;
 
 namespace MyProject.MergeGame
@@ -9,18 +9,51 @@ namespace MyProject.MergeGame
     /// </summary>
     public sealed class TowerDefinition
     {
+        /// <summary>
+        /// TowerId 속성입니다.
+        /// </summary>
         public long TowerId { get; set; }
+        /// <summary>
+        /// InitialGrade 속성입니다.
+        /// </summary>
         public int InitialGrade { get; set; } = 1;
+        /// <summary>
+        /// BaseAttackDamage 속성입니다.
+        /// </summary>
         public float BaseAttackDamage { get; set; } = 10f;
+        /// <summary>
+        /// BaseAttackSpeed 속성입니다.
+        /// </summary>
         public float BaseAttackSpeed { get; set; } = 1f;
+        /// <summary>
+        /// BaseAttackRange 속성입니다.
+        /// </summary>
         public float BaseAttackRange { get; set; } = 5f;
 
+        /// <summary>
+        /// AttackType 속성입니다.
+        /// </summary>
         public TowerAttackType AttackType { get; set; } = TowerAttackType.HitScan;
+        /// <summary>
+        /// ProjectileType 속성입니다.
+        /// </summary>
         public ProjectileType ProjectileType { get; set; } = ProjectileType.Direct;
+        /// <summary>
+        /// ProjectileSpeed 속성입니다.
+        /// </summary>
         public float ProjectileSpeed { get; set; } = 8f;
+        /// <summary>
+        /// ThrowRadius 속성입니다.
+        /// </summary>
         public float ThrowRadius { get; set; } = 1.5f;
+        /// <summary>
+        /// TrapDelay 속성입니다.
+        /// </summary>
         public float TrapDelay { get; set; } = 0f;
 
+        /// <summary>
+        /// TargetingType 속성입니다.
+        /// </summary>
         public TowerTargetingType TargetingType { get; set; } = TowerTargetingType.Nearest;
 
         /// <summary>

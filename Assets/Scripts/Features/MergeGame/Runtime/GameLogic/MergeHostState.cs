@@ -41,6 +41,9 @@ namespace MyProject.MergeGame
             /// </summary>
             public bool IsEmpty => TowerUid == 0;
 
+            /// <summary>
+            /// SlotInfo 생성자입니다.
+            /// </summary>
             public SlotInfo(int index, Point3D position)
             {
                 Index = index;
@@ -73,24 +76,54 @@ namespace MyProject.MergeGame
         /// </summary>
         public sealed class PlayerState
         {
+            /// <summary>
+            /// PlayerIndex 속성입니다.
+            /// </summary>
             public int PlayerIndex { get; }
 
             // 슬롯 및 타워
+            /// <summary>
+            /// Slots 필드입니다.
+            /// </summary>
             public readonly List<SlotInfo> Slots = new();
+            /// <summary>
+            /// Towers 필드입니다.
+            /// </summary>
             public readonly Dictionary<long, MergeTower> Towers = new();
 
             // 몬스터
+            /// <summary>
+            /// Monsters 필드입니다.
+            /// </summary>
             public readonly Dictionary<long, MergeMonster> Monsters = new();
+            /// <summary>
+            /// Paths 필드입니다.
+            /// </summary>
             public readonly List<MonsterPath> Paths = new();
 
             // 플레이어 상태
+            /// <summary>
+            /// Gold 필드입니다.
+            /// </summary>
             public int Gold;
+            /// <summary>
+            /// IsGameOver 필드입니다.
+            /// </summary>
             public bool IsGameOver;
 
             // 점수
+            /// <summary>
+            /// Score 필드입니다.
+            /// </summary>
             public int Score;
+            /// <summary>
+            /// MaxGrade 필드입니다.
+            /// </summary>
             public int MaxGrade;
 
+            /// <summary>
+            /// PlayerState 생성자입니다.
+            /// </summary>
             public PlayerState(int playerIndex)
             {
                 PlayerIndex = playerIndex;
@@ -626,4 +659,3 @@ namespace MyProject.MergeGame
 
     // WavePhase는 Shared/Enums/MergeEnums.cs에 정의됨
 }
-

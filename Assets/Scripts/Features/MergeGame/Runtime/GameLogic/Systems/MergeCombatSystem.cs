@@ -14,19 +14,61 @@ namespace MyProject.MergeGame.Systems
     {
         private sealed class PendingProjectile
         {
+            /// <summary>
+            /// Uid 필드입니다.
+            /// </summary>
             public long Uid;
+            /// <summary>
+            /// PlayerIndex 필드입니다.
+            /// </summary>
             public int PlayerIndex;
+            /// <summary>
+            /// AttackerUid 필드입니다.
+            /// </summary>
             public long AttackerUid;
+            /// <summary>
+            /// TargetUid 필드입니다.
+            /// </summary>
             public long TargetUid;
+            /// <summary>
+            /// SourceAscSnapshot 필드입니다.
+            /// </summary>
             public AbilitySystemComponent SourceAscSnapshot;
+            /// <summary>
+            /// TargetingStrategy 필드입니다.
+            /// </summary>
             public ITargetingStrategy TargetingStrategy;
+            /// <summary>
+            /// HitEffects 필드입니다.
+            /// </summary>
             public List<GameplayEffect> HitEffects;
+            /// <summary>
+            /// Start 필드입니다.
+            /// </summary>
             public Point3D Start;
+            /// <summary>
+            /// Impact 필드입니다.
+            /// </summary>
             public Point3D Impact;
+            /// <summary>
+            /// RemainingTime 필드입니다.
+            /// </summary>
             public float RemainingTime;
+            /// <summary>
+            /// TravelTime 필드입니다.
+            /// </summary>
             public float TravelTime;
+            /// <summary>
+            /// ProjectileType 필드입니다.
+            /// </summary>
             public ProjectileType ProjectileType;
+            /// <summary>
+            /// ThrowRadius 필드입니다.
+            /// </summary>
             public float ThrowRadius;
+            /// <summary>
+            /// IsLanded 필드입니다.
+            /// </summary>
             public bool IsLanded;
         }
 
@@ -35,14 +77,38 @@ namespace MyProject.MergeGame.Systems
         /// </summary>
         public readonly struct ActiveProjectile
         {
+            /// <summary>
+            /// Uid 속성입니다.
+            /// </summary>
             public long Uid { get; }
+            /// <summary>
+            /// PlayerIndex 속성입니다.
+            /// </summary>
             public int PlayerIndex { get; }
+            /// <summary>
+            /// Start 속성입니다.
+            /// </summary>
             public Point3D Start { get; }
+            /// <summary>
+            /// Impact 속성입니다.
+            /// </summary>
             public Point3D Impact { get; }
+            /// <summary>
+            /// Progress 속성입니다.
+            /// </summary>
             public float Progress { get; }
+            /// <summary>
+            /// ProjectileType 속성입니다.
+            /// </summary>
             public ProjectileType ProjectileType { get; }
+            /// <summary>
+            /// IsLanded 속성입니다.
+            /// </summary>
             public bool IsLanded { get; }
 
+            /// <summary>
+            /// ActiveProjectile 생성자입니다.
+            /// </summary>
             public ActiveProjectile(long uid, int playerIndex, Point3D start, Point3D impact, float progress, ProjectileType projectileType, bool isLanded)
             {
                 Uid = uid;
@@ -63,6 +129,9 @@ namespace MyProject.MergeGame.Systems
         private readonly List<ActiveProjectile> _activeProjectileBuffer = new();
         private long _nextProjectileUid = 1;
 
+        /// <summary>
+        /// TargetContext 속성입니다.
+        /// </summary>
         public TargetContext TargetContext => _targetContext;
 
         /// <summary>

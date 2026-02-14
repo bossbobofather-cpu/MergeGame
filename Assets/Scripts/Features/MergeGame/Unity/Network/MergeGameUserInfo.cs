@@ -5,15 +5,24 @@ using UnityEngine;
 namespace MyProject.MergeGame.Unity.Network
 {
     /// <summary>
-        /// 요약 설명입니다.
+        /// User 클래스입니다.
         /// </summary>
     public static class User
     {
+        /// <summary>
+        /// InvalidUserId 필드입니다.
+        /// </summary>
         public const long InvalidUserId = 0;
+        /// <summary>
+        /// OriginalEditorUserId 필드입니다.
+        /// </summary>
         public const long OriginalEditorUserId = 99999;
 
         static readonly Regex CloneFolderPattern = new Regex(@"clone_(\d+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
+        /// <summary>
+        /// UserId 속성입니다.
+        /// </summary>
         public static long UserId { get; private set; } = InvalidUserId;
         /// <summary>
         /// InitializeFromRuntime 메서드입니다.

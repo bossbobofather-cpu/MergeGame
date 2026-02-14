@@ -5,6 +5,9 @@ using UnityEngine.UI;
 
 namespace MyProject.Common.UI
 {    
+    /// <summary>
+    /// UIBase 클래스입니다.
+    /// </summary>
     public class UIBase : MonoBehaviour
     {
         /// <summary>
@@ -22,4 +25,3 @@ namespace MyProject.Common.UI
         }
     }
 }
-

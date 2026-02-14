@@ -20,7 +20,13 @@ namespace MyProject.MergeGame.Unity
             [SerializeField] private int _mapId;
             [SerializeField] private GameObject _prefab;
 
+            /// <summary>
+            /// MapId 속성입니다.
+            /// </summary>
             public int MapId => _mapId;
+            /// <summary>
+            /// Prefab 속성입니다.
+            /// </summary>
             public GameObject Prefab => _prefab;
         }
 
@@ -39,16 +45,49 @@ namespace MyProject.MergeGame.Unity
             [SerializeField] private LayerMask _cullingMask = ~0;
             [SerializeField] private float _depth = -1f;
 
+            /// <summary>
+            /// Position 속성입니다.
+            /// </summary>
             public Vector3 Position => _position;
+            /// <summary>
+            /// RotationEuler 속성입니다.
+            /// </summary>
             public Vector3 RotationEuler => _rotationEuler;
+            /// <summary>
+            /// Orthographic 속성입니다.
+            /// </summary>
             public bool Orthographic => _orthographic;
+            /// <summary>
+            /// OrthographicSize 속성입니다.
+            /// </summary>
             public float OrthographicSize => _orthographicSize;
+            /// <summary>
+            /// FieldOfView 속성입니다.
+            /// </summary>
             public float FieldOfView => _fieldOfView;
+            /// <summary>
+            /// NearClip 속성입니다.
+            /// </summary>
             public float NearClip => _nearClip;
+            /// <summary>
+            /// FarClip 속성입니다.
+            /// </summary>
             public float FarClip => _farClip;
+            /// <summary>
+            /// ClearFlags 속성입니다.
+            /// </summary>
             public CameraClearFlags ClearFlags => _clearFlags;
+            /// <summary>
+            /// BackgroundColor 속성입니다.
+            /// </summary>
             public Color BackgroundColor => _backgroundColor;
+            /// <summary>
+            /// CullingMask 속성입니다.
+            /// </summary>
             public int CullingMask => _cullingMask.value;
+            /// <summary>
+            /// Depth 속성입니다.
+            /// </summary>
             public float Depth => _depth;
         }
 
@@ -60,9 +99,21 @@ namespace MyProject.MergeGame.Unity
             [SerializeField] private int _depthBuffer = 16;
             [SerializeField] private RenderTextureFormat _format = RenderTextureFormat.ARGB32;
 
+            /// <summary>
+            /// Width 속성입니다.
+            /// </summary>
             public int Width => Mathf.Max(64, _width);
+            /// <summary>
+            /// Height 속성입니다.
+            /// </summary>
             public int Height => Mathf.Max(64, _height);
+            /// <summary>
+            /// DepthBuffer 속성입니다.
+            /// </summary>
             public int DepthBuffer => _depthBuffer;
+            /// <summary>
+            /// Format 속성입니다.
+            /// </summary>
             public RenderTextureFormat Format => _format;
         }
 
@@ -683,4 +734,3 @@ namespace MyProject.MergeGame.Unity
         }
     }
 }
-

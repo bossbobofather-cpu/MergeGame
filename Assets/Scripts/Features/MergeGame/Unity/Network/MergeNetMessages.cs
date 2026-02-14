@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Mirror;
 
 namespace MyProject.MergeGame.Unity.Network
@@ -16,8 +16,14 @@ namespace MyProject.MergeGame.Unity.Network
         InjectMonsters = 20,
     }
 
+    /// <summary>
+    /// NetAuthenticateMessage 구조체입니다.
+    /// </summary>
     public struct NetAuthenticateMessage : NetworkMessage
     {
+        /// <summary>
+        /// UserId 필드입니다.
+        /// </summary>
         public long UserId;
     }
 
@@ -26,7 +32,13 @@ namespace MyProject.MergeGame.Unity.Network
     /// </summary>
     public struct NetAuthResponseMessage : NetworkMessage
     {
+        /// <summary>
+        /// Success 필드입니다.
+        /// </summary>
         public bool Success;
+        /// <summary>
+        /// Message 필드입니다.
+        /// </summary>
         public string Message;
     }
 
@@ -35,9 +47,18 @@ namespace MyProject.MergeGame.Unity.Network
     /// </summary>
     public struct NetCommandMessage : NetworkMessage
     {
+        /// <summary>
+        /// SenderUid 필드입니다.
+        /// </summary>
         public long SenderUid;
+        /// <summary>
+        /// CommandType 필드입니다.
+        /// </summary>
         public MergeNetCommandType CommandType;
 
+        /// <summary>
+        /// Payload 필드입니다.
+        /// </summary>
         public ArraySegment<byte> Payload;
     }
 
@@ -46,9 +67,18 @@ namespace MyProject.MergeGame.Unity.Network
     /// </summary>
     public struct NetCommandResultMessage : NetworkMessage
     {
+        /// <summary>
+        /// SenderUid 필드입니다.
+        /// </summary>
         public long SenderUid;
+        /// <summary>
+        /// CommandType 필드입니다.
+        /// </summary>
         public MergeNetCommandType CommandType;
 
+        /// <summary>
+        /// Payload 필드입니다.
+        /// </summary>
         public ArraySegment<byte> Payload;
     }
 
@@ -58,8 +88,14 @@ namespace MyProject.MergeGame.Unity.Network
     /// </summary>
     public struct NetSnapshotMessage : NetworkMessage
     {
+        /// <summary>
+        /// PlayerIndex 필드입니다.
+        /// </summary>
         public int PlayerIndex;
 
+        /// <summary>
+        /// Payload 필드입니다.
+        /// </summary>
         public ArraySegment<byte> Payload;
     }
 
@@ -97,13 +133,24 @@ namespace MyProject.MergeGame.Unity.Network
     /// </summary>
     public struct NetEventMessage : NetworkMessage
     {
+        /// <summary>
+        /// PlayerIndex 필드입니다.
+        /// </summary>
         public int PlayerIndex;
+        /// <summary>
+        /// Tick 필드입니다.
+        /// </summary>
         public long Tick;
+        /// <summary>
+        /// EventType 필드입니다.
+        /// </summary>
         public MergeNetEventType EventType;
 
+        /// <summary>
+        /// Payload 필드입니다.
+        /// </summary>
         public ArraySegment<byte> Payload;
     }
 }
-
 
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Buffers.Binary;
 using System.Collections.Generic;
 using Noname.GameHost;
@@ -10,6 +10,9 @@ namespace MyProject.MergeGame.Events
     /// </summary>
     public abstract class MergeGameEvent : GameEventBase
     {
+        /// <summary>
+        /// PlayerIndex 속성입니다.
+        /// </summary>
         public int PlayerIndex { get; }
         /// <summary>
         /// base 메서드입니다.
@@ -53,6 +56,9 @@ namespace MyProject.MergeGame.Events
         }
     }
 
+    /// <summary>
+    /// ConnectedInfoEvent 클래스입니다.
+    /// </summary>
     public sealed class ConnectedInfoEvent : MergeGameEvent
     {
         /// <summary>
@@ -300,6 +306,9 @@ namespace MyProject.MergeGame.Events
         /// </summary>
         public int SlotIndex { get; }
 
+        /// <summary>
+        /// TowerMergedEvent 생성자입니다.
+        /// </summary>
         public TowerMergedEvent(
             long tick,
             int playerIndex,
@@ -619,14 +628,26 @@ namespace MyProject.MergeGame.Events
         /// 공격자 위치입니다. 
         /// </summary>
         public float AttackerX { get; }
+        /// <summary>
+        /// AttackerY 속성입니다.
+        /// </summary>
         public float AttackerY { get; }
+        /// <summary>
+        /// AttackerZ 속성입니다.
+        /// </summary>
         public float AttackerZ { get; }
 
         /// <summary>
         /// 대상 위치입니다.    
         /// </summary>
         public float TargetX { get; }
+        /// <summary>
+        /// TargetY 속성입니다.
+        /// </summary>
         public float TargetY { get; }
+        /// <summary>
+        /// TargetZ 속성입니다.
+        /// </summary>
         public float TargetZ { get; }
 
         /// <summary>
@@ -654,6 +675,9 @@ namespace MyProject.MergeGame.Events
         /// </summary>
         public long ProjectileUid { get; }
 
+        /// <summary>
+        /// TowerAttackedEvent 생성자입니다.
+        /// </summary>
         public TowerAttackedEvent(
             long tick,
             int playerIndex,
@@ -853,7 +877,13 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
         /// 이펙트 발동 위치입니다.
         /// </summary>
         public float PositionX { get; }
+        /// <summary>
+        /// PositionY 속성입니다.
+        /// </summary>
         public float PositionY { get; }
+        /// <summary>
+        /// PositionZ 속성입니다.
+        /// </summary>
         public float PositionZ { get; }
 
         /// <summary>
@@ -876,6 +906,9 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
         /// </summary>
         public long ResultTowerUid { get; }
 
+        /// <summary>
+        /// EffectTriggeredEvent 생성자입니다.
+        /// </summary>
         public EffectTriggeredEvent(
             long tick,
             int playerIndex,
@@ -1017,7 +1050,13 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
         /// 스폰 위치입니다.
         /// </summary>
         public float PositionX { get; }
+        /// <summary>
+        /// PositionY 속성입니다.
+        /// </summary>
         public float PositionY { get; }
+        /// <summary>
+        /// PositionZ 속성입니다.
+        /// </summary>
         public float PositionZ { get; }
 
         /// <summary>
@@ -1025,6 +1064,9 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
         /// </summary>
         public float MaxHealth { get; }
 
+        /// <summary>
+        /// MonsterSpawnedEvent 생성자입니다.
+        /// </summary>
         public MonsterSpawnedEvent(
             long tick,
             int playerIndex,
@@ -1155,6 +1197,9 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
         /// </summary>
         public long AttackerUid { get; }
 
+        /// <summary>
+        /// MonsterDamagedEvent 생성자입니다.
+        /// </summary>
         public MonsterDamagedEvent(
             long tick,
             int playerIndex,
@@ -1242,7 +1287,13 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
         /// 사망 위치입니다.   
         /// </summary>
         public float PositionX { get; }
+        /// <summary>
+        /// PositionY 속성입니다.
+        /// </summary>
         public float PositionY { get; }
+        /// <summary>
+        /// PositionZ 속성입니다.
+        /// </summary>
         public float PositionZ { get; }
 
         /// <summary>
@@ -1255,6 +1306,9 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
         /// </summary>
         public long KillerUid { get; }
 
+        /// <summary>
+        /// MonsterDiedEvent 생성자입니다.
+        /// </summary>
         public MonsterDiedEvent(
             long tick,
             int playerIndex,
@@ -1362,7 +1416,13 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
         /// 새 위치입니다.  
         /// </summary>
         public float PositionX { get; }
+        /// <summary>
+        /// PositionY 속성입니다.
+        /// </summary>
         public float PositionY { get; }
+        /// <summary>
+        /// PositionZ 속성입니다.
+        /// </summary>
         public float PositionZ { get; }
 
         /// <summary>
@@ -1370,6 +1430,9 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
         /// </summary>
         public float PathProgress { get; }
 
+        /// <summary>
+        /// MonsterMovedEvent 생성자입니다.
+        /// </summary>
         public MonsterMovedEvent(
             long tick,
             int playerIndex,
@@ -1491,18 +1554,36 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
         /// 소스 위치입니다.
         /// </summary>
         public float SourceX { get; }
+        /// <summary>
+        /// SourceY 속성입니다.
+        /// </summary>
         public float SourceY { get; }
+        /// <summary>
+        /// SourceZ 속성입니다.
+        /// </summary>
         public float SourceZ { get; }
 
         /// <summary>
         /// 타겟 플레이어 보드에서 주입 몬스터가 스폰되는 시작 위치입니다.
         /// </summary>
         public float TargetSpawnX { get; }
+        /// <summary>
+        /// TargetSpawnY 속성입니다.
+        /// </summary>
         public float TargetSpawnY { get; }
+        /// <summary>
+        /// TargetSpawnZ 속성입니다.
+        /// </summary>
         public float TargetSpawnZ { get; }
 
+        /// <summary>
+        /// SourcePlayerIndex 속성입니다.
+        /// </summary>
         public int SourcePlayerIndex => PlayerIndex;
 
+        /// <summary>
+        /// MonsterInjectionTriggeredEvent 생성자입니다.
+        /// </summary>
         public MonsterInjectionTriggeredEvent(
             long tick,
             int sourcePlayerIndex,
@@ -1657,11 +1738,26 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
     /// </summary>
     public sealed class DifficultyStepChangedEvent : MergeGameEvent
     {
+        /// <summary>
+        /// Step 속성입니다.
+        /// </summary>
         public int Step { get; }
+        /// <summary>
+        /// SpawnCount 속성입니다.
+        /// </summary>
         public int SpawnCount { get; }
+        /// <summary>
+        /// HealthMultiplier 속성입니다.
+        /// </summary>
         public float HealthMultiplier { get; }
+        /// <summary>
+        /// SpawnInterval 속성입니다.
+        /// </summary>
         public float SpawnInterval { get; }
 
+        /// <summary>
+        /// DifficultyStepChangedEvent 생성자입니다.
+        /// </summary>
         public DifficultyStepChangedEvent(long tick, int playerIndex, int step, int spawnCount, float healthMultiplier, float spawnInterval)
             : base(tick, playerIndex)
         {
@@ -1804,11 +1900,26 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
     /// </summary>
     public readonly struct SlotPositionData
     {
+        /// <summary>
+        /// Index 속성입니다.
+        /// </summary>
         public int Index { get; }
+        /// <summary>
+        /// X 속성입니다.
+        /// </summary>
         public float X { get; }
+        /// <summary>
+        /// Y 속성입니다.
+        /// </summary>
         public float Y { get; }
+        /// <summary>
+        /// Z 속성입니다.
+        /// </summary>
         public float Z { get; }
 
+        /// <summary>
+        /// SlotPositionData 생성자입니다.
+        /// </summary>
         public SlotPositionData(int index, float x, float y, float z)
         {
             Index = index;
@@ -1823,10 +1934,22 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
     /// </summary>
     public readonly struct PathWaypointData
     {
+        /// <summary>
+        /// X 속성입니다.
+        /// </summary>
         public float X { get; }
+        /// <summary>
+        /// Y 속성입니다.
+        /// </summary>
         public float Y { get; }
+        /// <summary>
+        /// Z 속성입니다.
+        /// </summary>
         public float Z { get; }
 
+        /// <summary>
+        /// PathWaypointData 생성자입니다.
+        /// </summary>
         public PathWaypointData(float x, float y, float z)
         {
             X = x;
@@ -1850,6 +1973,9 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
         /// </summary>
         public IReadOnlyList<PathWaypointData> Waypoints { get; }
 
+        /// <summary>
+        /// PathData 생성자입니다.
+        /// </summary>
         public PathData(int pathIndex, IReadOnlyList<PathWaypointData> waypoints)
         {
             PathIndex = pathIndex;
@@ -1878,6 +2004,9 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
         /// </summary>
         public IReadOnlyList<PathData> Paths { get; }
 
+        /// <summary>
+        /// MapInitializedEvent 생성자입니다.
+        /// </summary>
         public MapInitializedEvent(
             long tick,
             int playerIndex,
@@ -2039,7 +2168,6 @@ BinaryPrimitives.ReadInt32LittleEndian(src.Slice(offset, sizeof(float))));
 
     #endregion
 }
-
 
 
 

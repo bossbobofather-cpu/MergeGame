@@ -469,18 +469,57 @@ namespace MyProject.MergeGame.Unity
 
         private sealed class ProjectileInstance
         {
+            /// <summary>
+            /// GameObject 필드입니다.
+            /// </summary>
             public GameObject GameObject;
+            /// <summary>
+            /// Start 필드입니다.
+            /// </summary>
             public Vector3 Start;
+            /// <summary>
+            /// Target 필드입니다.
+            /// </summary>
             public Vector3 Target;
+            /// <summary>
+            /// TravelTime 필드입니다.
+            /// </summary>
             public float TravelTime;
+            /// <summary>
+            /// Elapsed 필드입니다.
+            /// </summary>
             public float Elapsed;
+            /// <summary>
+            /// Type 필드입니다.
+            /// </summary>
             public ProjectileType Type;
+            /// <summary>
+            /// ArcHeight 필드입니다.
+            /// </summary>
             public float ArcHeight;
+            /// <summary>
+            /// ThrowRadius 필드입니다.
+            /// </summary>
             public float ThrowRadius;
+            /// <summary>
+            /// RangeIndicator 필드입니다.
+            /// </summary>
             public GameObject RangeIndicator;
+            /// <summary>
+            /// IsLanded 필드입니다.
+            /// </summary>
             public bool IsLanded;
+            /// <summary>
+            /// LandedTimer 필드입니다.
+            /// </summary>
             public float LandedTimer;
+            /// <summary>
+            /// BaseScale 필드입니다.
+            /// </summary>
             public Vector3 BaseScale;
+            /// <summary>
+            /// ShouldRemove 필드입니다.
+            /// </summary>
             public bool ShouldRemove;
         }
     }

@@ -20,10 +20,19 @@ namespace MyProject.MergeGame.Unity
         [Header("Prefabs")]
         [SerializeField] private GameObject _defaultTowerPrefab;
 
+        /// <summary>
+        /// TowerPrefab 클래스입니다.
+        /// </summary>
         [Serializable]
         public class TowerPrefab
         {
+            /// <summary>
+            /// Id 필드입니다.
+            /// </summary>
             public long Id;
+            /// <summary>
+            /// Prefab 필드입니다.
+            /// </summary>
             public GameObject Prefab;
         }
 

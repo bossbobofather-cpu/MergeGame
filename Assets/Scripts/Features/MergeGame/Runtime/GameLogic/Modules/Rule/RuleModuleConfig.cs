@@ -1,125 +1,125 @@
 namespace MyProject.MergeGame.Modules
 {
     /// <summary>
-        /// 요약 설명입니다.
+        /// VictoryConditionType 열거형입니다.
         /// </summary>
     public enum VictoryConditionType
     {
         /// <summary>
-        /// 요약 설명입니다.
+        /// 점수가 목표 값에 도달하면 승리합니다.
         /// </summary>
         ScoreReach,
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// 제한 시간 또는 라운드를 생존하면 승리합니다.
         /// </summary>
         Survive,
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// 유닛 등급이 목표 값에 도달하면 승리합니다.
         /// </summary>
         UnitGradeReach,
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// 마지막까지 생존한 플레이어가 승리합니다.
         /// </summary>
         LastPlayerStanding
     }
 
     /// <summary>
-        /// 요약 설명입니다.
+        /// DefeatConditionType 열거형입니다.
         /// </summary>
     public enum DefeatConditionType
     {
         /// <summary>
-        /// 요약 설명입니다.
+        /// 플레이어 체력이 0 이하가 되면 패배합니다.
         /// </summary>
         PlayerDeath,
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// 제한 시간을 초과하면 패배합니다.
         /// </summary>
         TimeOut
     }
 
     /// <summary>
-        /// 요약 설명입니다.
+        /// SpawnRuleType 열거형입니다.
         /// </summary>
     public enum SpawnRuleType
     {
         /// <summary>
-        /// 요약 설명입니다.
+        /// 덱에서 임의의 유닛을 스폰합니다.
         /// </summary>
         RandomFromDeck,
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// 가중치 기반 확률로 유닛을 스폰합니다.
         /// </summary>
         WeightedRandom,
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// 순차 규칙에 따라 유닛을 스폰합니다.
         /// </summary>
         Sequential
     }
 
     /// <summary>
-        /// 요약 설명입니다.
+        /// RuleModuleConfig 클래스입니다.
         /// </summary>
     public sealed class RuleModuleConfig
     {
         /// <summary>
-        /// 요약 설명입니다.
+        /// VictoryCondition 속성입니다.
         /// </summary>
         public VictoryConditionType VictoryCondition { get; set; } = VictoryConditionType.LastPlayerStanding;
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// VictoryConditionValue 속성입니다.
         /// </summary>
         public int VictoryConditionValue { get; set; } = 10;
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// DefeatCondition 속성입니다.
         /// </summary>
         public DefeatConditionType DefeatCondition { get; set; } = DefeatConditionType.PlayerDeath;
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// SpawnRule 속성입니다.
         /// </summary>
         public SpawnRuleType SpawnRule { get; set; } = SpawnRuleType.RandomFromDeck;
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// InitialUnitGrade 속성입니다.
         /// </summary>
         public int InitialUnitGrade { get; set; } = 1;
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// MaxUnitGrade 속성입니다.
         /// </summary>
         public int MaxUnitGrade { get; set; } = 10;
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// UnitSpawnCost 속성입니다.
         /// </summary>
         public int UnitSpawnCost { get; set; } = 10;
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// ScorePerGrade 속성입니다.
         /// </summary>
         public int ScorePerGrade { get; set; } = 100;
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// PlayerStartGold 속성입니다.
         /// </summary>
         public int PlayerStartGold { get; set; } = 100;
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// GoldPerMonsterKill 속성입니다.
         /// </summary>
         public int GoldPerMonsterKill { get; set; } = 5;
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// RequireSameTypeForMerge 속성입니다.
         /// </summary>
         public bool RequireSameTypeForMerge { get; set; } = true;
     }

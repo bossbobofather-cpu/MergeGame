@@ -3,10 +3,13 @@ using Noname.GameHost.Module;
 namespace MyProject.MergeGame.Modules
 {
     /// <summary>
-        /// 요약 설명입니다.
+        /// RuleModule 클래스입니다.
         /// </summary>
     public sealed class RuleModule : HostModuleBase<RuleModuleConfig>
     {
+        /// <summary>
+        /// MODULE_ID 필드입니다.
+        /// </summary>
         public const string MODULE_ID = "rule";
 
         /// <inheritdoc />
@@ -16,30 +19,30 @@ namespace MyProject.MergeGame.Modules
         public override bool IsRequired => true;
 
         /// <inheritdoc />
-        public override int Priority => 90; // MapModule ?ㅼ쓬?쇰줈 珥덇린??
+        public override int Priority => 90; // MapModule 다음으로 초기화
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// VictoryCondition 속성입니다.
         /// </summary>
         public VictoryConditionType VictoryCondition => Config.VictoryCondition;
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// DefeatCondition 속성입니다.
         /// </summary>
         public DefeatConditionType DefeatCondition => Config.DefeatCondition;
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// SpawnRule 속성입니다.
         /// </summary>
         public SpawnRuleType SpawnRule => Config.SpawnRule;
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// UnitSpawnCost 속성입니다.
         /// </summary>
         public int UnitSpawnCost => Config.UnitSpawnCost;
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// MaxUnitGrade 속성입니다.
         /// </summary>
         public int MaxUnitGrade => Config.MaxUnitGrade;
 
@@ -74,24 +77,24 @@ namespace MyProject.MergeGame.Modules
         #region 검증 메서드
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// CanMerge 메서드입니다.
         /// </summary>
         public bool CanMerge(int sourceGrade, int targetGrade, string sourceType, string targetType, out string failReason)
         {
             failReason = null;
             if (sourceGrade != targetGrade)
             {
-                failReason = "?깃툒???ㅻ쫭?덈떎.";
+                failReason = "등급이 일치하지 않습니다.";
                 return false;
             }
             if (sourceGrade >= Config.MaxUnitGrade)
             {
-                failReason = "理쒕? ?깃툒???꾨떖?덉뒿?덈떎.";
+                failReason = "최대 등급에 도달했습니다.";
                 return false;
             }
             if (Config.RequireSameTypeForMerge && sourceType != targetType)
             {
-                failReason = "??낆씠 ?ㅻ쫭?덈떎.";
+                failReason = "타입이 일치하지 않습니다.";
                 return false;
             }
 
@@ -99,7 +102,7 @@ namespace MyProject.MergeGame.Modules
         }
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// CanSpawn 메서드입니다.
         /// </summary>
         public bool CanSpawn(int currentGold, out string failReason)
         {
@@ -115,7 +118,7 @@ namespace MyProject.MergeGame.Modules
         }
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// CheckGameEnd 메서드입니다.
         /// </summary>
         public (bool isEnd, bool isVictory) CheckGameEnd(
             int currentHp,
@@ -153,10 +156,10 @@ namespace MyProject.MergeGame.Modules
 
         #endregion
 
-        #region 계산 메서??
+        #region 계산 메서드
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// CalculateMergeScore 메서드입니다.
         /// </summary>
         public int CalculateMergeScore(int resultGrade)
         {
@@ -164,7 +167,7 @@ namespace MyProject.MergeGame.Modules
         }
 
         /// <summary>
-        /// 요약 설명입니다.
+        /// CalculateMonsterKillReward 메서드입니다.
         /// </summary>
         public (int gold, int score) CalculateMonsterKillReward(string monsterId)
         {
@@ -172,12 +175,9 @@ namespace MyProject.MergeGame.Modules
             return (Config.GoldPerMonsterKill, 10);
         }
 
-        /// <summary>
-        /// 요약 설명입니다.
-        /// </summary>
         #endregion
 
-        #region ?대? ?대깽???몃뱾??
+        #region 내부 이벤트 핸들러
         /// <summary>
         /// OnMergeValidationRequest 메서드입니다.
         /// </summary>

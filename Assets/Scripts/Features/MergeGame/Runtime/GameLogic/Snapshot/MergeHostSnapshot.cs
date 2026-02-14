@@ -32,6 +32,9 @@ namespace MyProject.MergeGame.Snapshots
         /// </summary>
         public bool IsEmpty => TowerUid == 0;
 
+        /// <summary>
+        /// SlotSnapshot 생성자입니다.
+        /// </summary>
         public SlotSnapshot(int index, long unitUid, int unitGrade)
         {
             Index = index;
@@ -115,6 +118,9 @@ namespace MyProject.MergeGame.Snapshots
         /// </summary>
         public float ThrowRadius { get; }
 
+        /// <summary>
+        /// TowerSnapshot 생성자입니다.
+        /// </summary>
         public TowerSnapshot(
             long uid,
             long towerId,
@@ -208,6 +214,9 @@ namespace MyProject.MergeGame.Snapshots
         /// </summary>
         public float HealthRatio => MaxHealth > 0 ? CurrentHealth / MaxHealth : 0f;
 
+        /// <summary>
+        /// MonsterSnapshot 생성자입니다.
+        /// </summary>
         public MonsterSnapshot(
             long uid,
             long monsterId,
@@ -238,17 +247,50 @@ namespace MyProject.MergeGame.Snapshots
     /// </summary>
     public readonly struct ProjectileSnapshot
     {
+        /// <summary>
+        /// Uid 속성입니다.
+        /// </summary>
         public long Uid { get; }
+        /// <summary>
+        /// StartX 속성입니다.
+        /// </summary>
         public float StartX { get; }
+        /// <summary>
+        /// StartY 속성입니다.
+        /// </summary>
         public float StartY { get; }
+        /// <summary>
+        /// StartZ 속성입니다.
+        /// </summary>
         public float StartZ { get; }
+        /// <summary>
+        /// ImpactX 속성입니다.
+        /// </summary>
         public float ImpactX { get; }
+        /// <summary>
+        /// ImpactY 속성입니다.
+        /// </summary>
         public float ImpactY { get; }
+        /// <summary>
+        /// ImpactZ 속성입니다.
+        /// </summary>
         public float ImpactZ { get; }
+        /// <summary>
+        /// Progress 속성입니다.
+        /// </summary>
         public float Progress { get; }
+        /// <summary>
+        /// ProjectileType 속성입니다.
+        /// </summary>
         public ProjectileType ProjectileType { get; }
+        /// <summary>
+        /// IsLanded 속성입니다.
+        /// </summary>
         public bool IsLanded { get; }
 
+        /// <summary>
+        /// ProjectileSnapshot 생성자입니다.
+        /// </summary>
         public ProjectileSnapshot(
             long uid,
             float startX, float startY, float startZ,
@@ -669,4 +711,3 @@ namespace MyProject.MergeGame.Snapshots
         }
     }
 }
-

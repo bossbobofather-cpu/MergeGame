@@ -1,5 +1,19 @@
 {
   "dependencies": {
+    "com.noname.gameabilitysystemforunity": {
+      "version": "https://github.com/bossbobofather-cpu/GameAbilitySystemForUnity.git#v0.1.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "43cd4fba08ce682b797c738e98d74f3a742eef20"
+    },
+    "com.noname.gamehost": {
+      "version": "https://github.com/bossbobofather-cpu/GameHost.git#v0.1.0",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "c396e4974ddf7d7b968dd9158a15db99ac96efc3"
+    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,

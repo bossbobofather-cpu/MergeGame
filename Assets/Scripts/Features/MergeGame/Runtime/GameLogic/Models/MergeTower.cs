@@ -87,6 +87,9 @@ namespace MyProject.MergeGame.Models
         /// </summary>
         public List<GameplayEffect> OnMergeTargetEffects { get; }
 
+        /// <summary>
+        /// MergeTower 생성자입니다.
+        /// </summary>
         public MergeTower(
             long uid,
             long towerId,

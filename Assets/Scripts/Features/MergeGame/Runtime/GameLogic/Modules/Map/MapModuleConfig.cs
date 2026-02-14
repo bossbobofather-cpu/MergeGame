@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Noname.GameAbilitySystem;
 
 namespace MyProject.MergeGame.Modules
@@ -8,11 +8,26 @@ namespace MyProject.MergeGame.Modules
     /// </summary>
     public struct SlotDefinition
     {
+        /// <summary>
+        /// Index 필드입니다.
+        /// </summary>
         public int Index;
+        /// <summary>
+        /// X 필드입니다.
+        /// </summary>
         public float X;
+        /// <summary>
+        /// Y 필드입니다.
+        /// </summary>
         public float Y;
+        /// <summary>
+        /// Z 필드입니다.
+        /// </summary>
         public float Z;
 
+        /// <summary>
+        /// SlotDefinition 생성자입니다.
+        /// </summary>
         public SlotDefinition(int index, float x, float y, float z)
         {
             Index = index;
@@ -21,6 +36,9 @@ namespace MyProject.MergeGame.Modules
             Z = z;
         }
 
+        /// <summary>
+        /// ToPoint3D 메서드입니다.
+        /// </summary>
         public Point3D ToPoint3D() => new Point3D(X, Y, Z);
     }
 
@@ -29,9 +47,18 @@ namespace MyProject.MergeGame.Modules
     /// </summary>
     public struct PathDefinition
     {
+        /// <summary>
+        /// PathIndex 필드입니다.
+        /// </summary>
         public int PathIndex;
+        /// <summary>
+        /// Waypoints 필드입니다.
+        /// </summary>
         public List<Point3D> Waypoints;
 
+        /// <summary>
+        /// PathDefinition 생성자입니다.
+        /// </summary>
         public PathDefinition(int pathIndex, List<Point3D> waypoints)
         {
             PathIndex = pathIndex;
